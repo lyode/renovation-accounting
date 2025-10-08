@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
-   <!-- Favicons -->
-<link rel="icon" type="image/x-icon" href="./favicon.ico">
-<link rel="icon" type="image/png" sizes="96x96" href="./favicon-96x96.png">
-<link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
-<title>Renovation Accounting</title>
-
-<!-- PWA Manifest -->
-<link rel="manifest" href="./manifest.json">
-  
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#7899b3">
+    
+    <!-- Favicons -->
+    <link rel="icon" type="image/x-icon" href="./favicon.ico">
+    <link rel="icon" type="image/png" sizes="96x96" href="./favicon-96x96.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./apple-touch-icon.png">
+    <title>Renovation Accounting</title>
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="./manifest.json">
+    
     <style>
         * { 
             margin: 0; 
@@ -24,7 +27,6 @@
         }
         
         :root {
-            /* Darker Pastel Blue (Default) */
             --primary-color: #7899b3;
             --primary-dark: #5879a3;
             --primary-light: #a8c5d6;
@@ -33,23 +35,13 @@
             --text-color: #1f2937;
             --text-secondary: #6b7280;
             --border-color: #e5e7eb;
-            
-            /* Contrast levels */
             --contrast: 1;
             --brightness: 1;
         }
         
         /* Contrast Adjustments */
-        body.low-contrast {
-            --contrast: 0.85;
-            --brightness: 1.05;
-        }
-        
-        body.high-contrast {
-            --contrast: 1.25;
-            --brightness: 0.95;
-        }
-        
+        body.low-contrast { --contrast: 0.85; --brightness: 1.05; }
+        body.high-contrast { --contrast: 1.25; --brightness: 0.95; }
         body.extra-high-contrast {
             --contrast: 1.5;
             --brightness: 0.9;
@@ -58,62 +50,19 @@
             --border-color: #9ca3af;
         }
         
-        /* Apply contrast filter */
-        body {
-            filter: contrast(var(--contrast)) brightness(var(--brightness));
-        }
+        body { filter: contrast(var(--contrast)) brightness(var(--brightness)); }
         
-        /* Darker Pastel Themes */
-        body.theme-green { 
-            --primary-color: #7fa67f; 
-            --primary-dark: #6f966f;
-            --primary-light: #a8c6a8;
-        }
-        body.theme-purple { 
-            --primary-color: #8b7aa8; 
-            --primary-dark: #6b5a88;
-            --primary-light: #b19cd9;
-        }
-        body.theme-teal { 
-            --primary-color: #6fa0a0; 
-            --primary-dark: #5f9090;
-            --primary-light: #8fc4c4;
-        }
-        body.theme-pink { 
-            --primary-color: #d99ea7; 
-            --primary-dark: #c98e97;
-            --primary-light: #f0b8c1;
-        }
-        body.theme-orange { 
-            --primary-color: #d9a673; 
-            --primary-dark: #c99663;
-            --primary-light: #f0c493;
-        }
-        body.theme-indigo { 
-            --primary-color: #8185c9; 
-            --primary-dark: #6165b9;
-            --primary-light: #a1a5e9;
-        }
-        body.theme-emerald { 
-            --primary-color: #6fa882; 
-            --primary-dark: #5f9872;
-            --primary-light: #8fc8a2;
-        }
-        body.theme-rose { 
-            --primary-color: #d98c9c; 
-            --primary-dark: #c97c8c;
-            --primary-light: #f9acbc;
-        }
-        body.theme-amber { 
-            --primary-color: #d9a55c; 
-            --primary-dark: #c9954c;
-            --primary-light: #f9c57c;
-        }
-        body.theme-violet { 
-            --primary-color: #9c7ac9; 
-            --primary-dark: #8c6ab9;
-            --primary-light: #bc9ae9;
-        }
+        /* Themes */
+        body.theme-green { --primary-color: #7fa67f; --primary-dark: #6f966f; --primary-light: #a8c6a8; }
+        body.theme-purple { --primary-color: #8b7aa8; --primary-dark: #6b5a88; --primary-light: #b19cd9; }
+        body.theme-teal { --primary-color: #6fa0a0; --primary-dark: #5f9090; --primary-light: #8fc4c4; }
+        body.theme-pink { --primary-color: #d99ea7; --primary-dark: #c98e97; --primary-light: #f0b8c1; }
+        body.theme-orange { --primary-color: #d9a673; --primary-dark: #c99663; --primary-light: #f0c493; }
+        body.theme-indigo { --primary-color: #8185c9; --primary-dark: #6165b9; --primary-light: #a1a5e9; }
+        body.theme-emerald { --primary-color: #6fa882; --primary-dark: #5f9872; --primary-light: #8fc8a2; }
+        body.theme-rose { --primary-color: #d98c9c; --primary-dark: #c97c8c; --primary-light: #f9acbc; }
+        body.theme-amber { --primary-color: #d9a55c; --primary-dark: #c9954c; --primary-light: #f9c57c; }
+        body.theme-violet { --primary-color: #9c7ac9; --primary-dark: #8c6ab9; --primary-light: #bc9ae9; }
         
         /* Night Mode */
         body.night-mode {
@@ -168,8 +117,9 @@
         .settings-panel {
             position: fixed;
             top: 0;
-            right: -280px;
-            width: 280px;
+            right: -100%;
+            width: 90%;
+            max-width: 360px;
             height: 100%;
             background: var(--card-bg);
             box-shadow: -2px 0 10px rgba(0,0,0,0.2);
@@ -216,6 +166,49 @@
             color: var(--text-color);
             margin-bottom: 0.5rem;
             display: block;
+        }
+        
+        .settings-info {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+        
+        /* API Input Styling */
+        .api-input-group {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .api-input-group input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+        
+        .api-status {
+            padding: 0.5rem;
+            border-radius: 0.375rem;
+            font-size: 0.75rem;
+            margin-bottom: 0.75rem;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .api-status.connected {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .api-status.disconnected {
+            background: #fee2e2;
+            color: #991b1b;
         }
         
         .contrast-buttons {
@@ -292,6 +285,7 @@
             justify-content: center;
             align-items: center;
             gap: 10px;
+            flex-wrap: wrap;
         }
         
         .sync-status-bar.syncing {
@@ -450,6 +444,7 @@
             border-bottom-color: var(--primary-color); 
         }
         
+        /* Content - Responsive */
         .content { 
             padding: 1rem; 
             max-width: 100%; 
@@ -459,6 +454,7 @@
         
         .stat-grid { 
             display: grid; 
+            grid-template-columns: 1fr;
             gap: 0.75rem; 
             margin-bottom: 1rem; 
         }
@@ -728,14 +724,50 @@
             transform: scale(0.95);
         }
         
-        /* Responsive for tablets */
+        /* Responsive - Tablet & Desktop */
         @media (min-width: 640px) {
             .content { 
-                max-width: 640px; 
+                max-width: 680px; 
                 margin: 0 auto;
+                padding: 1.5rem;
+                padding-bottom: 5rem;
             }
+            
+            .stat-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
             .modal-content {
                 max-width: 500px;
+            }
+            
+            .settings-panel {
+                max-width: 400px;
+            }
+        }
+        
+        /* Desktop */
+        @media (min-width: 1024px) {
+            .content {
+                max-width: 900px;
+                padding: 2rem;
+                padding-bottom: 5rem;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .header p {
+                font-size: 0.875rem;
+            }
+        }
+        
+        /* iPhone 15 Pro Max specific */
+        @media (max-width: 430px) {
+            .sync-status-bar {
+                font-size: 10px;
+                padding: 3px 8px;
             }
         }
         
@@ -784,18 +816,53 @@
             <button class="close-settings" onclick="toggleSettings()">✕</button>
         </div>
         
+        <!-- API Key Management -->
         <div class="settings-section">
-            <label class="settings-label">Sync Status</label>
-            <div style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 0.5rem;">
+            <label class="settings-label">🔑 API Key Setup</label>
+            <div class="api-status" id="apiStatus">Not Connected</div>
+            
+            <div class="api-input-group">
+                <input 
+                    type="password" 
+                    id="apiKeyInput" 
+                    placeholder="Enter JSONBin API Key"
+                    class="form-input"
+                >
+                <button class="btn btn-small btn-primary" onclick="saveApiKey()" style="width: auto;">Save</button>
+            </div>
+            
+            <div class="settings-info">
+                Get your free API key from <a href="https://jsonbin.io" target="_blank" style="color: var(--primary-color); text-decoration: underline;">jsonbin.io</a>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="removeApiKey()" style="font-size: 0.8125rem;">Remove API Key</button>
+        </div>
+        
+        <!-- Auto-Sync Toggle -->
+        <div class="settings-section">
+            <label class="settings-label">⚡ Auto Sync</label>
+            <div class="toggle-switch">
+                <span class="settings-info" style="margin: 0; flex: 1;">Sync every 5 minutes</span>
+                <input type="checkbox" id="auto-sync-toggle" onchange="toggleAutoSync()">
+            </div>
+            <div class="settings-info" id="autoSyncStatus">Auto-sync is disabled</div>
+        </div>
+        
+        <!-- Sync Status -->
+        <div class="settings-section">
+            <label class="settings-label">📊 Sync Status</label>
+            <div class="settings-info">
                 Device: <strong id="settingsDevice">Mobile</strong><br>
                 Mode: <strong id="settingsMode">Manual Sync Only</strong><br>
                 Last Sync: <strong id="settingsLastSync">Never</strong>
             </div>
-            <button class="btn btn-primary" onclick="forceCloudPull()" style="margin-bottom: 0.5rem;">Force Pull from Cloud</button>
+            <button class="btn btn-primary" onclick="syncData()" style="margin-bottom: 0.5rem;">Manual Sync Now</button>
+            <button class="btn btn-secondary" onclick="forceCloudPull()" style="margin-bottom: 0;">Force Pull from Cloud</button>
         </div>
         
+        <!-- Page Contrast -->
         <div class="settings-section">
-            <label class="settings-label">Page Contrast</label>
+            <label class="settings-label">🎨 Page Contrast</label>
             <div class="contrast-buttons">
                 <button class="contrast-btn" onclick="setContrast('normal')" id="contrast-normal">Normal</button>
                 <button class="contrast-btn" onclick="setContrast('low')" id="contrast-low">Low</button>
@@ -804,15 +871,17 @@
             </div>
         </div>
         
+        <!-- Night Mode -->
         <div class="settings-section">
             <div class="toggle-switch">
-                <span class="settings-label" style="margin: 0;">Night Mode</span>
+                <span class="settings-label" style="margin: 0;">🌙 Night Mode</span>
                 <input type="checkbox" id="night-toggle" onchange="toggleDayNight()">
             </div>
         </div>
         
+        <!-- Color Theme -->
         <div class="settings-section">
-            <label class="settings-label">Color Theme</label>
+            <label class="settings-label">🎨 Color Theme</label>
             <div class="theme-grid">
                 <button onclick="setTheme('default')" class="theme-btn" style="background: #7899b3;">Blue</button>
                 <button onclick="setTheme('green')" class="theme-btn" style="background: #7fa67f;">Green</button>
@@ -829,10 +898,11 @@
             </div>
         </div>
         
+        <!-- Export/Import -->
         <div class="settings-section">
-            <button class="btn btn-primary" onclick="exportData()">Export Data</button>
+            <button class="btn btn-primary" onclick="exportData()">📥 Export Data</button>
             <label class="btn btn-success" style="display: block; text-align: center;">
-                Import Data
+                📤 Import Data
                 <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
             </label>
         </div>
@@ -968,18 +1038,18 @@
         // PWA Support
         let deferredPrompt;
         
-      // Register Service Worker for PWA
-if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
-            .then(registration => {
-                console.log('ServiceWorker registered:', registration.scope);
-            })
-            .catch(err => {
-                console.log('ServiceWorker registration failed:', err);
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed:', err);
+                    });
             });
-    });
-}
+        }
         
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -1008,6 +1078,10 @@ if ('serviceWorker' in navigator) {
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         const deviceType = isMobile ? 'Mobile' : 'Laptop';
         
+        // AUTO-SYNC VARIABLES
+        let autoSyncInterval = null;
+        const AUTO_SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
+        
         // Mobile-First Cloud Sync Manager
         class MobileFirstCloudSync {
             constructor() {
@@ -1022,40 +1096,12 @@ if ('serviceWorker' in navigator) {
             
             async setup() {
                 if (!this.apiKey) {
-                    const apiKey = prompt('Enter your JSONBin API Key (same as Team Projects app):');
-                    if (!apiKey) {
-                        alert('Sync cancelled. You can set it up later from the cloud button.');
-                        return false;
-                    }
-                    
-                    this.apiKey = apiKey;
-                    localStorage.setItem('accountingSyncApiKey', apiKey);
-                    
-                    // Test the API key
-                    try {
-                        const response = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
-                            headers: {
-                                'X-Master-Key': this.apiKey
-                            }
-                        });
-                        
-                        if (!response.ok) throw new Error('Invalid API key');
-                        
-                        this.showStatus('✅ Cloud sync connected!');
-                        updateSyncStatus('Connected', true);
-                        return true;
-                    } catch (error) {
-                        alert('Invalid API key. Please check and try again.');
-                        localStorage.removeItem('accountingSyncApiKey');
-                        this.apiKey = '';
-                        return false;
-                    }
+                    return false;
                 }
                 return true;
             }
             
             async push(forceUpdate = false) {
-                // Prevent multiple simultaneous syncs
                 if (this.isSyncing) {
                     this.syncQueue = true;
                     return false;
@@ -1067,7 +1113,6 @@ if ('serviceWorker' in navigator) {
                 updateSyncStatus('Syncing...', true);
                 
                 try {
-                    // Add device info and timestamp to data
                     const pushData = {
                         projects: projects,
                         transactions: transactions,
@@ -1096,7 +1141,6 @@ if ('serviceWorker' in navigator) {
                         updateLastSyncDisplay();
                         this.isSyncing = false;
                         
-                        // Handle queued sync if any
                         if (this.syncQueue) {
                             this.syncQueue = false;
                             setTimeout(() => this.push(), 2000);
@@ -1133,11 +1177,8 @@ if ('serviceWorker' in navigator) {
                         const result = await response.json();
                         const cloudData = result.record;
                         
-                        // Check if cloud data is newer or force pull
                         if (force || !cloudData.lastUpdated || new Date(cloudData.lastUpdated) > new Date(localStorage.getItem('lastLocalUpdate') || 0)) {
-                            // Merge or replace based on device type
                             if (this.isMobile && !force) {
-                                // Mobile: Only pull if explicitly requested or cloud is significantly newer
                                 if (confirm(`Cloud data from ${cloudData.lastUpdateDevice || 'unknown device'}. Replace your local data?`)) {
                                     this.applyCloudData(cloudData);
                                 } else {
@@ -1145,7 +1186,6 @@ if ('serviceWorker' in navigator) {
                                     return false;
                                 }
                             } else {
-                                // Laptop: Always pull before working
                                 this.applyCloudData(cloudData);
                             }
                         }
@@ -1172,7 +1212,6 @@ if ('serviceWorker' in navigator) {
                 projects = cloudData.projects || [];
                 transactions = cloudData.transactions || [];
                 
-                // Apply theme settings
                 if (cloudData.theme) {
                     setTheme(cloudData.theme);
                 }
@@ -1187,7 +1226,6 @@ if ('serviceWorker' in navigator) {
                     setContrast(cloudData.contrast);
                 }
                 
-                // Save to localStorage
                 localStorage.setItem('offlineProjects', JSON.stringify(projects));
                 localStorage.setItem('offlineTransactions', JSON.stringify(transactions));
                 
@@ -1215,23 +1253,149 @@ if ('serviceWorker' in navigator) {
         const expenseCategories = ['Materials', 'Labor', 'Tools & Equipment', 'Transportation', 'Permits', 'Subcontractors', 'Other'];
         const incomeCategories = ['Project Payment', 'Deposit', 'Final Payment', 'Other Income'];
         
+        // API KEY MANAGEMENT FUNCTIONS
+        function saveApiKey() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            
+            if (!apiKey) {
+                alert('Please enter an API key');
+                return;
+            }
+            
+            cloudSync.apiKey = apiKey;
+            
+            // Test the API key
+            fetch(`${cloudSync.baseUrl}/b/${cloudSync.binId}/latest`, {
+                headers: {
+                    'X-Master-Key': apiKey
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    localStorage.setItem('accountingSyncApiKey', apiKey);
+                    document.getElementById('apiKeyInput').value = '';
+                    updateApiStatus();
+                    alert('✅ API Key saved successfully!');
+                } else {
+                    cloudSync.apiKey = '';
+                    alert('❌ Invalid API key. Please check and try again.');
+                }
+            })
+            .catch(error => {
+                cloudSync.apiKey = '';
+                alert('❌ Invalid API key. Please check and try again.');
+            });
+        }
+        
+        function removeApiKey() {
+            if (confirm('Remove API key? This will disable cloud sync.')) {
+                localStorage.removeItem('accountingSyncApiKey');
+                cloudSync.apiKey = '';
+                stopAutoSync();
+                document.getElementById('auto-sync-toggle').checked = false;
+                localStorage.setItem('autoSyncEnabled', 'false');
+                updateApiStatus();
+                updateAutoSyncStatus();
+                alert('API key removed');
+            }
+        }
+        
+        function updateApiStatus() {
+            const statusEl = document.getElementById('apiStatus');
+            const hasKey = !!cloudSync.apiKey;
+            
+            if (hasKey) {
+                statusEl.textContent = '✅ Connected';
+                statusEl.className = 'api-status connected';
+            } else {
+                statusEl.textContent = '❌ Not Connected';
+                statusEl.className = 'api-status disconnected';
+            }
+        }
+        
+        // AUTO-SYNC FUNCTIONS
+        function toggleAutoSync() {
+            const enabled = document.getElementById('auto-sync-toggle').checked;
+            
+            if (enabled && !cloudSync.apiKey) {
+                alert('Please set up your API key first');
+                document.getElementById('auto-sync-toggle').checked = false;
+                return;
+            }
+            
+            if (enabled) {
+                startAutoSync();
+                localStorage.setItem('autoSyncEnabled', 'true');
+            } else {
+                stopAutoSync();
+                localStorage.setItem('autoSyncEnabled', 'false');
+            }
+            
+            updateAutoSyncStatus();
+        }
+        
+        function startAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+            }
+            
+            autoSyncInterval = setInterval(async () => {
+                console.log('Auto-syncing...');
+                await cloudSync.push();
+            }, AUTO_SYNC_INTERVAL);
+            
+            console.log('Auto-sync enabled: every 5 minutes');
+        }
+        
+        function stopAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+            }
+            console.log('Auto-sync disabled');
+        }
+        
+        function updateAutoSyncStatus() {
+            const enabled = document.getElementById('auto-sync-toggle').checked;
+            const statusEl = document.getElementById('autoSyncStatus');
+            const settingsModeEl = document.getElementById('settingsMode');
+            
+            if (enabled) {
+                statusEl.textContent = '✅ Auto-sync active (every 5 minutes)';
+                statusEl.style.color = '#065f46';
+                settingsModeEl.textContent = 'Auto Sync (5 min)';
+            } else {
+                statusEl.textContent = '⏸️ Auto-sync is disabled';
+                statusEl.style.color = 'var(--text-secondary)';
+                settingsModeEl.textContent = 'Manual Sync Only';
+            }
+        }
+        
+        // INITIALIZATION FUNCTION
+        function initializeSettings() {
+            updateApiStatus();
+            
+            const autoSyncEnabled = localStorage.getItem('autoSyncEnabled') === 'true';
+            document.getElementById('auto-sync-toggle').checked = autoSyncEnabled;
+            
+            if (autoSyncEnabled && cloudSync.apiKey) {
+                startAutoSync();
+            }
+            
+            updateAutoSyncStatus();
+        }
+        
         // Update sync status display
         function updateSyncStatus(status, isLoading) {
             const statusBar = document.getElementById('syncStatusBar');
             const syncMode = document.getElementById('syncMode');
-            const settingsMode = document.getElementById('settingsMode');
             const settingsDevice = document.getElementById('settingsDevice');
             
-            // Update device type
             document.getElementById('deviceType').textContent = deviceType;
             settingsDevice.textContent = deviceType;
             
-            // Update sync mode
-            const mode = 'Manual Sync Only';
             syncMode.textContent = status;
-            settingsMode.textContent = mode;
             
-            // Update status bar appearance
             statusBar.classList.remove('syncing', 'success', 'error');
             if (isLoading) {
                 statusBar.classList.add('syncing');
@@ -1259,9 +1423,8 @@ if ('serviceWorker' in navigator) {
             }
         }
         
-        // Load data with mobile-first approach
+        // Load data
         async function loadData() {
-            // Load from localStorage first
             const savedProjects = localStorage.getItem('offlineProjects');
             const savedTrans = localStorage.getItem('offlineTransactions');
             
@@ -1271,54 +1434,44 @@ if ('serviceWorker' in navigator) {
             render();
             updateSyncStatus('Local Data', false);
             
-            // Different behavior for mobile vs laptop
             if (cloudSync.apiKey) {
                 if (!isMobile) {
-                    // Laptop: Always pull latest on startup
                     await cloudSync.pull();
                 }
-                // Mobile: Don't auto-pull, keep local data primary
                 updateLastSyncDisplay();
             }
         }
         
-        // Save data - NO automatic sync on changes
+        // Save data
         async function saveData() {
-            // Save locally first
             localStorage.setItem('offlineProjects', JSON.stringify(projects));
             localStorage.setItem('offlineTransactions', JSON.stringify(transactions));
             localStorage.setItem('lastLocalUpdate', new Date().toISOString());
-            
-            // Mobile: No automatic sync on changes (only via interval or manual)
-            // Laptop: Manual sync only
         }
         
-        // Manual sync button - same behavior for both mobile and laptop
+        // Manual sync button
         async function syncData() {
             if (!cloudSync.apiKey) {
-                const success = await cloudSync.setup();
-                if (success) {
-                    // After setup, offer choice
-                    const action = confirm('Choose action:\n\n📤 OK = Push to cloud\n📥 Cancel = Pull from cloud');
-                    if (action) {
-                        await cloudSync.push();
-                    } else {
-                        await cloudSync.pull();
-                    }
-                }
+                alert('Please set up your API key in Settings first');
+                toggleSettings();
+                return;
+            }
+            
+            const action = confirm('Choose action:\n\n📤 OK = Push to cloud\n📥 Cancel = Pull from cloud');
+            if (action) {
+                await cloudSync.push();
             } else {
-                // Both mobile and laptop get the same choice when manually syncing
-                const action = confirm('Choose action:\n\n📤 OK = Push to cloud\n📥 Cancel = Pull from cloud');
-                if (action) {
-                    await cloudSync.push();
-                } else {
-                    await cloudSync.pull();
-                }
+                await cloudSync.pull();
             }
         }
         
-        // Force pull from cloud (for emergency recovery)
+        // Force pull from cloud
         async function forceCloudPull() {
+            if (!cloudSync.apiKey) {
+                alert('Please set up your API key in Settings first');
+                return;
+            }
+            
             if (confirm('WARNING: This will replace ALL local data with cloud data. Continue?')) {
                 await cloudSync.pull(true);
                 toggleSettings();
@@ -1386,7 +1539,6 @@ if ('serviceWorker' in navigator) {
             }
             localStorage.setItem('appTheme', theme);
             
-            // Update theme color meta tag
             const themeColors = {
                 'default': '#7899b3',
                 'green': '#7fa67f',
@@ -1433,7 +1585,6 @@ if ('serviceWorker' in navigator) {
             document.getElementById('project-detail-tab').classList.add('hidden');
             document.getElementById(tabName + '-tab').classList.remove('hidden');
             
-            // Update FAB based on tab
             const fab = document.getElementById('fab');
             if (tabName === 'project-detail') {
                 fab.style.display = 'none';
@@ -1656,7 +1807,7 @@ if ('serviceWorker' in navigator) {
             }
         }
         
-        // Form submissions with immediate sync
+        // Form submissions
         document.getElementById('transaction-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             const lockedProject = document.getElementById('trans-locked-project').value;
@@ -1726,7 +1877,7 @@ if ('serviceWorker' in navigator) {
             return { income: income, expense: expense, profit: income - expense };
         }
         
-        // Delete functions with sync
+        // Delete functions
         async function deleteTransaction(id) {
             if (confirm('Delete this transaction?')) {
                 transactions = transactions.filter(t => t.id !== id);
@@ -1926,6 +2077,7 @@ if ('serviceWorker' in navigator) {
         // Initialize app
         loadTheme();
         loadData();
+        initializeSettings(); // NEW: Initialize settings including auto-sync
         updateSyncStatus('Loading...', false);
         updateLastSyncDisplay();
         
@@ -1943,14 +2095,15 @@ if ('serviceWorker' in navigator) {
             }
         }, { passive: false });
         
-        // Connection status check only (no auto-sync)
+        // Connection status check
         setInterval(() => {
             if (!navigator.onLine) {
                 updateSyncStatus('Offline', false);
             } else if (cloudSync.apiKey) {
-                updateSyncStatus('Ready', false);
+                const autoSyncEnabled = document.getElementById('auto-sync-toggle').checked;
+                updateSyncStatus(autoSyncEnabled ? 'Auto Sync Active' : 'Ready', false);
             }
-        }, 30000); // Check connection every 30 seconds
+        }, 30000);
     </script>
 </body>
 </html>
