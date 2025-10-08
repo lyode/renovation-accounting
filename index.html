@@ -63,6 +63,14 @@
         body.theme-rose { --primary-color: #d98c9c; --primary-dark: #c97c8c; --primary-light: #f9acbc; }
         body.theme-amber { --primary-color: #d9a55c; --primary-dark: #c9954c; --primary-light: #f9c57c; }
         body.theme-violet { --primary-color: #9c7ac9; --primary-dark: #8c6ab9; --primary-light: #bc9ae9; }
+        body.theme-cyan { --primary-color: #67c5c5; --primary-dark: #57b5b5; --primary-light: #87e5e5; }
+        body.theme-lime { --primary-color: #9fb86f; --primary-dark: #8fa85f; --primary-light: #bfd88f; }
+        body.theme-coral { --primary-color: #f08080; --primary-dark: #e07070; --primary-light: #ffa0a0; }
+        body.theme-sky { --primary-color: #87ceeb; --primary-dark: #77bedb; --primary-light: #a7eeff; }
+        body.theme-lavender { --primary-color: #b8a0d6; --primary-dark: #a890c6; --primary-light: #d8c0f6; }
+        body.theme-mint { --primary-color: #98d8c8; --primary-dark: #88c8b8; --primary-light: #b8f8e8; }
+        body.theme-peach { --primary-color: #ffb380; --primary-dark: #efa370; --primary-light: #ffd3a0; }
+        body.theme-navy { --primary-color: #5f7a9f; --primary-dark: #4f6a8f; --primary-light: #7f9abf; }
         
         /* Night Mode */
         body.night-mode {
@@ -201,10 +209,18 @@
             padding: 1.25rem;
             border-radius: 0.5rem;
             margin-bottom: 1.5rem;
+            display: block;
+            visibility: visible;
         }
         
         body.night-mode .api-section-highlight {
             background: linear-gradient(135deg, rgba(120, 153, 179, 0.2) 0%, rgba(88, 121, 163, 0.2) 100%);
+        }
+        
+        @media (min-width: 768px) {
+            .api-section-highlight {
+                padding: 1.5rem;
+            }
         }
         
         /* API Input Styling */
@@ -750,6 +766,13 @@
             margin-top: 0.5rem;
         }
         
+        @media (min-width: 400px) {
+            .theme-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 0.5rem;
+            }
+        }
+        
         .theme-btn {
             padding: 0.625rem 0.25rem;
             border: none;
@@ -759,10 +782,18 @@
             color: white;
             font-weight: 500;
             transition: transform 0.2s;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
         }
         
         .theme-btn:active {
             transform: scale(0.95);
+        }
+        
+        @media (min-width: 400px) {
+            .theme-btn {
+                font-size: 0.6875rem;
+                padding: 0.75rem 0.5rem;
+            }
         }
         
         /* Responsive - Tablet & Desktop */
@@ -857,8 +888,8 @@
             <button class="close-settings" onclick="toggleSettings()">✕</button>
         </div>
         
-        <!-- 1. API Key Setup -->
-        <div class="api-section-highlight">
+        <!-- 1. API Key Setup - MUST BE FIRST -->
+        <div class="settings-section api-section-highlight">
             <label class="settings-label" style="font-size: 1rem; margin-bottom: 0.75rem;">🔑 API Key Setup</label>
             <div class="api-status" id="apiStatus">Not Connected</div>
             
@@ -935,6 +966,14 @@
                 <button onclick="setTheme('rose')" class="theme-btn" style="background: #d98c9c;">Rose</button>
                 <button onclick="setTheme('amber')" class="theme-btn" style="background: #d9a55c;">Amber</button>
                 <button onclick="setTheme('violet')" class="theme-btn" style="background: #9c7ac9;">Violet</button>
+                <button onclick="setTheme('cyan')" class="theme-btn" style="background: #67c5c5;">Cyan</button>
+                <button onclick="setTheme('lime')" class="theme-btn" style="background: #9fb86f;">Lime</button>
+                <button onclick="setTheme('coral')" class="theme-btn" style="background: #f08080;">Coral</button>
+                <button onclick="setTheme('sky')" class="theme-btn" style="background: #87ceeb;">Sky</button>
+                <button onclick="setTheme('lavender')" class="theme-btn" style="background: #b8a0d6;">Lavender</button>
+                <button onclick="setTheme('mint')" class="theme-btn" style="background: #98d8c8;">Mint</button>
+                <button onclick="setTheme('peach')" class="theme-btn" style="background: #ffb380;">Peach</button>
+                <button onclick="setTheme('navy')" class="theme-btn" style="background: #5f7a9f;">Navy</button>
                 <button onclick="installApp()" class="theme-btn" style="background: #4b5563;">📱 Install</button>
             </div>
         </div>
@@ -1525,9 +1564,12 @@
             const isOpening = !panel.classList.contains('active');
             panel.classList.toggle('active');
             
-            // Scroll to top when opening
+            // Force scroll to top when opening
             if (isOpening) {
-                panel.scrollTop = 0;
+                // Use requestAnimationFrame to ensure DOM is ready
+                requestAnimationFrame(() => {
+                    panel.scrollTop = 0;
+                });
             }
         }
         
@@ -1598,7 +1640,15 @@
                 'emerald': '#6fa882',
                 'rose': '#d98c9c',
                 'amber': '#d9a55c',
-                'violet': '#9c7ac9'
+                'violet': '#9c7ac9',
+                'cyan': '#67c5c5',
+                'lime': '#9fb86f',
+                'coral': '#f08080',
+                'sky': '#87ceeb',
+                'lavender': '#b8a0d6',
+                'mint': '#98d8c8',
+                'peach': '#ffb380',
+                'navy': '#5f7a9f'
             };
             document.querySelector('meta[name="theme-color"]').content = themeColors[theme] || themeColors['default'];
             
