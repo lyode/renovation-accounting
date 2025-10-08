@@ -133,6 +133,15 @@
             right: 0;
         }
         
+        /* Desktop Settings Panel - Better Visibility */
+        @media (min-width: 768px) {
+            .settings-panel {
+                width: 450px;
+                max-width: 450px;
+                padding: 1.5rem;
+            }
+        }
+        
         .settings-header {
             display: flex;
             justify-content: space-between;
@@ -143,9 +152,15 @@
         }
         
         .settings-title {
-            font-size: 1.125rem;
+            font-size: 1.25rem;
             font-weight: bold;
             color: var(--text-color);
+        }
+        
+        @media (min-width: 768px) {
+            .settings-title {
+                font-size: 1.5rem;
+            }
         }
         
         .close-settings {
@@ -154,10 +169,35 @@
             font-size: 1.5rem;
             cursor: pointer;
             color: var(--text-color);
+            padding: 0.25rem;
+        }
+        
+        .close-settings:hover {
+            color: var(--primary-color);
+            transform: scale(1.1);
+        }
+        
+        @media (min-width: 768px) {
+            .close-settings {
+                font-size: 1.75rem;
+            }
         }
         
         .settings-section {
             margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+        
+        @media (min-width: 768px) {
+            .settings-section {
+                margin-bottom: 2rem;
+                padding-bottom: 2rem;
+            }
         }
         
         .settings-label {
@@ -168,11 +208,25 @@
             display: block;
         }
         
+        @media (min-width: 768px) {
+            .settings-label {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+        }
+        
         .settings-info {
             font-size: 0.75rem;
             color: var(--text-secondary);
             margin-bottom: 0.5rem;
             line-height: 1.4;
+        }
+        
+        @media (min-width: 768px) {
+            .settings-info {
+                font-size: 0.875rem;
+                line-height: 1.5;
+            }
         }
         
         /* API Input Styling */
@@ -184,12 +238,24 @@
         
         .api-input-group input {
             flex: 1;
-            padding: 0.5rem;
-            border: 1px solid var(--border-color);
+            padding: 0.625rem;
+            border: 2px solid var(--border-color);
             border-radius: 0.375rem;
-            font-size: 0.8125rem;
+            font-size: 0.875rem;
             background: var(--card-bg);
             color: var(--text-color);
+        }
+        
+        .api-input-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        @media (min-width: 768px) {
+            .api-input-group input {
+                font-size: 0.9375rem;
+                padding: 0.75rem;
+            }
         }
         
         .api-status {
@@ -199,6 +265,14 @@
             margin-bottom: 0.75rem;
             text-align: center;
             font-weight: 500;
+        }
+        
+        @media (min-width: 768px) {
+            .api-status {
+                padding: 0.75rem;
+                font-size: 0.875rem;
+                margin-bottom: 1rem;
+            }
         }
         
         .api-status.connected {
@@ -395,8 +469,21 @@
             transition: all 0.3s;
         }
         
+        .header-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: scale(1.05);
+        }
+        
         .header-btn:active {
             transform: scale(0.95);
+        }
+        
+        @media (min-width: 768px) {
+            .header-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 1.25rem;
+            }
         }
         
         /* Cloud Status */
