@@ -149,6 +149,11 @@
             margin-bottom: 1.5rem;
             padding-bottom: 0.5rem;
             border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            background: var(--card-bg);
+            z-index: 10;
+            padding-top: 0.5rem;
         }
         
         .settings-title {
@@ -226,6 +231,21 @@
             .settings-info {
                 font-size: 0.875rem;
                 line-height: 1.5;
+            }
+        }
+        
+        /* API Key Management */
+        .api-key-section {
+            background: linear-gradient(135deg, rgba(120, 153, 179, 0.1) 0%, rgba(88, 121, 163, 0.1) 100%);
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        @media (min-width: 768px) {
+            .api-key-section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
             }
         }
         
@@ -904,7 +924,7 @@
         </div>
         
         <!-- API Key Management -->
-        <div class="settings-section">
+        <div class="settings-section api-key-section">
             <label class="settings-label">🔑 API Key Setup</label>
             <div class="api-status" id="apiStatus">Not Connected</div>
             
@@ -1567,7 +1587,12 @@
         
         // Settings Functions
         function toggleSettings() {
-            document.getElementById('settings-panel').classList.toggle('active');
+            const panel = document.getElementById('settings-panel');
+            panel.classList.toggle('active');
+            // Always scroll to top when opening
+            if (panel.classList.contains('active')) {
+                panel.scrollTop = 0;
+            }
         }
         
         function setContrast(level) {
