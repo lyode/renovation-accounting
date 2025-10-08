@@ -113,32 +113,26 @@
             color: #fee2e2;
         }
         
-        /* Settings Panel */
+        /* Settings Panel - SIMPLIFIED */
         .settings-panel {
             position: fixed;
             top: 0;
             right: -100%;
             width: 90%;
             max-width: 360px;
-            height: 100%;
+            height: 100vh;
             background: var(--card-bg);
             box-shadow: -2px 0 10px rgba(0,0,0,0.2);
             transition: right 0.3s;
             z-index: 100;
             overflow-y: auto;
-            overflow-x: hidden;
             padding: 1rem;
-            display: flex;
-            flex-direction: column;
-            -webkit-overflow-scrolling: touch;
-            scroll-behavior: smooth;
         }
         
         .settings-panel.active {
             right: 0;
         }
         
-        /* Desktop Settings Panel - Better Visibility */
         @media (min-width: 768px) {
             .settings-panel {
                 width: 450px;
@@ -147,40 +141,19 @@
             }
         }
         
-        /* Ensure all sections are visible and scrollable */
-        .settings-section {
-            display: block !important;
-            visibility: visible !important;
-            opacity: 1 !important;
-            flex-shrink: 0;
-        }
-        
         .settings-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
-        }
-        
-        @media (min-width: 768px) {
-            .settings-header {
-                margin-bottom: 2rem;
-            }
+            padding-bottom: 0.75rem;
+            border-bottom: 2px solid var(--border-color);
         }
         
         .settings-title {
             font-size: 1.25rem;
             font-weight: bold;
             color: var(--text-color);
-        }
-        
-        @media (min-width: 768px) {
-            .settings-title {
-                font-size: 1.5rem;
-            }
         }
         
         .close-settings {
@@ -194,81 +167,44 @@
         
         .close-settings:hover {
             color: var(--primary-color);
-            transform: scale(1.1);
-        }
-        
-        @media (min-width: 768px) {
-            .close-settings {
-                font-size: 1.75rem;
-            }
         }
         
         .settings-section {
             margin-bottom: 1.5rem;
             padding-bottom: 1.5rem;
             border-bottom: 1px solid var(--border-color);
-            flex-shrink: 0;
-            min-height: auto;
         }
         
         .settings-section:last-child {
             border-bottom: none;
-            margin-bottom: 2rem;
-        }
-        
-        @media (min-width: 768px) {
-            .settings-section {
-                margin-bottom: 2rem;
-                padding-bottom: 2rem;
-            }
         }
         
         .settings-label {
-            font-size: 0.875rem;
+            font-size: 0.9375rem;
             font-weight: 600;
             color: var(--text-color);
             margin-bottom: 0.5rem;
             display: block;
         }
         
-        @media (min-width: 768px) {
-            .settings-label {
-                font-size: 1rem;
-                margin-bottom: 0.75rem;
-            }
-        }
-        
         .settings-info {
-            font-size: 0.75rem;
+            font-size: 0.8125rem;
             color: var(--text-secondary);
             margin-bottom: 0.5rem;
-            line-height: 1.4;
+            line-height: 1.5;
         }
         
-        @media (min-width: 768px) {
-            .settings-info {
-                font-size: 0.875rem;
-                line-height: 1.5;
-            }
-        }
-        
-        /* API Key Management */
-        .api-key-section {
-            background: linear-gradient(135deg, rgba(120, 153, 179, 0.1) 0%, rgba(88, 121, 163, 0.1) 100%);
-            padding: 1rem;
+        /* API Section Highlight */
+        .api-section-highlight {
+            background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%);
+            border: 2px solid var(--primary-color);
+            padding: 1.25rem;
             border-radius: 0.5rem;
-            margin-bottom: 1rem;
-            display: block !important;
-            visibility: visible !important;
+            margin-bottom: 1.5rem;
         }
         
-        @media (min-width: 768px) {
-            .api-key-section {
-                padding: 1.5rem;
-                margin-bottom: 1.5rem;
-                background: linear-gradient(135deg, rgba(120, 153, 179, 0.15) 0%, rgba(88, 121, 163, 0.15) 100%);
-                border: 2px solid var(--primary-light);
-            }
+        body.night-mode .api-section-highlight {
+            background: linear-gradient(135deg, rgba(120, 153, 179, 0.2) 0%, rgba(88, 121, 163, 0.2) 100%);
         }
         
         /* API Input Styling */
@@ -293,28 +229,13 @@
             border-color: var(--primary-color);
         }
         
-        @media (min-width: 768px) {
-            .api-input-group input {
-                font-size: 0.9375rem;
-                padding: 0.75rem;
-            }
-        }
-        
         .api-status {
-            padding: 0.5rem;
+            padding: 0.625rem;
             border-radius: 0.375rem;
-            font-size: 0.75rem;
+            font-size: 0.8125rem;
             margin-bottom: 0.75rem;
             text-align: center;
-            font-weight: 500;
-        }
-        
-        @media (min-width: 768px) {
-            .api-status {
-                padding: 0.75rem;
-                font-size: 0.875rem;
-                margin-bottom: 1rem;
-            }
+            font-weight: 600;
         }
         
         .api-status.connected {
@@ -500,32 +421,23 @@
             background: rgba(255,255,255,0.2);
             border: none;
             color: white;
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             cursor: pointer;
             font-size: 1.125rem;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
+            transition: all 0.2s;
         }
         
         .header-btn:hover {
             background: rgba(255,255,255,0.3);
-            transform: scale(1.05);
         }
         
         .header-btn:active {
             transform: scale(0.95);
-        }
-        
-        @media (min-width: 768px) {
-            .header-btn {
-                width: 40px;
-                height: 40px;
-                font-size: 1.25rem;
-            }
         }
         
         /* Cloud Status */
@@ -941,16 +853,13 @@
     <!-- Settings Panel -->
     <div class="settings-panel" id="settings-panel">
         <div class="settings-header">
-            <span class="settings-title">⚙️ Settings</span>
+            <span class="settings-title">Settings</span>
             <button class="close-settings" onclick="toggleSettings()">✕</button>
         </div>
         
-        <!-- API Key Management - ALWAYS FIRST -->
-        <div class="settings-section api-key-section" style="display: block !important;">
-            <div style="background: var(--primary-color); color: white; padding: 0.5rem; border-radius: 0.25rem; margin-bottom: 1rem; text-align: center; font-weight: bold; font-size: 0.875rem;">
-                STEP 1: Setup Cloud Sync
-            </div>
-            <label class="settings-label">🔑 API Key Setup</label>
+        <!-- 1. API Key Setup -->
+        <div class="api-section-highlight">
+            <label class="settings-label" style="font-size: 1rem; margin-bottom: 0.75rem;">🔑 API Key Setup</label>
             <div class="api-status" id="apiStatus">Not Connected</div>
             
             <div class="api-input-group">
@@ -970,8 +879,8 @@
             <button class="btn btn-secondary" onclick="removeApiKey()" style="font-size: 0.8125rem;">Remove API Key</button>
         </div>
         
-        <!-- Auto-Sync Toggle -->
-        <div class="settings-section" style="display: block !important;">
+        <!-- 2. Auto-Sync Toggle -->
+        <div class="settings-section">
             <label class="settings-label">⚡ Auto Sync</label>
             <div class="toggle-switch">
                 <span class="settings-info" style="margin: 0; flex: 1;">Sync every 5 minutes</span>
@@ -1515,13 +1424,6 @@
             }
             
             updateAutoSyncStatus();
-            
-            // Debug: Verify all sections are visible
-            console.log('Settings sections loaded:', {
-                apiSection: !!document.querySelector('.api-key-section'),
-                autoSyncToggle: !!document.getElementById('auto-sync-toggle'),
-                settingsPanel: !!document.getElementById('settings-panel')
-            });
         }
         
         // Update sync status display
@@ -1620,12 +1522,12 @@
         // Settings Functions
         function toggleSettings() {
             const panel = document.getElementById('settings-panel');
+            const isOpening = !panel.classList.contains('active');
             panel.classList.toggle('active');
-            // Always scroll to top when opening
-            if (panel.classList.contains('active')) {
-                setTimeout(() => {
-                    panel.scrollTop = 0;
-                }, 50);
+            
+            // Scroll to top when opening
+            if (isOpening) {
+                panel.scrollTop = 0;
             }
         }
         
