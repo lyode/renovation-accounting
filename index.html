@@ -875,7 +875,7 @@
                 <p>Track your business finances</p>
             </div>
             <div class="header-buttons">
-                <button onclick="syncData()" class="header-btn" title="Smart Sync (Merge All Data)">☁️</button>
+                <button onclick="manualStartupSync()" class="header-btn" title="Sync Now (Pull → Merge → Push)">🔄</button>
                 <button onclick="toggleSettings()" class="header-btn" title="Settings">⚙️</button>
             </div>
         </div>
@@ -899,7 +899,8 @@
             API Key: <span id="debug-api-key">Not set</span><br>
             Device: <span id="debug-device">Unknown</span><br>
             Local Data: <span id="debug-local-count">0 projects, 0 transactions</span><br>
-            <strong style="color: #16a34a;">✨ Smart Merge Enabled - Data never lost!</strong>
+            <strong style="color: #16a34a;">✨ Smart Merge Enabled - Data never lost!</strong><br>
+            <strong style="color: #3b82f6;" id="debug-auto-sync-info">Auto-sync: Disabled</strong>
         </div>
         
         <!-- 1. API Key Setup - MUST BE FIRST - FORCED VISIBLE -->
@@ -929,10 +930,17 @@
         <div class="settings-section">
             <label class="settings-label">⚡ Auto Sync</label>
             <div class="toggle-switch">
-                <span class="settings-info" style="margin: 0; flex: 1;">Sync every 5 minutes</span>
+                <span class="settings-info" style="margin: 0; flex: 1;">Sync on app open + every 5 minutes</span>
                 <input type="checkbox" id="auto-sync-toggle" onchange="toggleAutoSync()">
             </div>
             <div class="settings-info" id="autoSyncStatus">Auto-sync is disabled</div>
+            <div class="settings-info" style="background: #dbeafe; padding: 0.5rem; border-radius: 0.375rem; margin-top: 0.5rem;">
+                <strong>💡 When enabled:</strong><br>
+                • Syncs automatically when you open the app<br>
+                • Syncs every 5 minutes in background<br>
+                • Always have latest data from all users<br>
+                • No manual checking needed!
+            </div>
         </div>
         
         <!-- Sync Status -->
@@ -1004,6 +1012,30 @@
     </div>
     
     <div id="cloudStatus"></div>
+    
+            <!-- Startup Sync Loading Overlay -->
+    <div id="startup-sync-overlay" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px);">
+        <div style="background: var(--card-bg); padding: 2rem; border-radius: 1rem; text-align: center; max-width: 340px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+            <div style="font-size: 3rem; margin-bottom: 1rem; animation: spin 2s linear infinite;">🔄</div>
+            <div style="font-size: 1.25rem; font-weight: bold; color: var(--text-color); margin-bottom: 0.5rem;">Smart Sync in Progress</div>
+            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;" id="sync-progress-text">Pulling latest data from cloud...</div>
+            <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden; margin-bottom: 0.75rem;">
+                <div style="width: 100%; height: 100%; background: var(--primary-color); animation: progress 2s ease-in-out infinite;"></div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Merging data from all users...</div>
+        </div>
+    </div>
+    
+    <style>
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes progress {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
     
     <div class="tabs">
         <div class="tab active" onclick="showTab('dashboard')">Dashboard</div>
@@ -1523,11 +1555,28 @@
             }
             
             autoSyncInterval = setInterval(async () => {
-                console.log('Auto-syncing...');
-                await cloudSync.push();
+                console.log('🔄 Auto-syncing in background...');
+                const overlay = document.getElementById('startup-sync-overlay');
+                
+                // Show brief sync indicator (less intrusive for background sync)
+                overlay.style.display = 'flex';
+                document.getElementById('sync-progress-text').textContent = 'Background sync in progress...';
+                
+                const success = await cloudSync.push();
+                
+                // Show result briefly
+                if (success) {
+                    document.getElementById('sync-progress-text').textContent = '✅ Synced successfully!';
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } else {
+                    document.getElementById('sync-progress-text').textContent = '⚠️ Sync failed';
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
+                
+                overlay.style.display = 'none';
             }, AUTO_SYNC_INTERVAL);
             
-            console.log('Auto-sync enabled: every 5 minutes');
+            console.log('✅ Auto-sync enabled: on startup + every 5 minutes');
         }
         
         function stopAutoSync() {
@@ -1544,9 +1593,9 @@
             const settingsModeEl = document.getElementById('settingsMode');
             
             if (enabled) {
-                statusEl.textContent = '✅ Auto-sync active (every 5 minutes)';
+                statusEl.textContent = '✅ Auto-sync active (on open + every 5 minutes)';
                 statusEl.style.color = '#065f46';
-                settingsModeEl.textContent = 'Auto Sync (5 min)';
+                settingsModeEl.textContent = 'Auto Sync (Smart Mode)';
             } else {
                 statusEl.textContent = '⏸️ Auto-sync is disabled';
                 statusEl.style.color = 'var(--text-secondary)';
@@ -1617,10 +1666,49 @@
             render();
             updateSyncStatus('Local Data', false);
             
-            if (cloudSync.apiKey) {
-                if (!isMobile) {
-                    await cloudSync.pull();
+            // Check if auto-sync is enabled
+            const autoSyncEnabled = localStorage.getItem('autoSyncEnabled') === 'true';
+            
+            if (cloudSync.apiKey && autoSyncEnabled) {
+                // Auto-sync on startup!
+                console.log('🚀 Auto-sync enabled - syncing on startup...');
+                await performStartupSync();
+            } else {
+                updateLastSyncDisplay();
+            }
+        }
+        
+        // NEW: Startup sync with visual feedback
+        async function performStartupSync() {
+            const overlay = document.getElementById('startup-sync-overlay');
+            const progressText = document.getElementById('sync-progress-text');
+            
+            // Show loading overlay
+            overlay.style.display = 'flex';
+            
+            try {
+                // Step 1: Pull
+                progressText.textContent = 'Pulling latest data from cloud...';
+                await new Promise(resolve => setTimeout(resolve, 500)); // Brief pause for UX
+                
+                // Step 2: Merge & Push (handled by cloudSync.push)
+                progressText.textContent = 'Merging data from all users...';
+                const success = await cloudSync.push();
+                
+                if (success) {
+                    progressText.textContent = '✅ Sync complete! You have the latest data.';
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                } else {
+                    progressText.textContent = '⚠️ Sync failed - using local data';
+                    await new Promise(resolve => setTimeout(resolve, 1500));
                 }
+            } catch (error) {
+                console.error('Startup sync error:', error);
+                progressText.textContent = '⚠️ Sync failed - using local data';
+                await new Promise(resolve => setTimeout(resolve, 1500));
+            } finally {
+                // Hide overlay
+                overlay.style.display = 'none';
                 updateLastSyncDisplay();
             }
         }
@@ -1648,6 +1736,20 @@
             // Always push (which now includes pull → merge → push)
             console.log('Manual sync triggered - will pull, merge, and push...');
             await cloudSync.push();
+        }
+        
+        // Manual startup sync with overlay
+        async function manualStartupSync() {
+            if (!cloudSync.apiKey) {
+                alert('Please set up your API key in Settings first');
+                return;
+            }
+            
+            // Close settings
+            toggleSettings();
+            
+            // Perform sync with visual feedback
+            await performStartupSync();
         }
         
         // Force pull from cloud
