@@ -465,19 +465,33 @@
         #cloudStatus {
             position: fixed;
             top: calc(65px + env(safe-area-inset-top));
-            right: 10px;
+            left: 50%;
+            transform: translateX(-50%);
             background: var(--primary-color);
             color: white;
-            padding: 5px 12px;
-            border-radius: 15px;
-            font-size: 0.6875rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8125rem;
             z-index: 1000;
             transition: all 0.3s;
             opacity: 0;
+            pointer-events: none;
+            max-width: 90%;
+            text-align: center;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
         #cloudStatus.show {
             opacity: 1;
+        }
+        
+        @media (min-width: 768px) {
+            #cloudStatus {
+                font-size: 0.875rem;
+                padding: 10px 20px;
+                max-width: 600px;
+            }
         }
         
         .tabs { 
@@ -875,7 +889,7 @@
                 <p>Track your business finances</p>
             </div>
             <div class="header-buttons">
-                <button onclick="manualStartupSync()" class="header-btn" title="Sync Now (Pull → Merge → Push)">🔄</button>
+                <button onclick="manualStartupSync()" class="header-btn" title="Sync Now - Pull, Merge & Push">🔄</button>
                 <button onclick="toggleSettings()" class="header-btn" title="Settings">⚙️</button>
             </div>
         </div>
@@ -895,12 +909,16 @@
         
         <!-- DEBUG INFO -->
         <div style="background: #dbeafe; border: 2px solid #3b82f6; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1rem; font-size: 0.75rem;">
-            <strong>📊 System Info:</strong><br>
+            <strong>📊 System Status:</strong><br>
             API Key: <span id="debug-api-key">Not set</span><br>
             Device: <span id="debug-device">Unknown</span><br>
             Local Data: <span id="debug-local-count">0 projects, 0 transactions</span><br>
-            <strong style="color: #16a34a;">✨ Smart Merge Enabled - Data never lost!</strong><br>
-            <strong style="color: #3b82f6;" id="debug-auto-sync-info">Auto-sync: Disabled</strong>
+            <strong style="color: #16a34a;">✨ Smart Merge: Data never lost!</strong><br>
+            <strong style="color: #3b82f6;" id="debug-auto-sync-info">Auto-sync: Disabled</strong><br>
+            <br>
+            <div style="background: #fef3c7; padding: 0.5rem; border-radius: 0.25rem; margin-top: 0.5rem; font-size: 0.6875rem; color: #92400e;">
+                <strong>💡 Tip:</strong> Check browser console (F12) for detailed sync logs
+            </div>
         </div>
         
         <!-- 1. API Key Setup - MUST BE FIRST - FORCED VISIBLE -->
@@ -1162,6 +1180,28 @@
     </div>
 
     <script>
+        /*
+         * INTELLIGENT AUTO-SYNC SYSTEM
+         * ============================
+         * Features:
+         * 1. Smart Merge: Pull → Merge → Push (never loses data)
+         * 2. Auto-sync on app open (if enabled)
+         * 3. Auto-sync every 5 minutes (if enabled)
+         * 4. Visual feedback during sync
+         * 5. Works across unlimited users
+         * 6. All data from all devices stays synchronized
+         * 
+         * How it works:
+         * - When auto-sync is ON and you open the app:
+         *   → Automatically pulls latest from cloud
+         *   → Merges with your local data
+         *   → Pushes combined data back
+         *   → You always have the latest from ALL users
+         * 
+         * - Background sync every 5 minutes keeps everyone in sync
+         * - No manual checking needed - the app does everything!
+         */
+        
         // PWA Support
         let deferredPrompt;
         
@@ -1299,12 +1339,21 @@
                     console.log('Push response status:', response.status);
                     
                     if (response.ok) {
-                        // STEP 4: Update local data with merged data
+                        // STEP 4: Update local data with merged data - CRITICAL!
                         projects = mergedProjects;
                         transactions = mergedTransactions;
+                        
+                        // Save to localStorage
                         localStorage.setItem('offlineProjects', JSON.stringify(projects));
                         localStorage.setItem('offlineTransactions', JSON.stringify(transactions));
+                        
+                        // Force UI refresh - CRITICAL!
                         render();
+                        
+                        console.log('✅ Sync complete! Updated global arrays:', {
+                            projects: projects.length,
+                            transactions: transactions.length
+                        });
                         
                         this.lastSyncTime = Date.now();
                         localStorage.setItem('lastSyncTime', this.lastSyncTime.toString());
@@ -1339,24 +1388,35 @@
             
             // NEW: Merge function - combines two arrays without duplicates
             mergeData(cloudArray, localArray, uniqueKey) {
+                console.log(`🔀 Merging ${uniqueKey}s:`, {
+                    cloudCount: cloudArray.length,
+                    localCount: localArray.length
+                });
+                
                 const merged = [...cloudArray];
                 const cloudIds = new Set(cloudArray.map(item => item[uniqueKey]));
+                
+                let addedCount = 0;
+                let updatedCount = 0;
                 
                 // Add local items that don't exist in cloud
                 localArray.forEach(localItem => {
                     if (!cloudIds.has(localItem[uniqueKey])) {
                         merged.push(localItem);
-                        console.log(`Added new local item: ${localItem[uniqueKey]}`);
+                        addedCount++;
+                        console.log(`  ➕ Added new local item: ${localItem[uniqueKey]}`);
                     } else {
                         // Update existing items if local is newer
                         const cloudItem = merged.find(item => item[uniqueKey] === localItem[uniqueKey]);
                         if (cloudItem && localItem.timestamp && (!cloudItem.timestamp || new Date(localItem.timestamp) > new Date(cloudItem.timestamp))) {
                             Object.assign(cloudItem, localItem);
-                            console.log(`Updated item with newer local version: ${localItem[uniqueKey]}`);
+                            updatedCount++;
+                            console.log(`  🔄 Updated item with newer local version: ${localItem[uniqueKey]}`);
                         }
                     }
                 });
                 
+                console.log(`✅ Merge complete: ${merged.length} total (added: ${addedCount}, updated: ${updatedCount})`);
                 return merged;
             }
             
@@ -1424,8 +1484,11 @@
             }
             
             applyCloudData(cloudData) {
+                console.log('📥 Applying cloud data...');
                 projects = cloudData.projects || [];
                 transactions = cloudData.transactions || [];
+                
+                console.log(`  Projects: ${projects.length}, Transactions: ${transactions.length}`);
                 
                 if (cloudData.theme) {
                     setTheme(cloudData.theme);
@@ -1444,7 +1507,9 @@
                 localStorage.setItem('offlineProjects', JSON.stringify(projects));
                 localStorage.setItem('offlineTransactions', JSON.stringify(transactions));
                 
+                // Force UI refresh - CRITICAL!
                 render();
+                console.log('✅ Cloud data applied and UI refreshed');
             }
             
             showStatus(message) {
@@ -1547,6 +1612,7 @@
             }
             
             updateAutoSyncStatus();
+            updateDebugInfo(); // Update debug info when toggled
         }
         
         function startAutoSync() {
@@ -1556,24 +1622,39 @@
             
             autoSyncInterval = setInterval(async () => {
                 console.log('🔄 Auto-syncing in background...');
-                const overlay = document.getElementById('startup-sync-overlay');
                 
-                // Show brief sync indicator (less intrusive for background sync)
-                overlay.style.display = 'flex';
-                document.getElementById('sync-progress-text').textContent = 'Background sync in progress...';
+                // Store counts before sync
+                const beforeProjects = projects.length;
+                const beforeTransactions = transactions.length;
                 
+                // Perform sync
                 const success = await cloudSync.push();
                 
-                // Show result briefly
                 if (success) {
-                    document.getElementById('sync-progress-text').textContent = '✅ Synced successfully!';
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    // Force UI refresh after sync
+                    render();
+                    
+                    // Calculate what changed
+                    const addedProjects = projects.length - beforeProjects;
+                    const addedTransactions = transactions.length - beforeTransactions;
+                    
+                    // Show notification
+                    if (addedProjects > 0 || addedTransactions > 0) {
+                        showSyncNotification(
+                            `🔄 Synced! +${addedProjects} projects, +${addedTransactions} transactions`, 
+                            'success'
+                        );
+                    } else {
+                        showSyncNotification('🔄 Synced - Up to date', 'success');
+                    }
+                    
+                    console.log(`✅ Auto-sync complete: ${projects.length} projects, ${transactions.length} transactions`);
                 } else {
-                    document.getElementById('sync-progress-text').textContent = '⚠️ Sync failed';
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    console.log('⚠️ Auto-sync failed');
+                    showSyncNotification('⚠️ Auto-sync failed', 'error');
                 }
                 
-                overlay.style.display = 'none';
+                updateDebugInfo();
             }, AUTO_SYNC_INTERVAL);
             
             console.log('✅ Auto-sync enabled: on startup + every 5 minutes');
@@ -1657,23 +1738,39 @@
         
         // Load data
         async function loadData() {
+            console.log('📂 Loading data from localStorage...');
+            
             const savedProjects = localStorage.getItem('offlineProjects');
             const savedTrans = localStorage.getItem('offlineTransactions');
             
-            if (savedProjects) projects = JSON.parse(savedProjects);
-            if (savedTrans) transactions = JSON.parse(savedTrans);
+            if (savedProjects) {
+                projects = JSON.parse(savedProjects);
+                console.log(`Loaded ${projects.length} projects from localStorage`);
+            }
+            if (savedTrans) {
+                transactions = JSON.parse(savedTrans);
+                console.log(`Loaded ${transactions.length} transactions from localStorage`);
+            }
             
+            // Always render local data first
             render();
-            updateSyncStatus('Local Data', false);
+            updateSyncStatus('Local Data Loaded', false);
             
             // Check if auto-sync is enabled
             const autoSyncEnabled = localStorage.getItem('autoSyncEnabled') === 'true';
             
-            if (cloudSync.apiKey && autoSyncEnabled) {
-                // Auto-sync on startup!
-                console.log('🚀 Auto-sync enabled - syncing on startup...');
-                await performStartupSync();
+            if (cloudSync.apiKey) {
+                if (autoSyncEnabled) {
+                    // Auto-sync on startup!
+                    console.log('🚀 Auto-sync enabled - syncing on startup...');
+                    await performStartupSync();
+                } else {
+                    // Just update last sync display
+                    updateLastSyncDisplay();
+                    console.log('ℹ️ Auto-sync disabled - showing local data only');
+                }
             } else {
+                console.log('⚠️ No API key set - working offline');
                 updateLastSyncDisplay();
             }
         }
@@ -1687,29 +1784,57 @@
             overlay.style.display = 'flex';
             
             try {
-                // Step 1: Pull
-                progressText.textContent = 'Pulling latest data from cloud...';
-                await new Promise(resolve => setTimeout(resolve, 500)); // Brief pause for UX
+                console.log('🚀 Starting startup sync...');
                 
-                // Step 2: Merge & Push (handled by cloudSync.push)
+                // Step 1: Show pulling message
+                progressText.textContent = 'Pulling latest data from cloud...';
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Step 2: Actually pull and merge
                 progressText.textContent = 'Merging data from all users...';
-                const success = await cloudSync.push();
+                const success = await cloudSync.push(); // This does pull→merge→push
                 
                 if (success) {
-                    progressText.textContent = '✅ Sync complete! You have the latest data.';
-                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    // Data is now in global projects and transactions arrays
+                    // Force refresh the UI
+                    console.log('✅ Sync successful, rendering data...');
+                    render();
+                    
+                    // Show success with count
+                    progressText.textContent = `✅ Loaded ${projects.length} projects, ${transactions.length} transactions`;
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    
+                    // Show summary notification
+                    showSyncNotification(`Synced: ${projects.length} projects, ${transactions.length} transactions`, 'success');
                 } else {
                     progressText.textContent = '⚠️ Sync failed - using local data';
                     await new Promise(resolve => setTimeout(resolve, 1500));
+                    showSyncNotification('Sync failed - check API key', 'error');
                 }
             } catch (error) {
                 console.error('Startup sync error:', error);
                 progressText.textContent = '⚠️ Sync failed - using local data';
                 await new Promise(resolve => setTimeout(resolve, 1500));
+                showSyncNotification('Sync error: ' + error.message, 'error');
             } finally {
                 // Hide overlay
                 overlay.style.display = 'none';
                 updateLastSyncDisplay();
+                updateDebugInfo();
+            }
+        }
+        
+        // NEW: Show sync notification
+        function showSyncNotification(message, type = 'info') {
+            const status = document.getElementById('cloudStatus');
+            if (status) {
+                status.textContent = message;
+                status.classList.add('show');
+                
+                // Auto-hide after 5 seconds
+                setTimeout(() => {
+                    status.classList.remove('show');
+                }, 5000);
             }
         }
         
@@ -1733,9 +1858,35 @@
                 return;
             }
             
-            // Always push (which now includes pull → merge → push)
-            console.log('Manual sync triggered - will pull, merge, and push...');
-            await cloudSync.push();
+            console.log('📤 Manual sync triggered - pull, merge, and push...');
+            
+            // Store counts before sync
+            const beforeProjects = projects.length;
+            const beforeTransactions = transactions.length;
+            
+            // Perform sync (pull → merge → push)
+            const success = await cloudSync.push();
+            
+            if (success) {
+                // Force UI refresh
+                render();
+                
+                // Show what changed
+                const addedProjects = projects.length - beforeProjects;
+                const addedTransactions = transactions.length - beforeTransactions;
+                
+                const message = `Synced! Total: ${projects.length} projects, ${transactions.length} transactions` +
+                    (addedProjects > 0 || addedTransactions > 0 ? 
+                        ` (+${addedProjects} projects, +${addedTransactions} transactions)` : 
+                        ` (no new data)`);
+                
+                showSyncNotification(message, 'success');
+                console.log('✅ ' + message);
+            } else {
+                showSyncNotification('Sync failed - check API key and network', 'error');
+            }
+            
+            updateDebugInfo();
         }
         
         // Manual startup sync with overlay
@@ -1797,6 +1948,16 @@
             document.getElementById('debug-api-key').textContent = cloudSync.apiKey ? `Set (${cloudSync.apiKey.substring(0, 8)}...)` : 'Not set';
             document.getElementById('debug-device').textContent = deviceType;
             document.getElementById('debug-local-count').textContent = `${projects.length} projects, ${transactions.length} transactions`;
+            
+            const autoSyncEnabled = document.getElementById('auto-sync-toggle').checked;
+            const autoSyncInfo = document.getElementById('debug-auto-sync-info');
+            if (autoSyncEnabled) {
+                autoSyncInfo.textContent = 'Auto-sync: ✅ Active (on open + every 5 min)';
+                autoSyncInfo.style.color = '#16a34a';
+            } else {
+                autoSyncInfo.textContent = 'Auto-sync: ⏸️ Disabled';
+                autoSyncInfo.style.color = '#6b7280';
+            }
         }
         
         function setContrast(level) {
