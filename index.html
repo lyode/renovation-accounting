@@ -875,7 +875,7 @@
                 <p>Track your business finances</p>
             </div>
             <div class="header-buttons">
-                <button onclick="syncData()" class="header-btn" title="Cloud Sync">☁️</button>
+                <button onclick="syncData()" class="header-btn" title="Smart Sync (Merge All Data)">☁️</button>
                 <button onclick="toggleSettings()" class="header-btn" title="Settings">⚙️</button>
             </div>
         </div>
@@ -894,11 +894,12 @@
         </div>
         
         <!-- DEBUG INFO -->
-        <div style="background: #fef3c7; border: 2px solid #f59e0b; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1rem; font-size: 0.75rem;">
-            <strong>🐛 Debug Info:</strong><br>
+        <div style="background: #dbeafe; border: 2px solid #3b82f6; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1rem; font-size: 0.75rem;">
+            <strong>📊 System Info:</strong><br>
             API Key: <span id="debug-api-key">Not set</span><br>
             Device: <span id="debug-device">Unknown</span><br>
-            Browser: <span id="debug-browser">Unknown</span>
+            Local Data: <span id="debug-local-count">0 projects, 0 transactions</span><br>
+            <strong style="color: #16a34a;">✨ Smart Merge Enabled - Data never lost!</strong>
         </div>
         
         <!-- 1. API Key Setup - MUST BE FIRST - FORCED VISIBLE -->
@@ -1211,18 +1212,48 @@
                 updateSyncStatus('Syncing...', true);
                 
                 try {
+                    // STEP 1: PULL FIRST to get latest cloud data
+                    console.log('Step 1: Pulling latest cloud data before push...');
+                    const pullResponse = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
+                        headers: {
+                            'X-Master-Key': this.apiKey
+                        }
+                    });
+                    
+                    let cloudData = { projects: [], transactions: [] };
+                    if (pullResponse.ok) {
+                        const result = await pullResponse.json();
+                        cloudData = result.record;
+                        console.log('Cloud data retrieved:', cloudData);
+                    }
+                    
+                    // STEP 2: MERGE local data with cloud data (never overwrite!)
+                    console.log('Step 2: Merging local and cloud data...');
+                    const mergedProjects = this.mergeData(cloudData.projects || [], projects, 'id');
+                    const mergedTransactions = this.mergeData(cloudData.transactions || [], transactions, 'id');
+                    
+                    console.log('Merge complete:', {
+                        cloudProjects: (cloudData.projects || []).length,
+                        localProjects: projects.length,
+                        mergedProjects: mergedProjects.length,
+                        cloudTransactions: (cloudData.transactions || []).length,
+                        localTransactions: transactions.length,
+                        mergedTransactions: mergedTransactions.length
+                    });
+                    
+                    // STEP 3: Push merged data to cloud
                     const pushData = {
-                        projects: projects,
-                        transactions: transactions,
+                        projects: mergedProjects,
+                        transactions: mergedTransactions,
                         theme: localStorage.getItem('appTheme'),
                         nightMode: document.body.classList.contains('night-mode'),
                         contrast: localStorage.getItem('contrast'),
                         lastUpdated: new Date().toISOString(),
                         lastUpdateDevice: deviceType,
-                        version: '2.0'
+                        version: '2.1'
                     };
                     
-                    console.log('Pushing to cloud...', pushData);
+                    console.log('Step 3: Pushing merged data to cloud...');
                     
                     const response = await fetch(`${this.baseUrl}/b/${this.binId}`, {
                         method: 'PUT',
@@ -1236,9 +1267,16 @@
                     console.log('Push response status:', response.status);
                     
                     if (response.ok) {
+                        // STEP 4: Update local data with merged data
+                        projects = mergedProjects;
+                        transactions = mergedTransactions;
+                        localStorage.setItem('offlineProjects', JSON.stringify(projects));
+                        localStorage.setItem('offlineTransactions', JSON.stringify(transactions));
+                        render();
+                        
                         this.lastSyncTime = Date.now();
                         localStorage.setItem('lastSyncTime', this.lastSyncTime.toString());
-                        this.showStatus('☁️ Saved to cloud');
+                        this.showStatus('☁️ Synced & Merged');
                         updateSyncStatus('Synced', false);
                         updateLastSyncDisplay();
                         this.isSyncing = false;
@@ -1265,6 +1303,29 @@
                     alert('Network error: ' + error.message);
                     return false;
                 }
+            }
+            
+            // NEW: Merge function - combines two arrays without duplicates
+            mergeData(cloudArray, localArray, uniqueKey) {
+                const merged = [...cloudArray];
+                const cloudIds = new Set(cloudArray.map(item => item[uniqueKey]));
+                
+                // Add local items that don't exist in cloud
+                localArray.forEach(localItem => {
+                    if (!cloudIds.has(localItem[uniqueKey])) {
+                        merged.push(localItem);
+                        console.log(`Added new local item: ${localItem[uniqueKey]}`);
+                    } else {
+                        // Update existing items if local is newer
+                        const cloudItem = merged.find(item => item[uniqueKey] === localItem[uniqueKey]);
+                        if (cloudItem && localItem.timestamp && (!cloudItem.timestamp || new Date(localItem.timestamp) > new Date(cloudItem.timestamp))) {
+                            Object.assign(cloudItem, localItem);
+                            console.log(`Updated item with newer local version: ${localItem[uniqueKey]}`);
+                        }
+                    }
+                });
+                
+                return merged;
             }
             
             async pull(force = false) {
@@ -1569,6 +1630,11 @@
             localStorage.setItem('offlineProjects', JSON.stringify(projects));
             localStorage.setItem('offlineTransactions', JSON.stringify(transactions));
             localStorage.setItem('lastLocalUpdate', new Date().toISOString());
+            
+            // Update debug info if settings is open
+            if (document.getElementById('settings-panel').classList.contains('active')) {
+                updateDebugInfo();
+            }
         }
         
         // Manual sync button
@@ -1579,12 +1645,9 @@
                 return;
             }
             
-            const action = confirm('Choose action:\n\n📤 OK = Push to cloud\n📥 Cancel = Pull from cloud');
-            if (action) {
-                await cloudSync.push();
-            } else {
-                await cloudSync.pull();
-            }
+            // Always push (which now includes pull → merge → push)
+            console.log('Manual sync triggered - will pull, merge, and push...');
+            await cloudSync.push();
         }
         
         // Force pull from cloud
@@ -1631,9 +1694,7 @@
         function updateDebugInfo() {
             document.getElementById('debug-api-key').textContent = cloudSync.apiKey ? `Set (${cloudSync.apiKey.substring(0, 8)}...)` : 'Not set';
             document.getElementById('debug-device').textContent = deviceType;
-            document.getElementById('debug-browser').textContent = navigator.userAgent.includes('Chrome') ? 'Chrome' : 
-                                                                   navigator.userAgent.includes('Firefox') ? 'Firefox' : 
-                                                                   navigator.userAgent.includes('Safari') ? 'Safari' : 'Other';
+            document.getElementById('debug-local-count').textContent = `${projects.length} projects, ${transactions.length} transactions`;
         }
         
         function setContrast(level) {
