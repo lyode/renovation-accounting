@@ -53,6 +53,9 @@
         body.night-mode input, body.night-mode select, body.night-mode textarea {
             background: #1a1a1f; color: var(--text-color); border-color: var(--border-color);
         }
+        body.night-mode .project-detail-tabs { background: #1a1a1f; }
+        body.night-mode .project-tab { color: var(--text-secondary); }
+        body.night-mode .project-tab.active { background: var(--card-bg); color: var(--primary-color); }
         
         body.theme-steel { --primary-gradient: linear-gradient(135deg, #7899b3 0%, #a8c5d6 100%); --primary-color: #7899b3; --bg-color: #e6eff5; }
         body.theme-sage { --primary-gradient: linear-gradient(135deg, #87a087 0%, #a8c0a8 100%); --primary-color: #87a087; --bg-color: #eef4ee; }
@@ -229,6 +232,7 @@
             overflow: hidden;
             margin-bottom: 15px;
             transition: transform 0.2s;
+            cursor: pointer;
         }
         
         .project-card:active { transform: scale(0.98); }
@@ -244,7 +248,6 @@
         
         .project-header-left {
             flex: 1;
-            cursor: pointer;
         }
         
         .project-name {
@@ -303,6 +306,47 @@
             margin-top: 2px;
         }
         
+        .back-btn {
+            background: #6b7280;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            margin-bottom: 15px;
+            font-size: calc(14px * var(--font-scale));
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .back-btn:active { transform: scale(0.95); }
+        
+        .project-detail-tabs {
+            display: flex;
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .project-tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: calc(12px * var(--font-scale));
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        
+        .project-tab.active {
+            background: var(--card-bg);
+            color: var(--primary-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
         .transaction-item,
         .task-item {
             padding: 12px;
@@ -348,6 +392,8 @@
         
         .badge-income { background: #d1fae5; color: #065f46; }
         .badge-expense { background: #fee2e2; color: #991b1b; }
+        .badge-completed { background: #d1fae5; color: #065f46; }
+        .badge-pending { background: #fff3cd; color: #856404; }
         
         .empty-state {
             text-align: center;
@@ -693,6 +739,10 @@
                     <label class="form-label">Start Date</label>
                     <input type="date" class="form-input" id="projectStart">
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="projectDescription" placeholder="Project details..."></textarea>
+                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('projectModal')">Cancel</button>
@@ -715,7 +765,7 @@
                         <option value="income">Income</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="transProjectGroup">
                     <label class="form-label">Project</label>
                     <select class="form-select" id="transProject"></select>
                 </div>
@@ -754,7 +804,7 @@
                     <label class="form-label">Task Name *</label>
                     <input type="text" class="form-input" id="taskName">
                 </div>
-                <div class="form-group">
+                <div class="form-group" id="taskProjectGroup">
                     <label class="form-label">Project</label>
                     <select class="form-select" id="taskProject"></select>
                 </div>
@@ -764,6 +814,7 @@
                         <option value="Low">Low</option>
                         <option value="Medium">Medium</option>
                         <option value="High">High</option>
+                        <option value="Critical">Critical</option>
                     </select>
                 </div>
                 <div class="form-group">
@@ -777,6 +828,10 @@
                         <option value="In Progress">In Progress</option>
                         <option value="Completed">Completed</option>
                     </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="taskDescription"></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -792,6 +847,8 @@
             transactions: [],
             tasks: [],
             currentView: 'home',
+            currentProject: null,
+            currentProjectTab: 'overview',
             apiKey: '',
             contrast: 'normal',
             fontSize: 'normal',
@@ -799,11 +856,12 @@
         };
         
         let editingId = null;
+        let lockedProjectId = null;
         const binId = '68e121b8ae596e708f05df17';
         const baseUrl = 'https://api.jsonbin.io/v3';
         
-        const expenseCategories = ['Materials', 'Labor', 'Tools', 'Transportation', 'Permits', 'Other'];
-        const incomeCategories = ['Project Payment', 'Deposit', 'Final Payment', 'Other'];
+        const expenseCategories = ['Materials', 'Labor', 'Tools & Equipment', 'Transportation', 'Permits', 'Subcontractors', 'Other'];
+        const incomeCategories = ['Project Payment', 'Deposit', 'Final Payment', 'Progress Payment', 'Other Income'];
         
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
@@ -885,6 +943,7 @@
         
         function switchView(view) {
             data.currentView = view;
+            data.currentProject = null;
             
             document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
@@ -892,15 +951,36 @@
             renderView();
         }
         
+        function openProject(projectId) {
+            data.currentProject = projectId;
+            data.currentProjectTab = 'overview';
+            renderView();
+        }
+        
+        function closeProject() {
+            data.currentProject = null;
+            data.currentView = 'projects';
+            renderView();
+        }
+        
+        function switchProjectTab(tab) {
+            data.currentProjectTab = tab;
+            renderProjectDetail(document.getElementById('mainContent'));
+        }
+        
         function renderView() {
             const container = document.getElementById('mainContent');
             
-            switch(data.currentView) {
-                case 'home': renderHome(container); break;
-                case 'projects': renderProjects(container); break;
-                case 'finance': renderFinance(container); break;
-                case 'tasks': renderTasks(container); break;
-                case 'schedule': renderSchedule(container); break;
+            if (data.currentProject) {
+                renderProjectDetail(container);
+            } else {
+                switch(data.currentView) {
+                    case 'home': renderHome(container); break;
+                    case 'projects': renderProjects(container); break;
+                    case 'finance': renderFinance(container); break;
+                    case 'tasks': renderTasks(container); break;
+                    case 'schedule': renderSchedule(container); break;
+                }
             }
         }
         
@@ -983,7 +1063,7 @@
                             const completed = tasks.filter(t => t.status === 'Completed').length;
                             
                             return `
-                                <div class="project-card">
+                                <div class="project-card" onclick="openProject(${project.id})">
                                     <div class="project-header">
                                         <div class="project-header-left">
                                             <div class="project-name">${project.name}</div>
@@ -1035,7 +1115,7 @@
                     const completed = tasks.filter(t => t.status === 'Completed').length;
                     
                     html += `
-                        <div class="project-card">
+                        <div class="project-card" onclick="openProject(${project.id})">
                             <div class="project-header">
                                 <div class="project-header-left">
                                     <div class="project-name">${project.name}</div>
@@ -1070,6 +1150,122 @@
             }
             
             html += '</div>';
+            container.innerHTML = html;
+        }
+        
+        function renderProjectDetail(container) {
+            const project = data.projects.find(p => p.id === data.currentProject);
+            if (!project) return;
+            
+            const income = data.transactions.filter(t => t.projectId === project.id && t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expenses = data.transactions.filter(t => t.projectId === project.id && t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const profit = income - expenses;
+            const tasks = data.tasks.filter(t => t.projectId === project.id);
+            const completed = tasks.filter(t => t.status === 'Completed').length;
+            
+            let html = `
+                <button class="back-btn" onclick="closeProject()">← Back to Projects</button>
+                
+                <div class="card">
+                    <div class="project-header" style="border-radius: 10px; margin-bottom: 15px;">
+                        <div class="project-header-left">
+                            <div class="project-name">${project.name}</div>
+                            <div class="project-client">${project.client}</div>
+                        </div>
+                        <div class="project-header-actions">
+                            <button class="project-action-btn" onclick="editProject(${project.id})">Edit</button>
+                        </div>
+                    </div>
+                    
+                    <div class="project-detail-tabs">
+                        <div class="project-tab ${data.currentProjectTab === 'overview' ? 'active' : ''}" onclick="switchProjectTab('overview')">📊 Overview</div>
+                        <div class="project-tab ${data.currentProjectTab === 'finance' ? 'active' : ''}" onclick="switchProjectTab('finance')">💰 Finance</div>
+                        <div class="project-tab ${data.currentProjectTab === 'tasks' ? 'active' : ''}" onclick="switchProjectTab('tasks')">✅ Tasks</div>
+                    </div>
+                    
+                    <div id="projectTabContent">`;
+            
+            if (data.currentProjectTab === 'overview') {
+                html += `
+                    <div class="stats-grid" style="margin-bottom: 15px;">
+                        <div class="stat-card">
+                            <div class="stat-value green">$${income.toFixed(0)}</div>
+                            <div class="stat-label">Income</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value red">$${expenses.toFixed(0)}</div>
+                            <div class="stat-label">Expenses</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value ${profit >= 0 ? 'green' : 'red'}">$${profit.toFixed(0)}</div>
+                            <div class="stat-label">Profit</div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: var(--bg-color); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                        <div style="font-size: 14px; color: var(--text-secondary); margin-bottom: 5px;">Task Progress</div>
+                        <div style="font-size: 24px; font-weight: bold;">${completed} / ${tasks.length}</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);">${tasks.length > 0 ? Math.round(completed/tasks.length*100) : 0}% Complete</div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <button class="btn btn-primary" onclick="quickAddTransaction('expense')">+ Add Expense</button>
+                        <button class="btn btn-primary" onclick="quickAddTransaction('income')">+ Add Income</button>
+                    </div>
+                    <button class="btn btn-primary" onclick="quickAddTask()" style="width: 100%; margin-top: 10px;">+ Add Task</button>
+                `;
+            } else if (data.currentProjectTab === 'finance') {
+                const transactions = data.transactions.filter(t => t.projectId === project.id);
+                html += `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                        <button class="btn btn-primary" onclick="quickAddTransaction('expense')">+ Expense</button>
+                        <button class="btn btn-primary" onclick="quickAddTransaction('income')">+ Income</button>
+                    </div>
+                    ${transactions.length === 0 ? 
+                        '<div class="empty-state">No transactions yet</div>' :
+                        transactions.map(t => `
+                            <div class="transaction-item ${t.type}">
+                                <span class="badge badge-${t.type}">${t.type}</span>
+                                <div class="item-title">${t.category || 'Transaction'}</div>
+                                <span class="item-amount ${t.type}">${t.type === 'income' ? '+' : '-'}$${t.amount.toFixed(2)}</span>
+                                <div class="item-meta">${t.date} ${t.description ? '• ' + t.description : ''}</div>
+                                <div class="action-buttons">
+                                    <button class="btn btn-small btn-edit" onclick="editTransaction(${t.id})">Edit</button>
+                                    <button class="btn btn-small btn-delete" onclick="deleteTransaction(${t.id})">Delete</button>
+                                </div>
+                            </div>
+                        `).join('')
+                    }
+                `;
+            } else if (data.currentProjectTab === 'tasks') {
+                html += `
+                    <button class="btn btn-primary" onclick="quickAddTask()" style="width: 100%; margin-bottom: 15px;">+ Add Task</button>
+                    ${tasks.length === 0 ?
+                        '<div class="empty-state">No tasks yet</div>' :
+                        tasks.map(t => {
+                            const isOverdue = new Date(t.dueDate) < new Date() && t.status !== 'Completed';
+                            return `
+                                <div class="task-item ${t.status === 'Completed' ? 'completed' : isOverdue ? 'overdue' : ''}">
+                                    <span class="badge badge-${t.status === 'Completed' ? 'completed' : 'pending'}">${t.status}</span>
+                                    <div class="item-title">${t.name}</div>
+                                    <div class="item-meta">Due: ${t.dueDate} • ${t.priority}</div>
+                                    ${t.description ? `<div style="font-size: 12px; margin-top: 5px; color: var(--text-secondary);">${t.description}</div>` : ''}
+                                    <div class="action-buttons">
+                                        <button class="btn btn-small btn-edit" onclick="editTask(${t.id})">Edit</button>
+                                        <button class="btn btn-small btn-delete" onclick="deleteTask(${t.id})">Delete</button>
+                                    </div>
+                                </div>
+                            `;
+                        }).join('')
+                    }
+                `;
+            }
+            
+            html += `
+                    </div>
+                </div>
+            `;
+            
             container.innerHTML = html;
         }
         
@@ -1177,7 +1373,7 @@
                         }
                         
                         return `
-                            <div style="background: var(--bg-color); padding: 15px; border-radius: 8px; margin-bottom: 12px;">
+                            <div style="background: var(--bg-color); padding: 15px; border-radius: 8px; margin-bottom: 12px; cursor: pointer;" onclick="openProject(${project.id})">
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
                                     <div>
                                         <div style="font-weight: 600; margin-bottom: 4px;">${project.name}</div>
@@ -1185,7 +1381,7 @@
                                             ${project.client} | ${startDate} → ${endDate}
                                         </div>
                                     </div>
-                                    <button class="btn btn-small btn-edit" onclick="editProject(${project.id})">Edit</button>
+                                    <button class="btn btn-small btn-edit" onclick="event.stopPropagation(); editProject(${project.id})">Edit</button>
                                 </div>
                                 
                                 <div style="background: var(--card-bg); padding: 10px; border-radius: 6px;">
@@ -1209,16 +1405,15 @@
             container.innerHTML = html;
         }
         
-        // FAB Handler - FIXED
         function handleFAB() {
-            if (data.currentView === 'home' || data.currentView === 'projects') {
+            if (data.currentProject) {
+                quickAddTask();
+            } else if (data.currentView === 'home' || data.currentView === 'projects' || data.currentView === 'schedule') {
                 showProjectModal();
             } else if (data.currentView === 'finance') {
                 showTransactionModal();
             } else if (data.currentView === 'tasks') {
                 showTaskModal();
-            } else if (data.currentView === 'schedule') {
-                showProjectModal();
             }
         }
         
@@ -1228,6 +1423,7 @@
             document.getElementById('projectName').value = '';
             document.getElementById('projectClient').value = '';
             document.getElementById('projectStart').value = new Date().toISOString().split('T')[0];
+            document.getElementById('projectDescription').value = '';
             document.getElementById('projectModal').classList.add('show');
         }
         
@@ -1240,6 +1436,7 @@
             document.getElementById('projectName').value = project.name;
             document.getElementById('projectClient').value = project.client;
             document.getElementById('projectStart').value = project.startDate;
+            document.getElementById('projectDescription').value = project.description || '';
             document.getElementById('projectModal').classList.add('show');
         }
         
@@ -1247,6 +1444,7 @@
             const name = document.getElementById('projectName').value;
             const client = document.getElementById('projectClient').value;
             const startDate = document.getElementById('projectStart').value;
+            const description = document.getElementById('projectDescription').value;
             
             if (!name || !client) {
                 alert('Please fill in required fields');
@@ -1254,24 +1452,24 @@
             }
             
             if (editingId) {
-                // FIXED: Update existing project
                 const index = data.projects.findIndex(p => p.id === editingId);
                 if (index !== -1) {
                     data.projects[index] = {
                         ...data.projects[index],
                         name: name,
                         client: client,
-                        startDate: startDate
+                        startDate: startDate,
+                        description: description
                     };
                 }
                 showStatus('✅ Project updated!');
             } else {
-                // Create new project
                 const project = {
                     id: Date.now(),
                     name: name,
                     client: client,
                     startDate: startDate,
+                    description: description,
                     createdAt: new Date().toISOString()
                 };
                 data.projects.push(project);
@@ -1297,9 +1495,24 @@
         
         function showTransactionModal() {
             editingId = null;
+            lockedProjectId = null;
             document.getElementById('transactionModalTitle').textContent = 'Add Transaction';
             document.getElementById('transType').value = 'expense';
+            document.getElementById('transProjectGroup').style.display = 'block';
             populateProjectSelect('transProject');
+            updateTransCategories();
+            document.getElementById('transAmount').value = '';
+            document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('transDescription').value = '';
+            document.getElementById('transactionModal').classList.add('show');
+        }
+        
+        function quickAddTransaction(type) {
+            editingId = null;
+            lockedProjectId = data.currentProject;
+            document.getElementById('transactionModalTitle').textContent = `Add ${type === 'income' ? 'Income' : 'Expense'}`;
+            document.getElementById('transType').value = type;
+            document.getElementById('transProjectGroup').style.display = 'none';
             updateTransCategories();
             document.getElementById('transAmount').value = '';
             document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
@@ -1322,10 +1535,18 @@
             const trans = data.transactions.find(t => t.id === transId);
             if (!trans) return;
             
+            lockedProjectId = data.currentProject;
             document.getElementById('transactionModalTitle').textContent = 'Edit Transaction';
             document.getElementById('transType').value = trans.type;
-            populateProjectSelect('transProject');
-            document.getElementById('transProject').value = trans.projectId || '';
+            
+            if (lockedProjectId) {
+                document.getElementById('transProjectGroup').style.display = 'none';
+            } else {
+                document.getElementById('transProjectGroup').style.display = 'block';
+                populateProjectSelect('transProject');
+                document.getElementById('transProject').value = trans.projectId || '';
+            }
+            
             updateTransCategories();
             document.getElementById('transCategory').value = trans.category;
             document.getElementById('transAmount').value = trans.amount;
@@ -1342,12 +1563,14 @@
                 return;
             }
             
+            const projectId = lockedProjectId || (parseInt(document.getElementById('transProject').value) || null);
+            
             if (editingId) {
                 const index = data.transactions.findIndex(t => t.id === editingId);
                 if (index !== -1) {
                     data.transactions[index] = {
                         ...data.transactions[index],
-                        projectId: parseInt(document.getElementById('transProject').value) || null,
+                        projectId: projectId,
                         type: document.getElementById('transType').value,
                         category: document.getElementById('transCategory').value,
                         amount: amount,
@@ -1359,7 +1582,7 @@
             } else {
                 const transaction = {
                     id: Date.now(),
-                    projectId: parseInt(document.getElementById('transProject').value) || null,
+                    projectId: projectId,
                     type: document.getElementById('transType').value,
                     category: document.getElementById('transCategory').value,
                     amount: amount,
@@ -1387,12 +1610,28 @@
         
         function showTaskModal() {
             editingId = null;
+            lockedProjectId = null;
             document.getElementById('taskModalTitle').textContent = 'Add Task';
             document.getElementById('taskName').value = '';
+            document.getElementById('taskProjectGroup').style.display = 'block';
             populateProjectSelect('taskProject');
             document.getElementById('taskPriority').value = 'Medium';
             document.getElementById('taskDue').value = new Date().toISOString().split('T')[0];
             document.getElementById('taskStatus').value = 'Not Started';
+            document.getElementById('taskDescription').value = '';
+            document.getElementById('taskModal').classList.add('show');
+        }
+        
+        function quickAddTask() {
+            editingId = null;
+            lockedProjectId = data.currentProject;
+            document.getElementById('taskModalTitle').textContent = 'Add Task';
+            document.getElementById('taskName').value = '';
+            document.getElementById('taskProjectGroup').style.display = 'none';
+            document.getElementById('taskPriority').value = 'Medium';
+            document.getElementById('taskDue').value = new Date().toISOString().split('T')[0];
+            document.getElementById('taskStatus').value = 'Not Started';
+            document.getElementById('taskDescription').value = '';
             document.getElementById('taskModal').classList.add('show');
         }
         
@@ -1401,13 +1640,22 @@
             const task = data.tasks.find(t => t.id === taskId);
             if (!task) return;
             
+            lockedProjectId = data.currentProject;
             document.getElementById('taskModalTitle').textContent = 'Edit Task';
             document.getElementById('taskName').value = task.name;
-            populateProjectSelect('taskProject');
-            document.getElementById('taskProject').value = task.projectId || '';
+            
+            if (lockedProjectId) {
+                document.getElementById('taskProjectGroup').style.display = 'none';
+            } else {
+                document.getElementById('taskProjectGroup').style.display = 'block';
+                populateProjectSelect('taskProject');
+                document.getElementById('taskProject').value = task.projectId || '';
+            }
+            
             document.getElementById('taskPriority').value = task.priority || 'Medium';
             document.getElementById('taskDue').value = task.dueDate;
             document.getElementById('taskStatus').value = task.status;
+            document.getElementById('taskDescription').value = task.description || '';
             document.getElementById('taskModal').classList.add('show');
         }
         
@@ -1420,27 +1668,31 @@
                 return;
             }
             
+            const projectId = lockedProjectId || (parseInt(document.getElementById('taskProject').value) || null);
+            
             if (editingId) {
                 const index = data.tasks.findIndex(t => t.id === editingId);
                 if (index !== -1) {
                     data.tasks[index] = {
                         ...data.tasks[index],
                         name: name,
-                        projectId: parseInt(document.getElementById('taskProject').value) || null,
+                        projectId: projectId,
                         priority: document.getElementById('taskPriority').value,
                         dueDate: dueDate,
-                        status: document.getElementById('taskStatus').value
+                        status: document.getElementById('taskStatus').value,
+                        description: document.getElementById('taskDescription').value
                     };
                 }
                 showStatus('✅ Task updated!');
             } else {
                 const task = {
                     id: Date.now(),
-                    projectId: parseInt(document.getElementById('taskProject').value) || null,
+                    projectId: projectId,
                     name: name,
                     priority: document.getElementById('taskPriority').value,
                     dueDate: dueDate,
                     status: document.getElementById('taskStatus').value,
+                    description: document.getElementById('taskDescription').value,
                     createdAt: new Date().toISOString()
                 };
                 data.tasks.push(task);
