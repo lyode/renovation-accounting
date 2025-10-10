@@ -58,6 +58,7 @@
         body.night-mode .project-tab.active { background: var(--card-bg); color: var(--primary-color); }
         body.night-mode .kanban-column { background: var(--card-bg); }
         body.night-mode .kanban-task { background: #3a3a42; }
+        body.night-mode .gantt-chart { background: #2f2f36; }
         
         body.theme-steel { --primary-gradient: linear-gradient(135deg, #7899b3 0%, #a8c5d6 100%); --primary-color: #7899b3; --bg-color: #e6eff5; }
         body.theme-sage { --primary-gradient: linear-gradient(135deg, #87a087 0%, #a8c0a8 100%); --primary-color: #87a087; --bg-color: #eef4ee; }
@@ -148,6 +149,39 @@
             text-align: center;
         }
         
+        .sync-status-bar {
+            background: var(--primary-light);
+            color: var(--text-color);
+            padding: 4px 10px;
+            font-size: 11px;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .sync-status-bar.syncing {
+            background: #fbbf24;
+            animation: pulse 1s infinite;
+        }
+        
+        .sync-status-bar.success {
+            background: #10b981;
+            color: white;
+        }
+        
+        .sync-status-bar.error {
+            background: #ef4444;
+            color: white;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
         .view-tabs {
             background: var(--card-bg);
             display: flex;
@@ -176,7 +210,7 @@
             border-bottom-color: var(--primary-color);
         }
         
-        .sync-status {
+        .sync-notification {
             position: fixed;
             top: calc(120px + env(safe-area-inset-top));
             left: 50%;
@@ -192,14 +226,31 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         
-        .sync-status.show { opacity: 1; }
-        .sync-status.syncing { background: #f39c12; animation: pulse 1s infinite; }
-        .sync-status.error { background: #ef4444; }
-        .sync-status.success { background: #10b981; }
+        .sync-notification.show { opacity: 1; }
+        .sync-notification.syncing { background: #f39c12; animation: pulse 1s infinite; }
+        .sync-notification.error { background: #ef4444; }
+        .sync-notification.success { background: #10b981; }
         
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
+        /* Startup Sync Overlay */
+        #startup-sync-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @keyframes progress {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
         }
         
         .container {
@@ -213,9 +264,15 @@
         
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
             margin-bottom: 20px;
+        }
+        
+        @media (min-width: 640px) {
+            .stats-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
         }
         
         .stat-card {
@@ -262,6 +319,53 @@
             font-size: calc(16px * var(--font-scale));
             font-weight: 600;
             color: var(--text-color);
+        }
+        
+        /* Gantt Chart Styles */
+        .gantt-chart {
+            background: var(--bg-color);
+            border-radius: 8px;
+            padding: 10px;
+            overflow-x: auto;
+        }
+        
+        .gantt-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            min-height: 30px;
+        }
+        
+        .gantt-label {
+            min-width: 120px;
+            font-size: calc(11px * var(--font-scale));
+            padding-right: 10px;
+            color: var(--text-primary);
+        }
+        
+        .gantt-bar-container {
+            flex: 1;
+            position: relative;
+            height: 24px;
+            background: repeating-linear-gradient(90deg, var(--border-color) 0, var(--border-color) 1px, transparent 1px, transparent 40px);
+        }
+        
+        .gantt-bar {
+            position: absolute;
+            height: 20px;
+            background: var(--primary-gradient);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            color: white;
+            font-size: calc(10px * var(--font-scale));
+            font-weight: 500;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .gantt-bar.completed {
+            background: linear-gradient(135deg, var(--success) 0%, #0e9469 100%);
         }
         
         /* Kanban Board Styles */
@@ -484,6 +588,7 @@
         
         .task-item.completed { border-left-color: var(--success); opacity: 0.7; }
         .task-item.overdue { border-left-color: var(--danger); }
+        .task-item.due-today { border-left-color: var(--warning); }
         .transaction-item.income { border-left-color: var(--success); }
         .transaction-item.expense { border-left-color: var(--danger); }
         
@@ -720,6 +825,25 @@
             display: block;
         }
         
+        .api-status {
+            padding: 0.625rem;
+            border-radius: 0.375rem;
+            font-size: 0.8125rem;
+            margin-bottom: 0.75rem;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .api-status.connected {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .api-status.disconnected {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
         .user-profile-section {
             background: var(--primary-gradient);
             color: white;
@@ -806,55 +930,6 @@
         
         .toggle-switch input[type="checkbox"]:checked::after { left: 22px; }
         
-        .conflict-modal {
-            background: rgba(0,0,0,0.7);
-        }
-        
-        .conflict-content {
-            max-width: 500px;
-        }
-        
-        .conflict-warning {
-            background: #fff3cd;
-            color: #856404;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: calc(12px * var(--font-scale));
-        }
-        
-        .conflict-options {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        
-        .conflict-option {
-            padding: 15px;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            cursor: pointer;
-            background: var(--bg-color);
-            transition: all 0.3s;
-        }
-        
-        .conflict-option:hover {
-            border-color: var(--primary-color);
-            background: var(--primary-light);
-        }
-        
-        .conflict-option-title {
-            font-weight: 600;
-            margin-bottom: 5px;
-            color: var(--text-primary);
-            font-size: calc(13px * var(--font-scale));
-        }
-        
-        .conflict-option-desc {
-            font-size: calc(11px * var(--font-scale));
-            color: var(--text-secondary);
-        }
-        
         .hidden { display: none; }
         
         @media (max-width: 768px) {
@@ -871,16 +946,33 @@
                 <span class="user-badge" id="userBadge">Loading...</span>
             </div>
             <div class="header-buttons">
-                <button class="header-btn" onclick="syncData()" title="Sync" id="syncBtn">
-                    ☁️
-                    <span class="badge" id="conflictBadge" style="display: none;">!</span>
+                <button class="header-btn" onclick="manualSync()" title="Smart Sync" id="syncBtn">
+                    🔄
                 </button>
                 <button class="header-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
             </div>
         </div>
+        <div class="sync-status-bar" id="syncStatusBar">
+            <span id="deviceType"></span> • 
+            <span id="lastSyncTime">Never synced</span> • 
+            <span id="syncMode">Offline</span>
+        </div>
     </div>
     
-    <div class="sync-status" id="syncStatus"></div>
+    <div class="sync-notification" id="syncNotification"></div>
+    
+    <!-- Startup Sync Loading Overlay -->
+    <div id="startup-sync-overlay">
+        <div style="background: var(--card-bg); padding: 2rem; border-radius: 1rem; text-align: center; max-width: 340px; box-shadow: 0 20px 50px rgba(0,0,0,0.3);">
+            <div style="font-size: 3rem; margin-bottom: 1rem; animation: spin 2s linear infinite;">🔄</div>
+            <div style="font-size: 1.25rem; font-weight: bold; color: var(--text-color); margin-bottom: 0.5rem;">Smart Sync in Progress</div>
+            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;" id="sync-progress-text">Pulling latest data from cloud...</div>
+            <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden; margin-bottom: 0.75rem;">
+                <div style="width: 100%; height: 100%; background: var(--primary-color); animation: progress 2s ease-in-out infinite;"></div>
+            </div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Merging data from all users...</div>
+        </div>
+    </div>
     
     <div class="view-tabs">
         <div class="view-tab active" onclick="switchView('home')">🏠 Home</div>
@@ -908,20 +1000,23 @@
         </div>
         
         <div class="settings-section">
-            <label class="settings-label">🔑 Cloud Sync</label>
-            <button class="btn btn-secondary" onclick="setupSync()" style="width: 100%; margin-bottom: 10px;">Setup Sync</button>
+            <label class="settings-label">🔑 API Key Setup</label>
+            <div class="api-status" id="apiStatus">Not Connected</div>
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <input type="password" id="apiKeyInput" placeholder="Enter JSONBin API Key" class="form-input" style="flex: 1;">
+                <button class="btn btn-small btn-primary" onclick="saveApiKey()">Save</button>
+            </div>
+            <button class="btn btn-secondary" onclick="removeApiKey()" style="width: 100%;">Remove API Key</button>
+        </div>
+        
+        <div class="settings-section">
+            <label class="settings-label">⚡ Auto Sync</label>
             <div class="toggle-switch">
-                <span style="font-size: 12px;">Enable Auto-Sync</span>
+                <span style="font-size: 12px;">Enable Auto-Sync (5 min)</span>
                 <input type="checkbox" id="autoSyncToggle" onchange="toggleAutoSync()">
             </div>
-            <div class="form-group" style="margin-bottom: 0;">
-                <label style="font-size: 11px; margin-bottom: 5px;">Sync Interval</label>
-                <select class="form-select" id="syncInterval" onchange="updateSyncInterval()">
-                    <option value="30">Every 30 seconds</option>
-                    <option value="60" selected>Every 1 minute</option>
-                    <option value="120">Every 2 minutes</option>
-                    <option value="300">Every 5 minutes</option>
-                </select>
+            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">
+                When enabled, syncs on app open + every 5 minutes
             </div>
         </div>
         
@@ -962,38 +1057,6 @@
     </div>
     
     <button class="fab" onclick="handleFAB()">+</button>
-    
-    <!-- Conflict Resolution Modal -->
-    <div class="modal conflict-modal" id="conflictModal">
-        <div class="modal-content conflict-content">
-            <div class="modal-header">
-                <h2 class="modal-title">⚠️ Sync Conflict Detected</h2>
-            </div>
-            <div class="modal-body">
-                <div class="conflict-warning">
-                    <strong>Changes detected in cloud!</strong><br>
-                    Your local data differs from the cloud. Choose how to resolve:
-                </div>
-                <div class="conflict-options">
-                    <div class="conflict-option" onclick="resolveConflict('cloud')">
-                        <div class="conflict-option-title">☁️ Use Cloud Version</div>
-                        <div class="conflict-option-desc">Replace your local data with cloud data (your recent changes will be lost)</div>
-                    </div>
-                    <div class="conflict-option" onclick="resolveConflict('local')">
-                        <div class="conflict-option-title">💾 Use My Version</div>
-                        <div class="conflict-option-desc">Overwrite cloud with your local data (cloud changes will be lost)</div>
-                    </div>
-                    <div class="conflict-option" onclick="resolveConflict('merge')">
-                        <div class="conflict-option-title">🔀 Merge Both</div>
-                        <div class="conflict-option-desc">Combine both versions (may create duplicates)</div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal('conflictModal')">Cancel</button>
-            </div>
-        </div>
-    </div>
     
     <div class="modal" id="projectModal">
         <div class="modal-content">
@@ -1160,86 +1223,146 @@
     </div>
 
     <script>
-        // Enhanced Cloud Sync with Conflict Resolution
-        class CloudSync {
+        // Device Detection
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const deviceType = isMobile ? 'Mobile' : 'Desktop';
+        
+        // Auto-sync variables
+        let autoSyncInterval = null;
+        const AUTO_SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
+        
+        // Smart Cloud Sync Manager with Pull->Merge->Push
+        class SmartCloudSync {
             constructor() {
                 this.binId = '68e121b8ae596e708f05df17';
-                this.apiKey = '';
+                this.apiKey = localStorage.getItem('builderProApiKey') || '';
                 this.baseUrl = 'https://api.jsonbin.io/v3';
+                this.lastSyncTime = parseInt(localStorage.getItem('lastSyncTime')) || 0;
                 this.isSyncing = false;
-                this.lastSyncTime = null;
-                this.autoSyncInterval = null;
-                this.pendingConflict = null;
             }
             
             async setup() {
-                const saved = localStorage.getItem('syncApiKey');
-                if (saved) {
-                    this.apiKey = saved;
-                    return true;
-                }
+                return !!this.apiKey;
+            }
+            
+            // Merge function - combines arrays without duplicates
+            mergeData(cloudArray, localArray, uniqueKey) {
+                console.log(`Merging ${uniqueKey}s:`, {
+                    cloudCount: cloudArray.length,
+                    localCount: localArray.length
+                });
                 
-                const apiKey = prompt('Enter your JSONBin API Key:\n\nGet one free at jsonbin.io');
-                if (!apiKey) {
-                    showStatus('Sync cancelled', 'error');
-                    return false;
-                }
+                const merged = [...cloudArray];
+                const cloudIds = new Set(cloudArray.map(item => String(item[uniqueKey])));
                 
-                this.apiKey = apiKey.trim();
-                localStorage.setItem('syncApiKey', this.apiKey);
+                let addedCount = 0;
+                localArray.forEach(localItem => {
+                    const localId = String(localItem[uniqueKey]);
+                    if (!cloudIds.has(localId)) {
+                        merged.push(localItem);
+                        addedCount++;
+                        console.log(`Added new local item: ${localId}`);
+                    }
+                });
                 
-                try {
-                    const response = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
-                        headers: { 'X-Master-Key': this.apiKey }
-                    });
-                    
-                    if (!response.ok) throw new Error('Invalid API key');
-                    showStatus('✅ Sync connected!', 'success');
-                    return true;
-                } catch (error) {
-                    showStatus('❌ Invalid API key', 'error');
-                    localStorage.removeItem('syncApiKey');
-                    this.apiKey = '';
-                    return false;
-                }
+                console.log(`Merge complete: ${merged.length} total (added: ${addedCount})`);
+                return merged;
             }
             
             async push(silent = false) {
-                if (!await this.setup()) return false;
                 if (this.isSyncing) return false;
                 
+                if (!await this.setup()) {
+                    showNotification('⚠️ No API key set', 'error');
+                    return false;
+                }
+                
                 this.isSyncing = true;
-                if (!silent) showStatus('Syncing...', 'syncing');
+                updateSyncStatus('Syncing...', true);
                 
                 try {
-                    const dataToSync = {
+                    // STEP 1: Pull latest cloud data first
+                    console.log('Step 1: Pulling latest cloud data...');
+                    const pullResponse = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
+                        headers: { 'X-Master-Key': this.apiKey }
+                    });
+                    
+                    let cloudData = { projects: [], transactions: [], tasks: [], users: [], activityLog: [] };
+                    if (pullResponse.ok) {
+                        const result = await pullResponse.json();
+                        cloudData = result.record;
+                        console.log('Cloud data retrieved:', cloudData);
+                    }
+                    
+                    // STEP 2: Merge local with cloud data
+                    console.log('Step 2: Merging data...');
+                    const mergedProjects = this.mergeData(cloudData.projects || [], data.projects, 'id');
+                    const mergedTransactions = this.mergeData(cloudData.transactions || [], data.transactions, 'id');
+                    const mergedTasks = this.mergeData(cloudData.tasks || [], data.tasks, 'id');
+                    const mergedUsers = [...new Set([...(cloudData.users || []), ...data.users])];
+                    const mergedActivity = [...(cloudData.activityLog || []), ...data.activityLog]
+                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+                        .slice(0, 100);
+                    
+                    // STEP 3: Push merged data to cloud
+                    const pushData = {
                         ...data,
+                        projects: mergedProjects,
+                        transactions: mergedTransactions,
+                        tasks: mergedTasks,
+                        users: mergedUsers,
+                        activityLog: mergedActivity,
                         lastUpdated: new Date().toISOString(),
                         lastUpdatedBy: data.currentUser,
                         syncVersion: (data.syncVersion || 0) + 1
                     };
                     
+                    console.log('Step 3: Pushing merged data to cloud...');
                     const response = await fetch(`${this.baseUrl}/b/${this.binId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-Master-Key': this.apiKey
                         },
-                        body: JSON.stringify(dataToSync)
+                        body: JSON.stringify(pushData)
                     });
                     
                     if (response.ok) {
-                        this.lastSyncTime = new Date();
-                        data.syncVersion = dataToSync.syncVersion;
-                        data.lastUpdated = dataToSync.lastUpdated;
-                        if (!silent) showStatus('☁️ Synced!', 'success');
+                        // STEP 4: Update local data with merged data
+                        data.projects = mergedProjects;
+                        data.transactions = mergedTransactions;
+                        data.tasks = mergedTasks;
+                        data.users = mergedUsers;
+                        data.activityLog = mergedActivity;
+                        data.syncVersion = pushData.syncVersion;
+                        data.lastUpdated = pushData.lastUpdated;
+                        
+                        saveData();
+                        renderView();
+                        
+                        this.lastSyncTime = Date.now();
+                        localStorage.setItem('lastSyncTime', this.lastSyncTime.toString());
+                        
+                        if (!silent) showNotification('☁️ Synced & Merged!', 'success');
+                        updateSyncStatus('Synced', false);
+                        updateLastSyncDisplay();
+                        
+                        console.log('✅ Sync complete!', {
+                            projects: data.projects.length,
+                            tasks: data.tasks.length,
+                            transactions: data.transactions.length
+                        });
+                        
                         return true;
                     } else {
-                        showStatus('⚠️ Sync failed', 'error');
+                        showNotification('⚠️ Sync failed', 'error');
+                        updateSyncStatus('Sync Failed', false);
                         return false;
                     }
                 } catch (error) {
-                    showStatus('📵 Offline', 'error');
+                    console.error('Sync error:', error);
+                    showNotification('📵 Offline', 'error');
+                    updateSyncStatus('Offline', false);
                     return false;
                 } finally {
                     this.isSyncing = false;
@@ -1247,11 +1370,12 @@
             }
             
             async pull(silent = false) {
-                if (!await this.setup()) return false;
-                if (this.isSyncing) return false;
+                if (!await this.setup()) {
+                    showNotification('⚠️ No API key set', 'error');
+                    return false;
+                }
                 
-                this.isSyncing = true;
-                if (!silent) showStatus('Loading...', 'syncing');
+                updateSyncStatus('Loading...', true);
                 
                 try {
                     const response = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
@@ -1262,74 +1386,48 @@
                         const result = await response.json();
                         const cloudData = result.record;
                         
-                        // Check for conflicts
-                        if (data.lastUpdated && cloudData.lastUpdated !== data.lastUpdated) {
-                            const localVersion = data.syncVersion || 0;
-                            const cloudVersion = cloudData.syncVersion || 0;
-                            
-                            if (localVersion !== cloudVersion) {
-                                this.pendingConflict = cloudData;
-                                this.isSyncing = false;
-                                document.getElementById('conflictBadge').style.display = 'block';
-                                showConflictModal();
-                                return false;
-                            }
-                        }
-                        
                         // Apply cloud data
-                        this.applyCloudData(cloudData);
-                        this.lastSyncTime = new Date();
-                        if (!silent) showStatus('☁️ Loaded from cloud', 'success');
+                        data.projects = cloudData.projects || [];
+                        data.transactions = cloudData.transactions || [];
+                        data.tasks = cloudData.tasks || [];
+                        data.users = cloudData.users || data.users;
+                        data.activityLog = cloudData.activityLog || [];
+                        
+                        if (cloudData.theme) setTheme(cloudData.theme);
+                        if (cloudData.nightMode) {
+                            document.body.classList.add('night-mode');
+                            document.getElementById('nightToggle').checked = true;
+                        }
+                        if (cloudData.contrast) setContrast(cloudData.contrast);
+                        if (cloudData.fontSize) setFontSize(cloudData.fontSize);
+                        
+                        saveData();
+                        renderView();
+                        updateUserBadge();
+                        
+                        this.lastSyncTime = Date.now();
+                        localStorage.setItem('lastSyncTime', this.lastSyncTime.toString());
+                        
+                        if (!silent) showNotification('☁️ Loaded from cloud', 'success');
+                        updateSyncStatus('Synced', false);
+                        updateLastSyncDisplay();
                         return true;
                     } else {
-                        showStatus('⚠️ Failed to load', 'error');
+                        showNotification('⚠️ Load failed', 'error');
+                        updateSyncStatus('Load Failed', false);
                         return false;
                     }
                 } catch (error) {
-                    showStatus('📵 Offline', 'error');
+                    showNotification('📵 Offline', 'error');
+                    updateSyncStatus('Offline', false);
                     return false;
-                } finally {
-                    this.isSyncing = false;
-                }
-            }
-            
-            applyCloudData(cloudData) {
-                const oldView = data.currentView;
-                const oldProject = data.currentProject;
-                
-                data = { 
-                    ...data, 
-                    ...cloudData,
-                    currentView: oldView,
-                    currentProject: oldProject
-                };
-                
-                saveData();
-                renderView();
-                updateUserBadge();
-            }
-            
-            startAutoSync(intervalSeconds = 60) {
-                this.stopAutoSync();
-                this.autoSyncInterval = setInterval(() => {
-                    if (navigator.onLine && !this.isSyncing) {
-                        this.pull(true);
-                    }
-                }, intervalSeconds * 1000);
-                addActivityLog('System', 'Auto-sync enabled');
-            }
-            
-            stopAutoSync() {
-                if (this.autoSyncInterval) {
-                    clearInterval(this.autoSyncInterval);
-                    this.autoSyncInterval = null;
-                    addActivityLog('System', 'Auto-sync disabled');
                 }
             }
         }
         
-        const cloudSync = new CloudSync();
+        const cloudSync = new SmartCloudSync();
         
+        // Data structure
         let data = {
             currentUser: '',
             users: ['John Doe', 'Jane Smith', 'Mike Johnson', 'Sarah Williams'],
@@ -1343,8 +1441,8 @@
             contrast: 'normal',
             fontSize: 'normal',
             nightMode: false,
+            theme: '',
             autoSyncEnabled: false,
-            autoSyncInterval: 60,
             lastUpdated: null,
             syncVersion: 0
         };
@@ -1352,19 +1450,205 @@
         let editingId = null;
         let lockedProjectId = null;
         let draggedElement = null;
-        const binId = '68e121b8ae596e708f05df17';
         
         const expenseCategories = ['Materials', 'Labor', 'Tools & Equipment', 'Transportation', 'Permits', 'Subcontractors', 'Other'];
         const incomeCategories = ['Project Payment', 'Deposit', 'Final Payment', 'Progress Payment', 'Other Income'];
         
-        document.addEventListener('DOMContentLoaded', () => {
-            loadData();
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async () => {
+            await loadData();
             initializeUser();
             renderView();
             setupDefaults();
             applySettings();
             updateUserBadge();
+            initializeSettings();
+            
+            // Auto-sync on startup if enabled
+            if (data.autoSyncEnabled && cloudSync.apiKey) {
+                await performStartupSync();
+            }
         });
+        
+        function initializeSettings() {
+            updateApiStatus();
+            document.getElementById('autoSyncToggle').checked = data.autoSyncEnabled;
+            
+            if (data.autoSyncEnabled && cloudSync.apiKey) {
+                startAutoSync();
+            }
+        }
+        
+        function updateApiStatus() {
+            const statusEl = document.getElementById('apiStatus');
+            if (cloudSync.apiKey) {
+                statusEl.textContent = '✅ Connected';
+                statusEl.className = 'api-status connected';
+            } else {
+                statusEl.textContent = '❌ Not Connected';
+                statusEl.className = 'api-status disconnected';
+            }
+        }
+        
+        function saveApiKey() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            
+            if (!apiKey) {
+                alert('Please enter an API key');
+                return;
+            }
+            
+            // Test the API key
+            fetch(`${cloudSync.baseUrl}/b/${cloudSync.binId}/latest`, {
+                headers: { 'X-Master-Key': apiKey }
+            })
+            .then(response => {
+                if (response.ok) {
+                    cloudSync.apiKey = apiKey;
+                    localStorage.setItem('builderProApiKey', apiKey);
+                    document.getElementById('apiKeyInput').value = '';
+                    updateApiStatus();
+                    showNotification('✅ API Key saved!', 'success');
+                } else {
+                    alert('❌ Invalid API key');
+                }
+            })
+            .catch(error => {
+                alert('❌ Invalid API key');
+            });
+        }
+        
+        function removeApiKey() {
+            if (confirm('Remove API key? This will disable cloud sync.')) {
+                localStorage.removeItem('builderProApiKey');
+                cloudSync.apiKey = '';
+                stopAutoSync();
+                document.getElementById('autoSyncToggle').checked = false;
+                data.autoSyncEnabled = false;
+                saveData();
+                updateApiStatus();
+                showNotification('API key removed', 'success');
+            }
+        }
+        
+        function toggleAutoSync() {
+            data.autoSyncEnabled = document.getElementById('autoSyncToggle').checked;
+            
+            if (data.autoSyncEnabled && !cloudSync.apiKey) {
+                alert('Please set up your API key first');
+                document.getElementById('autoSyncToggle').checked = false;
+                data.autoSyncEnabled = false;
+                return;
+            }
+            
+            if (data.autoSyncEnabled) {
+                startAutoSync();
+                showNotification('✅ Auto-sync enabled', 'success');
+            } else {
+                stopAutoSync();
+                showNotification('⏸️ Auto-sync disabled', 'success');
+            }
+            
+            saveData();
+        }
+        
+        function startAutoSync() {
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            
+            autoSyncInterval = setInterval(async () => {
+                console.log('🔄 Auto-syncing...');
+                await cloudSync.push(true);
+            }, AUTO_SYNC_INTERVAL);
+            
+            console.log('✅ Auto-sync started');
+        }
+        
+        function stopAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+            }
+            console.log('Auto-sync stopped');
+        }
+        
+        async function performStartupSync() {
+            const overlay = document.getElementById('startup-sync-overlay');
+            const progressText = document.getElementById('sync-progress-text');
+            
+            overlay.style.display = 'flex';
+            
+            try {
+                progressText.textContent = 'Pulling latest data from cloud...';
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                progressText.textContent = 'Merging data from all users...';
+                const success = await cloudSync.push();
+                
+                if (success) {
+                    renderView();
+                    progressText.textContent = `✅ Loaded ${data.projects.length} projects, ${data.transactions.length} transactions`;
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                } else {
+                    progressText.textContent = '⚠️ Sync failed - using local data';
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                }
+            } finally {
+                overlay.style.display = 'none';
+            }
+        }
+        
+        async function manualSync() {
+            if (!cloudSync.apiKey) {
+                alert('Please set up your API key in Settings first');
+                toggleSettings();
+                return;
+            }
+            
+            await cloudSync.push();
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('syncNotification');
+            notification.textContent = message;
+            notification.className = 'sync-notification show';
+            
+            if (type === 'syncing') notification.classList.add('syncing');
+            else if (type === 'error') notification.classList.add('error');
+            else if (type === 'success') notification.classList.add('success');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        
+        function updateSyncStatus(status, isLoading) {
+            const statusBar = document.getElementById('syncStatusBar');
+            const syncMode = document.getElementById('syncMode');
+            
+            document.getElementById('deviceType').textContent = deviceType;
+            syncMode.textContent = status;
+            
+            statusBar.classList.remove('syncing', 'success', 'error');
+            if (isLoading) {
+                statusBar.classList.add('syncing');
+            } else if (status === 'Synced') {
+                statusBar.classList.add('success');
+                setTimeout(() => statusBar.classList.remove('success'), 2000);
+            } else if (status.includes('Failed')) {
+                statusBar.classList.add('error');
+            }
+        }
+        
+        function updateLastSyncDisplay() {
+            const lastSync = localStorage.getItem('lastSyncTime');
+            
+            if (lastSync) {
+                const date = new Date(parseInt(lastSync));
+                const timeStr = date.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = date.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                document.getElementById('lastSyncTime').textContent = `${dateStr} ${timeStr}`;
+            }
+        }
         
         function initializeUser() {
             if (!data.currentUser) {
@@ -1394,7 +1678,7 @@
                 saveData();
                 updateUserBadge();
                 addActivityLog(data.currentUser, `Changed name from ${oldName}`);
-                showStatus('Name updated', 'success');
+                showNotification('Name updated', 'success');
             }
         }
         
@@ -1413,16 +1697,9 @@
             
             setContrast(data.contrast);
             setFontSize(data.fontSize);
-            
-            if (data.autoSyncEnabled) {
-                document.getElementById('autoSyncToggle').checked = true;
-                cloudSync.startAutoSync(data.autoSyncInterval);
-            }
-            
-            document.getElementById('syncInterval').value = data.autoSyncInterval;
         }
         
-        function loadData() {
+        async function loadData() {
             const saved = localStorage.getItem('builderProData');
             if (saved) {
                 data = { ...data, ...JSON.parse(saved) };
@@ -1432,134 +1709,6 @@
         function saveData() {
             data.lastUpdated = new Date().toISOString();
             localStorage.setItem('builderProData', JSON.stringify(data));
-        }
-        
-        async function setupSync() {
-            if (await cloudSync.setup()) {
-                const action = confirm('Choose action:\n\n✅ OK = Pull from cloud\n❌ Cancel = Push to cloud');
-                if (action) {
-                    await cloudSync.pull();
-                } else {
-                    await cloudSync.push();
-                }
-            }
-        }
-        
-        async function syncData() {
-            if (!cloudSync.apiKey) {
-                await setupSync();
-            } else {
-                const action = confirm('Choose action:\n\n✅ OK = Pull from cloud\n❌ Cancel = Push to cloud');
-                if (action) {
-                    await cloudSync.pull();
-                } else {
-                    await cloudSync.push();
-                }
-            }
-        }
-        
-        function toggleAutoSync() {
-            data.autoSyncEnabled = document.getElementById('autoSyncToggle').checked;
-            
-            if (data.autoSyncEnabled) {
-                cloudSync.startAutoSync(data.autoSyncInterval);
-                showStatus('Auto-sync enabled', 'success');
-            } else {
-                cloudSync.stopAutoSync();
-                showStatus('Auto-sync disabled', 'success');
-            }
-            
-            saveData();
-        }
-        
-        function updateSyncInterval() {
-            data.autoSyncInterval = parseInt(document.getElementById('syncInterval').value);
-            
-            if (data.autoSyncEnabled) {
-                cloudSync.startAutoSync(data.autoSyncInterval);
-                showStatus(`Sync interval: ${data.autoSyncInterval}s`, 'success');
-            }
-            
-            saveData();
-        }
-        
-        async function resolveConflict(resolution) {
-            const cloudData = cloudSync.pendingConflict;
-            
-            switch(resolution) {
-                case 'cloud':
-                    cloudSync.applyCloudData(cloudData);
-                    showStatus('Cloud version applied', 'success');
-                    addActivityLog(data.currentUser, 'Resolved conflict: used cloud version');
-                    break;
-                    
-                case 'local':
-                    await cloudSync.push();
-                    showStatus('Your version saved to cloud', 'success');
-                    addActivityLog(data.currentUser, 'Resolved conflict: kept local version');
-                    break;
-                    
-                case 'merge':
-                    // Merge unique items
-                    const mergedProjects = [...data.projects];
-                    cloudData.projects.forEach(cp => {
-                        if (!mergedProjects.find(p => p.id === cp.id)) {
-                            mergedProjects.push(cp);
-                        }
-                    });
-                    
-                    const mergedTasks = [...data.tasks];
-                    cloudData.tasks.forEach(ct => {
-                        if (!mergedTasks.find(t => t.id === ct.id)) {
-                            mergedTasks.push(ct);
-                        }
-                    });
-                    
-                    const mergedTransactions = [...data.transactions];
-                    cloudData.transactions.forEach(ct => {
-                        if (!mergedTransactions.find(t => t.id === ct.id)) {
-                            mergedTransactions.push(ct);
-                        }
-                    });
-                    
-                    const mergedUsers = [...new Set([...data.users, ...cloudData.users])];
-                    const mergedActivity = [...data.activityLog, ...cloudData.activityLog]
-                        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-                        .slice(0, 100);
-                    
-                    data.projects = mergedProjects;
-                    data.tasks = mergedTasks;
-                    data.transactions = mergedTransactions;
-                    data.users = mergedUsers;
-                    data.activityLog = mergedActivity;
-                    
-                    saveData();
-                    await cloudSync.push();
-                    renderView();
-                    showStatus('Data merged successfully', 'success');
-                    addActivityLog(data.currentUser, 'Resolved conflict: merged versions');
-                    break;
-            }
-            
-            document.getElementById('conflictBadge').style.display = 'none';
-            cloudSync.pendingConflict = null;
-            closeModal('conflictModal');
-        }
-        
-        function showConflictModal() {
-            document.getElementById('conflictModal').classList.add('show');
-        }
-        
-        function showStatus(msg, type = 'default') {
-            const el = document.getElementById('syncStatus');
-            el.textContent = msg;
-            el.className = 'sync-status show';
-            
-            if (type === 'syncing') el.classList.add('syncing');
-            else if (type === 'error') el.classList.add('error');
-            else if (type === 'success') el.classList.add('success');
-            
-            setTimeout(() => el.classList.remove('show'), 3000);
         }
         
         function addActivityLog(user, action) {
@@ -1572,7 +1721,6 @@
             
             data.activityLog.unshift(activity);
             
-            // Keep only last 100 activities
             if (data.activityLog.length > 100) {
                 data.activityLog = data.activityLog.slice(0, 100);
             }
@@ -1648,8 +1796,16 @@
             const totalTasks = data.tasks.length;
             const completedTasks = data.tasks.filter(t => t.status === 'Completed').length;
             
-            const today = new Date().toISOString().split('T')[0];
-            const todayTasks = data.tasks.filter(t => t.dueDate === today);
+            const today = new Date();
+            today.setHours(0,0,0,0);
+            const todayStr = today.toISOString().split('T')[0];
+            
+            // Today's focus - only due tasks
+            const dueTasks = data.tasks.filter(t => {
+                const dueDate = new Date(t.dueDate);
+                dueDate.setHours(0,0,0,0);
+                return dueDate <= today && t.status !== 'Completed';
+            });
             
             let html = `
                 <div class="stats-grid">
@@ -1658,33 +1814,44 @@
                         <div class="stat-label">Projects</div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-value green">$${totalIncome.toFixed(0)}</div>
+                        <div class="stat-label">Income</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value red">$${totalExpenses.toFixed(0)}</div>
+                        <div class="stat-label">Expenses</div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-value ${profit >= 0 ? 'green' : 'red'}">$${profit.toFixed(0)}</div>
-                        <div class="stat-label">Profit</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${completedTasks}/${totalTasks}</div>
-                        <div class="stat-label">Tasks</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-value">${data.users.length}</div>
-                        <div class="stat-label">Team Members</div>
+                        <div class="stat-label">Net Profit</div>
                     </div>
                 </div>
                 
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title">🎯 Today's Tasks</div>
+                        <div class="card-title">🎯 Today's Focus (Due Tasks)</div>
                     </div>
-                    ${todayTasks.length === 0 ? 
-                        '<div class="empty-state">No tasks due today! 🎉</div>' :
-                        todayTasks.map(task => {
+                    ${dueTasks.length === 0 ? 
+                        '<div class="empty-state">No overdue tasks! 🎉</div>' :
+                        dueTasks.map(task => {
                             const project = data.projects.find(p => p.id === task.projectId);
+                            const dueDate = new Date(task.dueDate);
+                            const isToday = task.dueDate === todayStr;
+                            const daysOverdue = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));
+                            
                             return `
-                                <div class="task-item" onclick="editTask(${task.id})">
-                                    <div class="item-title">${task.name}</div>
+                                <div class="task-item ${isToday ? 'due-today' : 'overdue'}" onclick="editTask(${task.id})">
+                                    <div class="item-title">
+                                        ${task.name} 
+                                        <span class="badge badge-${task.priority.toLowerCase()}">${task.priority}</span>
+                                        ${isToday ? 
+                                            '<span class="badge badge-pending">Due Today</span>' : 
+                                            `<span class="badge badge-expense">${daysOverdue} days overdue</span>`
+                                        }
+                                    </div>
                                     <div class="item-meta">
                                         ${project ? project.name : 'No Project'}
-                                        ${task.assignee ? `<span class="user-tag">${task.assignee}</span>` : ''}
+                                        ${task.assignee ? `• <span class="user-tag">${task.assignee}</span>` : ''}
                                     </div>
                                 </div>
                             `;
@@ -1694,27 +1861,75 @@
                 
                 <div class="card">
                     <div class="card-header">
-                        <div class="card-title">📊 Recent Activity</div>
+                        <div class="card-title">📅 Project Schedule (Gantt Chart)</div>
                     </div>
-                    <div class="activity-list" style="max-height: 200px;">
-                        ${data.activityLog.length === 0 ?
-                            '<div class="empty-state">No activity yet</div>' :
-                            data.activityLog.slice(0, 5).map(activity => {
-                                const time = new Date(activity.timestamp);
-                                const timeStr = formatActivityTime(time);
-                                return `
-                                    <div class="activity-item">
-                                        <div><span class="activity-user">${activity.user}</span> ${activity.action}</div>
-                                        <div class="activity-time">${timeStr}</div>
-                                    </div>
-                                `;
-                            }).join('')
-                        }
+                    ${renderGanttChart()}
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">💰 Finance Summary</div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; text-align: center;">
+                        <div>
+                            <div style="font-size: 24px; color: var(--success); font-weight: bold;">$${totalIncome.toFixed(0)}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Income</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 24px; color: var(--danger); font-weight: bold;">$${totalExpenses.toFixed(0)}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Expenses</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 24px; color: ${profit >= 0 ? 'var(--success)' : 'var(--danger)'}; font-weight: bold;">$${profit.toFixed(0)}</div>
+                            <div style="font-size: 12px; color: var(--text-secondary);">Net</div>
+                        </div>
                     </div>
                 </div>
             `;
             
             container.innerHTML = html;
+        }
+        
+        function renderGanttChart() {
+            if (data.projects.length === 0) {
+                return '<div class="empty-state">No projects to display</div>';
+            }
+            
+            const today = new Date();
+            const minDate = new Date(Math.min(...data.projects.map(p => new Date(p.startDate || today))));
+            const maxDate = new Date(Math.max(...data.projects.map(p => new Date(p.endDate || p.startDate || today))));
+            const totalDays = Math.max(30, Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)));
+            
+            let html = '<div class="gantt-chart">';
+            
+            data.projects.forEach(project => {
+                const startDate = new Date(project.startDate || today);
+                const endDate = new Date(project.endDate || startDate);
+                const startOffset = Math.max(0, Math.floor((startDate - minDate) / (1000 * 60 * 60 * 24)));
+                const duration = Math.max(1, Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24)));
+                const leftPercent = (startOffset / totalDays) * 100;
+                const widthPercent = (duration / totalDays) * 100;
+                
+                const tasks = data.tasks.filter(t => t.projectId === project.id);
+                const completedTasks = tasks.filter(t => t.status === 'Completed').length;
+                const isCompleted = tasks.length > 0 && completedTasks === tasks.length;
+                
+                html += `
+                    <div class="gantt-row">
+                        <div class="gantt-label">${project.name}</div>
+                        <div class="gantt-bar-container">
+                            <div class="gantt-bar ${isCompleted ? 'completed' : ''}" 
+                                 style="left: ${leftPercent}%; width: ${widthPercent}%;"
+                                 onclick="openProject(${project.id})">
+                                ${completedTasks}/${tasks.length}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
         }
         
         function renderProjects(container) {
@@ -1877,13 +2092,16 @@
                         data.tasks.map(t => {
                             const project = data.projects.find(p => p.id === t.projectId);
                             const today = new Date();
+                            today.setHours(0,0,0,0);
                             const dueDate = new Date(t.dueDate);
+                            dueDate.setHours(0,0,0,0);
                             const isOverdue = dueDate < today && t.status !== 'Completed';
+                            const isDueToday = dueDate.getTime() === today.getTime();
                             
                             const priorityBadge = `<span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span>`;
                             
                             return `
-                                <div class="task-item ${t.status === 'Completed' ? 'completed' : isOverdue ? 'overdue' : ''}">
+                                <div class="task-item ${t.status === 'Completed' ? 'completed' : isDueToday ? 'due-today' : isOverdue ? 'overdue' : ''}">
                                     <div class="item-title">${t.name} ${priorityBadge}</div>
                                     <div class="item-meta">
                                         ${project ? project.name : 'No Project'} • Due: ${t.dueDate}
@@ -1933,33 +2151,6 @@
             });
             
             html += '</div></div>';
-            
-            // Task distribution
-            html += `
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">Task Distribution</div>
-                    </div>`;
-            
-            data.users.forEach(user => {
-                const userTasks = data.tasks.filter(t => t.assignee === user);
-                const completed = userTasks.filter(t => t.status === 'Completed').length;
-                const percentage = userTasks.length > 0 ? (completed / userTasks.length * 100).toFixed(0) : 0;
-                
-                html += `
-                    <div style="margin-bottom: 15px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-                            <span style="font-weight: 500;">${user}</span>
-                            <span style="font-size: 12px; color: var(--text-secondary);">${completed}/${userTasks.length} tasks</span>
-                        </div>
-                        <div style="background: var(--bg-color); height: 20px; border-radius: 10px; overflow: hidden;">
-                            <div style="background: var(--primary-gradient); height: 100%; width: ${percentage}%; transition: width 0.3s;"></div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
             
             container.innerHTML = html;
         }
@@ -2144,12 +2335,12 @@
         
         function editProject(projectId) {
             editingId = projectId;
-            const project = data.projects.find(p => p.id === projectId);
+            const project = data.projects.find(p => p.id == projectId);
             if (!project) return;
             
             document.getElementById('projectModalTitle').textContent = 'Edit Project';
-            document.getElementById('projectName').value = project.name;
-            document.getElementById('projectClient').value = project.client;
+            document.getElementById('projectName').value = project.name || '';
+            document.getElementById('projectClient').value = project.client || '';
             document.getElementById('projectStart').value = project.startDate || '';
             document.getElementById('projectEnd').value = project.endDate || '';
             document.getElementById('projectDescription').value = project.description || '';
@@ -2172,7 +2363,7 @@
             }
             
             if (editingId) {
-                const index = data.projects.findIndex(p => p.id === editingId);
+                const index = data.projects.findIndex(p => p.id == editingId);
                 if (index !== -1) {
                     data.projects[index] = {
                         ...data.projects[index],
@@ -2184,7 +2375,7 @@
                         lead: lead
                     };
                 }
-                showStatus('✅ Project updated!', 'success');
+                showNotification('✅ Project updated!', 'success');
                 addActivityLog(data.currentUser, `Updated project: ${name}`);
             } else {
                 const project = {
@@ -2199,7 +2390,7 @@
                     createdAt: new Date().toISOString()
                 };
                 data.projects.push(project);
-                showStatus('✅ Project created!', 'success');
+                showNotification('✅ Project created!', 'success');
                 addActivityLog(data.currentUser, `Created project: ${name}`);
             }
             
@@ -2221,7 +2412,7 @@
                 
                 saveData();
                 renderView();
-                showStatus('🗑️ Project deleted', 'success');
+                showNotification('🗑️ Project deleted', 'success');
                 addActivityLog(data.currentUser, `Deleted project: ${project.name}`);
                 
                 if (data.autoSyncEnabled) {
@@ -2317,7 +2508,7 @@
                         description: document.getElementById('transDescription').value
                     };
                 }
-                showStatus('✅ Transaction updated!', 'success');
+                showNotification('✅ Transaction updated!', 'success');
                 addActivityLog(data.currentUser, `Updated ${type}: $${amount}`);
             } else {
                 const transaction = {
@@ -2332,7 +2523,7 @@
                     createdAt: new Date().toISOString()
                 };
                 data.transactions.push(transaction);
-                showStatus('✅ Transaction saved!', 'success');
+                showNotification('✅ Transaction saved!', 'success');
                 addActivityLog(data.currentUser, `Added ${type}: $${amount}`);
             }
             
@@ -2351,7 +2542,7 @@
                 data.transactions = data.transactions.filter(t => t.id !== transId);
                 saveData();
                 renderView();
-                showStatus('🗑️ Transaction deleted', 'success');
+                showNotification('🗑️ Transaction deleted', 'success');
                 addActivityLog(data.currentUser, `Deleted transaction: $${trans.amount}`);
                 
                 if (data.autoSyncEnabled) {
@@ -2440,7 +2631,7 @@
                         description: document.getElementById('taskDescription').value
                     };
                 }
-                showStatus('✅ Task updated!', 'success');
+                showNotification('✅ Task updated!', 'success');
                 addActivityLog(data.currentUser, `Updated task: ${name}`);
             } else {
                 const task = {
@@ -2456,7 +2647,7 @@
                     createdAt: new Date().toISOString()
                 };
                 data.tasks.push(task);
-                showStatus('✅ Task created!', 'success');
+                showNotification('✅ Task created!', 'success');
                 addActivityLog(data.currentUser, `Created task: ${name}`);
             }
             
@@ -2475,7 +2666,7 @@
                 task.status = 'Completed';
                 saveData();
                 renderView();
-                showStatus('✅ Task completed!', 'success');
+                showNotification('✅ Task completed!', 'success');
                 addActivityLog(data.currentUser, `Completed task: ${task.name}`);
                 
                 if (data.autoSyncEnabled) {
@@ -2490,7 +2681,7 @@
                 data.tasks = data.tasks.filter(t => t.id !== taskId);
                 saveData();
                 renderView();
-                showStatus('🗑️ Task deleted', 'success');
+                showNotification('🗑️ Task deleted', 'success');
                 addActivityLog(data.currentUser, `Deleted task: ${task.name}`);
                 
                 if (data.autoSyncEnabled) {
@@ -2521,13 +2712,13 @@
                 saveData();
                 document.getElementById('newUserName').value = '';
                 showUserModal();
-                showStatus(`✅ ${newUserName} added`, 'success');
+                showNotification(`✅ ${newUserName} added`, 'success');
                 
                 if (data.autoSyncEnabled) {
                     cloudSync.push(true);
                 }
             } else if (data.users.includes(newUserName)) {
-                showStatus('⚠️ User already exists', 'error');
+                showNotification('⚠️ User already exists', 'error');
             }
         }
         
@@ -2543,7 +2734,7 @@
                 addActivityLog(data.currentUser, `Removed team member: ${userName}`);
                 saveData();
                 showUserModal();
-                showStatus(`🗑️ ${userName} removed`, 'success');
+                showNotification(`🗑️ ${userName} removed`, 'success');
                 
                 if (data.autoSyncEnabled) {
                     cloudSync.push(true);
@@ -2637,7 +2828,7 @@
             a.download = 'builder-pro-' + new Date().toISOString().split('T')[0] + '.json';
             a.click();
             URL.revokeObjectURL(url);
-            showStatus('📥 Data exported!', 'success');
+            showNotification('📥 Data exported!', 'success');
             toggleSettings();
         }
         
@@ -2651,9 +2842,10 @@
                         if (confirm('Replace all data? (Cancel to merge)')) {
                             data = { ...data, ...imported };
                         } else {
-                            data.projects = [...data.projects, ...(imported.projects || [])];
-                            data.transactions = [...data.transactions, ...(imported.transactions || [])];
-                            data.tasks = [...data.tasks, ...(imported.tasks || [])];
+                            // Smart merge using the sync logic
+                            data.projects = cloudSync.mergeData(data.projects, imported.projects || [], 'id');
+                            data.transactions = cloudSync.mergeData(data.transactions, imported.transactions || [], 'id');
+                            data.tasks = cloudSync.mergeData(data.tasks, imported.tasks || [], 'id');
                             data.users = [...new Set([...data.users, ...(imported.users || [])])];
                             data.activityLog = [...data.activityLog, ...(imported.activityLog || [])]
                                 .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
@@ -2661,7 +2853,7 @@
                         }
                         saveData();
                         renderView();
-                        showStatus('✅ Data imported!', 'success');
+                        showNotification('✅ Data imported!', 'success');
                         toggleSettings();
                     } catch (error) {
                         alert('Error importing data');
@@ -2695,17 +2887,4 @@
                     const oldStatus = task.status;
                     task.status = newStatus;
                     
-                    addActivityLog(data.currentUser, `Moved "${task.name}" from ${oldStatus} to ${newStatus}`);
-                    saveData();
-                    renderKanban(document.getElementById('mainContent'));
-                    showStatus(`✅ Task moved to ${newStatus}`, 'success');
-                    
-                    if (data.autoSyncEnabled) {
-                        cloudSync.push(true);
-                    }
-                }
-            }
-        }
-    </script>
-</body>
-</html>
+                    addActivityLog(data.currentUser
