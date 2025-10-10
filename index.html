@@ -27,7 +27,12 @@
             --danger: #ef4444;
             --contrast: 1;
             --brightness: 1;
+            --btn-scale: 1;
         }
+        
+        body.btn-small { --btn-scale: 0.85; }
+        body.btn-large { --btn-scale: 1.15; }
+        body.btn-xlarge { --btn-scale: 1.3; }
         
         body.low-contrast { --contrast: 0.85; --brightness: 1.05; }
         body.high-contrast { --contrast: 1.25; --brightness: 0.95; }
@@ -161,6 +166,8 @@
             max-width: 1400px;
             margin: 0 auto;
             padding-bottom: calc(100px + env(safe-area-inset-bottom));
+            overflow-x: hidden;
+            width: 100%;
         }
         
         .stats-grid {
@@ -365,9 +372,15 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            transform: scale(var(--btn-scale));
         }
         
-        .fab:active { transform: scale(0.95); }
+        .fab:active { transform: scale(calc(var(--btn-scale) * 0.95)); }
+        
+        /* Hide FAB on mobile when on projects view */
+        @media (max-width: 768px) {
+            .fab.hide-mobile { display: none; }
+        }
         
         .modal {
             display: none;
@@ -458,6 +471,8 @@
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
+            transform: scale(var(--btn-scale));
+            transform-origin: center;
         }
         
         .btn-primary {
@@ -647,6 +662,16 @@
         </div>
         
         <div class="settings-section">
+            <label class="settings-label">🔘 Button Size</label>
+            <div class="contrast-buttons">
+                <button class="contrast-btn" onclick="setButtonSize('normal')" id="btn-size-normal">Normal</button>
+                <button class="contrast-btn" onclick="setButtonSize('small')" id="btn-size-small">Small</button>
+                <button class="contrast-btn" onclick="setButtonSize('large')" id="btn-size-large">Large</button>
+                <button class="contrast-btn" onclick="setButtonSize('xlarge')" id="btn-size-xlarge">X-Large</button>
+            </div>
+        </div>
+        
+        <div class="settings-section">
             <label class="settings-label">📊 Page Contrast</label>
             <div class="contrast-buttons">
                 <button class="contrast-btn" onclick="setContrast('normal')" id="contrast-normal">Normal</button>
@@ -796,6 +821,7 @@
             apiKey: '',
             autoSync: false,
             contrast: 'normal',
+            buttonSize: 'normal',
             nightMode: false,
             syncVersion: 0
         };
@@ -823,22 +849,15 @@
             }
             
             setContrast(data.contrast);
+            setButtonSize(data.buttonSize);
         }
         
         function loadData() {
             const saved = localStorage.getItem('builderProData');
             if (saved) {
                 data = { ...data, ...JSON.parse(saved) };
-            } else {
-                // Create sample project
-                data.projects = [{
-                    id: Date.now(),
-                    name: 'Sample Kitchen Renovation',
-                    client: 'John Doe',
-                    startDate: new Date().toISOString().split('T')[0],
-                    createdAt: new Date().toISOString()
-                }];
             }
+            // No sample data - start clean
         }
         
         function saveData() {
@@ -939,6 +958,14 @@
             
             document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
+            
+            // Hide FAB on mobile for projects view
+            const fab = document.querySelector('.fab');
+            if (view === 'projects' && window.innerWidth <= 768) {
+                fab.classList.add('hide-mobile');
+            } else {
+                fab.classList.remove('hide-mobile');
+            }
             
             renderView();
         }
@@ -1511,6 +1538,27 @@
         // Settings
         function toggleSettings() {
             document.getElementById('settingsPanel').classList.toggle('show');
+        }
+        
+        function setButtonSize(size) {
+            document.body.classList.remove('btn-small', 'btn-large', 'btn-xlarge');
+            document.querySelectorAll('[id^="btn-size-"]').forEach(btn => btn.classList.remove('active'));
+            
+            if (size === 'small') {
+                document.body.classList.add('btn-small');
+                document.getElementById('btn-size-small').classList.add('active');
+            } else if (size === 'large') {
+                document.body.classList.add('btn-large');
+                document.getElementById('btn-size-large').classList.add('active');
+            } else if (size === 'xlarge') {
+                document.body.classList.add('btn-xlarge');
+                document.getElementById('btn-size-xlarge').classList.add('active');
+            } else {
+                document.getElementById('btn-size-normal').classList.add('active');
+            }
+            
+            data.buttonSize = size;
+            saveData();
         }
         
         function setContrast(level) {
