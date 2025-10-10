@@ -5,21 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="theme-color" content="#8b7aa8">
+    <meta name="theme-color" content="#6b5d56">
     <title>Builder Pro - Complete Project Manager</title>
     
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #8b7aa8 0%, #b19cd9 100%);
-            --primary-color: #8b7aa8;
-            --primary-dark: #6b5a88;
-            --primary-light: #d6c9f0;
-            --bg-color: #f5f0fa;
+            --primary-gradient: linear-gradient(135deg, #6b5d56 0%, #8a7a72 100%);
+            --primary-color: #6b5d56;
+            --primary-dark: #524840;
+            --primary-light: #9d8d85;
+            --bg-color: #f5f3f1;
             --card-bg: #ffffff;
             --text-primary: #3a3a3a;
             --text-secondary: #5a5a5a;
-            --border-color: #d9d5e0;
-            --shadow-color: rgba(139, 122, 168, 0.15);
+            --border-color: #d9d5d0;
+            --shadow-color: rgba(107, 93, 86, 0.15);
             --success: #10b981;
             --warning: #f39c12;
             --danger: #ef4444;
@@ -45,9 +45,9 @@
             --text-secondary: #c0c0c8; 
             --border-color: #4a4a52; 
             --shadow-color: rgba(0,0,0,0.5);
-            --primary-gradient: linear-gradient(135deg, #a999c7 0%, #d0bdf9 100%);
-            --primary-color: #a999c7;
-            --primary-light: #5a4a78;
+            --primary-gradient: linear-gradient(135deg, #8a7a72 0%, #9d8d85 100%);
+            --primary-color: #8a7a72;
+            --primary-light: #524840;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
@@ -56,137 +56,101 @@
         
         .header { background: var(--primary-gradient); color: white; padding: 10px 12px; box-shadow: 0 2px 10px var(--shadow-color); position: sticky; top: 0; z-index: 100; }
         .header-content { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .header-left { display: flex; align-items: center; gap: 10px; flex: 1; }
-        .header h1 { font-size: calc(18px * var(--font-scale)); font-weight: 600; }
+        .header-left { display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; }
+        .header h1 { font-size: calc(16px * var(--font-scale)); font-weight: 600; }
+        .header-subtitle { font-size: calc(11px * var(--font-scale)); opacity: 0.9; margin-top: 2px; }
         .header-controls { display: flex; gap: 8px; align-items: center; }
         .header-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: calc(14px * var(--font-scale)); display: flex; align-items: center; justify-content: center; position: relative; }
         .header-btn:active { transform: scale(0.9); }
-        .header-btn .badge { position: absolute; top: -4px; right: -4px; background: #ff4444; color: white; border-radius: 10px; padding: 2px 5px; font-size: 9px; min-width: 16px; text-align: center; }
+        .sync-indicator { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: #10b981; border: 2px solid white; }
+        .sync-indicator.syncing { background: #f39c12; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         
-        /* Sync Status Bar */
-        .sync-status-bar { position: fixed; top: 52px; left: 0; right: 0; background: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; z-index: 90; font-size: calc(11px * var(--font-scale)); color: var(--text-secondary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); transform: translateY(-100%); transition: transform 0.3s; }
-        .sync-status-bar.show { transform: translateY(0); }
-        .sync-status-left { display: flex; align-items: center; gap: 8px; }
-        .sync-icon { font-size: 16px; }
-        .sync-icon.syncing { animation: spin 1s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .sync-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 500; }
-        .sync-badge.online { background: #d4edda; color: #155724; }
-        .sync-badge.offline { background: #f8d7da; color: #721c24; }
+        .sync-status-bar { background: var(--primary-light); color: var(--text-primary); padding: 4px 10px; font-size: 11px; text-align: center; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .sync-status-bar.syncing { background: #fbbf24; animation: pulse 1s infinite; }
+        .sync-status-bar.success { background: #10b981; color: white; }
+        .sync-status-bar.error { background: #ef4444; color: white; }
         
         .tabs { background: var(--card-bg); display: flex; border-bottom: 2px solid var(--border-color); position: sticky; top: 52px; z-index: 90; overflow-x: auto; }
-        .tab { flex: 1; min-width: 80px; padding: 12px 8px; text-align: center; cursor: pointer; font-weight: 500; color: var(--text-secondary); border-bottom: 3px solid transparent; font-size: calc(13px * var(--font-scale)); }
+        .tab { flex: 1; min-width: 80px; padding: 10px 8px; text-align: center; cursor: pointer; font-weight: 500; color: var(--text-secondary); border-bottom: 3px solid transparent; font-size: calc(12px * var(--font-scale)); }
         .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
         
-        .container { flex: 1; padding: 12px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
+        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; background: var(--bg-color); }
+        .stat-card { background: var(--card-bg); padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color); text-align: center; }
+        .stat-card h3 { font-size: calc(16px * var(--font-scale)); color: var(--primary-color); margin-bottom: 2px; font-weight: 700; }
+        .stat-card p { font-size: calc(10px * var(--font-scale)); color: var(--text-secondary); }
+        .stat-card.income h3 { color: var(--income-color); }
+        .stat-card.expense h3 { color: var(--expense-color); }
         
-        /* Finance Summary Cards */
-        .finance-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
-        .finance-card { background: var(--card-bg); padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px var(--shadow-color); text-align: center; }
-        .finance-card-label { font-size: calc(11px * var(--font-scale)); color: var(--text-secondary); margin-bottom: 5px; }
-        .finance-card-value { font-size: calc(22px * var(--font-scale)); font-weight: bold; }
-        .finance-card.income .finance-card-value { color: var(--income-color); }
-        .finance-card.expense .finance-card-value { color: var(--expense-color); }
-        .finance-card.profit .finance-card-value { color: var(--success); }
+        .container { flex: 1; padding: 10px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
         
-        /* Project Summary */
-        .section-card { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 8px var(--shadow-color); margin-bottom: 15px; }
-        .section-title { font-size: calc(15px * var(--font-scale)); font-weight: 600; margin-bottom: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+        .timeline-filters { display: flex; gap: 8px; margin-bottom: 12px; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color); }
+        .filter-btn { flex: 1; padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; cursor: pointer; font-size: calc(12px * var(--font-scale)); transition: all 0.2s; }
+        .filter-btn.active { background: var(--primary-gradient); color: white; border-color: var(--primary-color); }
         
-        .project-summary-item { background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: transform 0.2s; border-left: 4px solid var(--primary-color); }
-        .project-summary-item:active { transform: scale(0.98); }
-        .project-summary-name { font-weight: 600; font-size: calc(14px * var(--font-scale)); margin-bottom: 5px; }
-        .project-summary-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
-        .project-summary-stat { text-align: center; }
-        .project-summary-stat-label { font-size: calc(10px * var(--font-scale)); color: var(--text-secondary); }
-        .project-summary-stat-value { font-size: calc(13px * var(--font-scale)); font-weight: bold; }
+        .project-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 2px 10px var(--shadow-color); overflow: hidden; margin-bottom: 12px; }
+        .project-header { background: var(--primary-gradient); color: white; padding: 12px; cursor: pointer; }
+        .project-header h3 { font-size: calc(15px * var(--font-scale)); margin-bottom: 3px; }
+        .project-meta { font-size: calc(10px * var(--font-scale)); opacity: 0.9; }
+        .project-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; background: rgba(0,0,0,0.1); }
+        .project-stat { text-align: center; }
+        .project-stat-label { font-size: calc(9px * var(--font-scale)); opacity: 0.8; }
+        .project-stat-value { font-size: calc(13px * var(--font-scale)); font-weight: bold; }
+        .project-actions { display: flex; gap: 5px; margin-top: 8px; }
+        .action-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: calc(10px * var(--font-scale)); }
         
-        /* Today's Focus */
-        .focus-section { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 8px var(--shadow-color); margin-bottom: 15px; }
-        .focus-header { font-size: calc(15px * var(--font-scale)); font-weight: 600; margin-bottom: 12px; color: var(--danger); display: flex; align-items: center; gap: 8px; }
-        
-        /* Task Items */
-        .task-item { padding: 12px; margin-bottom: 8px; background: var(--bg-color); border-radius: 8px; border-left: 3px solid var(--primary-color); }
+        .task-item { padding: 10px; margin-bottom: 8px; background: var(--bg-color); border-radius: 8px; border-left: 3px solid var(--primary-color); display: flex; justify-content: space-between; align-items: start; }
         .task-item.completed { opacity: 0.7; border-left-color: var(--success); }
         .task-item.overdue { border-left-color: var(--danger); }
+        .task-info { flex: 1; }
         .task-title { font-weight: 500; margin-bottom: 5px; font-size: calc(13px * var(--font-scale)); }
-        .task-meta { font-size: calc(11px * var(--font-scale)); color: var(--text-secondary); }
+        .task-meta { font-size: calc(10px * var(--font-scale)); color: var(--text-secondary); }
+        .task-duration { font-size: calc(9px * var(--font-scale)); color: var(--primary-color); margin-top: 3px; font-weight: 600; }
+        .task-actions { display: flex; gap: 4px; }
+        .icon-btn { background: var(--primary-color); border: none; color: white; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: calc(12px * var(--font-scale)); display: flex; align-items: center; justify-content: center; }
+        .icon-btn.danger { background: var(--danger); }
         
-        /* Gantt Chart */
-        .gantt-container { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 8px var(--shadow-color); overflow-x: auto; margin-bottom: 15px; }
-        .gantt-header { font-size: calc(15px * var(--font-scale)); font-weight: 600; margin-bottom: 15px; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-        .gantt-row { display: flex; align-items: center; margin-bottom: 12px; min-height: 32px; }
-        .gantt-label { width: 150px; min-width: 150px; font-size: calc(11px * var(--font-scale)); font-weight: 500; color: var(--text-primary); }
-        .gantt-timeline { flex: 1; position: relative; height: 32px; background: var(--bg-color); border-radius: 6px; margin-left: 10px; }
-        .gantt-bar { position: absolute; height: 100%; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: calc(9px * var(--font-scale)); color: white; font-weight: 500; }
-        .gantt-bar.project { background: var(--primary-gradient); }
-        .gantt-bar.task { background: linear-gradient(135deg, #10b981 0%, #059669 100%); height: 60%; top: 20%; }
-        
-        /* Project Cards */
-        .projects-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
-        .project-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 2px 8px var(--shadow-color); overflow: hidden; cursor: pointer; transition: transform 0.2s; }
-        .project-card:active { transform: scale(0.98); }
-        .project-header { background: var(--primary-gradient); color: white; padding: 15px; }
-        .project-header h3 { font-size: calc(16px * var(--font-scale)); margin-bottom: 5px; }
-        .project-meta { font-size: calc(11px * var(--font-scale)); opacity: 0.9; }
-        .project-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; background: rgba(0,0,0,0.1); }
-        .project-stat { text-align: center; }
-        .project-stat-label { font-size: calc(10px * var(--font-scale)); opacity: 0.8; }
-        .project-stat-value { font-size: calc(14px * var(--font-scale)); font-weight: bold; }
-        .project-actions { display: flex; gap: 8px; padding: 12px; background: rgba(255,255,255,0.1); }
-        .action-btn { background: rgba(255,255,255,0.3); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: calc(11px * var(--font-scale)); flex: 1; }
-        
-        /* Kanban */
-        .kanban-view { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .kanban-column { min-width: 260px; background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 8px var(--shadow-color); }
-        .kanban-header { font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); font-size: calc(14px * var(--font-scale)); }
-        .kanban-task { background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 10px; cursor: move; font-size: calc(12px * var(--font-scale)); border: 2px solid transparent; }
-        .kanban-task.dragging { opacity: 0.5; }
-        
-        /* Transaction Items */
         .transaction-item { display: flex; justify-content: space-between; padding: 10px; background: var(--bg-color); border-radius: 8px; margin-bottom: 8px; align-items: center; }
         .transaction-info { flex: 1; }
         .transaction-category { font-weight: 500; margin-bottom: 3px; font-size: calc(12px * var(--font-scale)); }
         .transaction-date { font-size: calc(10px * var(--font-scale)); color: var(--text-secondary); }
-        .transaction-amount { font-weight: bold; font-size: calc(14px * var(--font-scale)); }
+        .transaction-amount { font-weight: bold; font-size: calc(14px * var(--font-scale)); margin-right: 8px; }
         .transaction-amount.income { color: var(--income-color); }
         .transaction-amount.expense { color: var(--expense-color); }
+        .transaction-actions { display: flex; gap: 4px; }
         
-        .settings-panel { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: var(--card-bg); box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s; z-index: 3000; overflow-y: auto; padding: 20px; }
-        .settings-panel.show { right: 0; }
-        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
-        .settings-title { font-size: calc(18px * var(--font-scale)); font-weight: 600; color: var(--text-primary); }
-        .close-settings { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-secondary); }
-        .settings-section { margin-bottom: 25px; }
-        .settings-label { font-size: calc(13px * var(--font-scale)); font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; display: block; }
-        .user-profile-section { background: var(--primary-gradient); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-        .user-profile-name { font-size: calc(16px * var(--font-scale)); font-weight: 600; margin-bottom: 5px; }
-        .user-profile-role { font-size: calc(11px * var(--font-scale)); opacity: 0.9; }
-        .change-name-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: calc(11px * var(--font-scale)); cursor: pointer; margin-top: 8px; }
-        .auto-sync-options { display: flex; flex-direction: column; gap: 10px; }
-        .sync-interval-select { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-primary); font-size: calc(13px * var(--font-scale)); }
-        .contrast-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .contrast-btn { padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; font-size: calc(12px * var(--font-scale)); cursor: pointer; }
-        .contrast-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-        .font-size-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
-        .font-btn { padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; font-size: 12px; cursor: pointer; }
-        .font-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-        .toggle-switch { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .toggle-switch input[type="checkbox"] { width: 44px; height: 24px; -webkit-appearance: none; background: #cbd5e0; border-radius: 12px; position: relative; cursor: pointer; }
-        .toggle-switch input[type="checkbox"]:checked { background: var(--primary-color); }
-        .toggle-switch input[type="checkbox"]::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: left 0.3s; }
-        .toggle-switch input[type="checkbox"]:checked::after { left: 22px; }
+        .kanban-view { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .kanban-column { min-width: 280px; background: var(--card-bg); border-radius: 10px; padding: 10px; box-shadow: 0 2px 10px var(--shadow-color); }
+        .kanban-header { font-weight: 600; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); font-size: calc(13px * var(--font-scale)); }
+        .kanban-task { background: var(--bg-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: move; font-size: calc(12px * var(--font-scale)); border: 2px solid transparent; }
+        .kanban-task.dragging { opacity: 0.5; }
+        
+        .gantt-container { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); overflow-x: auto; }
+        .gantt-header { font-size: calc(14px * var(--font-scale)); font-weight: 600; margin-bottom: 15px; color: var(--text-primary); }
+        .gantt-row { display: flex; align-items: center; margin-bottom: 10px; min-height: 30px; }
+        .gantt-label { width: 150px; font-size: calc(11px * var(--font-scale)); font-weight: 500; color: var(--text-primary); }
+        .gantt-timeline { flex: 1; position: relative; height: 30px; background: var(--bg-color); border-radius: 4px; }
+        .gantt-bar { position: absolute; height: 100%; background: var(--primary-gradient); border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: calc(9px * var(--font-scale)); color: white; font-weight: 500; }
+        
+        .focus-section { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); margin-bottom: 15px; }
+        .focus-header { font-size: calc(14px * var(--font-scale)); font-weight: 600; margin-bottom: 12px; color: var(--danger); }
+        
+        .finance-summary { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); margin-bottom: 15px; }
+        .finance-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
+        .finance-row:last-child { border-bottom: none; font-weight: 600; }
+        .finance-label { font-size: calc(12px * var(--font-scale)); color: var(--text-secondary); }
+        .finance-value { font-size: calc(14px * var(--font-scale)); font-weight: 600; }
         
         .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
-        .fab { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-gradient); color: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color); }
+        .fab { width: 50px; height: 50px; border-radius: 50%; background: var(--primary-gradient); color: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color); }
         .fab:active { transform: scale(0.95); }
-        .fab-menu { position: absolute; bottom: 68px; right: 0; display: none; flex-direction: column; gap: 8px; }
+        .fab-menu { position: absolute; bottom: 60px; right: 0; display: none; flex-direction: column; gap: 8px; }
         .fab-menu.show { display: flex; }
-        .fab-option { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 10px var(--shadow-color); cursor: pointer; white-space: nowrap; font-size: calc(13px * var(--font-scale)); }
+        .fab-option { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 10px var(--shadow-color); cursor: pointer; white-space: nowrap; font-size: calc(12px * var(--font-scale)); }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         .modal.show { display: flex; }
-        .modal-content { background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 450px; max-height: 85vh; overflow-y: auto; }
+        .modal-content { background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
         .modal-header { padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .modal-header h2 { font-size: calc(16px * var(--font-scale)); color: var(--text-primary); }
         .modal-close { font-size: 24px; color: var(--text-secondary); cursor: pointer; }
@@ -195,46 +159,65 @@
         
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; margin-bottom: 4px; font-size: calc(12px * var(--font-scale)); color: var(--text-secondary); font-weight: 500; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: calc(13px * var(--font-scale)); background: var(--bg-color); color: var(--text-primary); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: calc(13px * var(--font-scale)); background: var(--bg-color); color: var(--text-primary); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
-        .btn { padding: 10px 16px; border: none; border-radius: 6px; font-size: calc(13px * var(--font-scale)); cursor: pointer; }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: calc(13px * var(--font-scale)); cursor: pointer; }
         .btn-primary { background: var(--primary-gradient); color: white; }
         .btn-secondary { background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
-        .btn-export { background: #7fa67f; color: white; width: 100%; margin-bottom: 10px; }
-        .btn-import { background: #7899b3; color: white; width: 100%; margin-bottom: 10px; }
         
-        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--card-bg); color: var(--text-primary); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999; opacity: 0; transition: opacity 0.3s; font-size: calc(13px * var(--font-scale)); max-width: 90%; }
+        .settings-panel { position: fixed; top: 0; right: -100%; width: 90%; max-width: 360px; height: 100vh; background: var(--card-bg); box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s; z-index: 3000; overflow-y: auto; padding: 20px; }
+        .settings-panel.show { right: 0; }
+        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .settings-title { font-size: 1.25rem; font-weight: bold; color: var(--text-primary); }
+        .close-settings { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); padding: 0.25rem; }
+        .settings-section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
+        .settings-section:last-child { border-bottom: none; }
+        .settings-label { font-size: calc(13px * var(--font-scale)); font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; display: block; }
+        .settings-info { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.5rem; line-height: 1.5; }
+        .toggle-switch { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .toggle-switch input[type="checkbox"] { width: 44px; height: 24px; -webkit-appearance: none; background: #cbd5e0; border-radius: 12px; position: relative; cursor: pointer; }
+        .toggle-switch input[type="checkbox"]:checked { background: var(--primary-color); }
+        .toggle-switch input[type="checkbox"]::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: left 0.3s; }
+        .toggle-switch input[type="checkbox"]:checked::after { left: 22px; }
+        
+        .api-section-highlight { background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%); border: 3px solid var(--primary-color); padding: 1.25rem; border-radius: 0.5rem; margin-bottom: 1.5rem; }
+        body.night-mode .api-section-highlight { background: linear-gradient(135deg, rgba(120, 153, 179, 0.3) 0%, rgba(88, 121, 163, 0.3) 100%); }
+        
+        .api-input-group { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
+        .api-input-group input { flex: 1; padding: 0.625rem; border: 2px solid var(--border-color); border-radius: 0.375rem; font-size: 0.875rem; background: var(--card-bg); color: var(--text-primary); }
+        .api-status { padding: 0.625rem; border-radius: 0.375rem; font-size: 0.8125rem; margin-bottom: 0.75rem; text-align: center; font-weight: 600; }
+        .api-status.connected { background: #d1fae5; color: #065f46; }
+        .api-status.disconnected { background: #fee2e2; color: #991b1b; }
+        
+        .contrast-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
+        .contrast-btn { padding: 0.5rem; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary); border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
+        .contrast-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        
+        .color-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 10px; }
+        .color-option { width: 40px; height: 40px; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: all 0.2s; }
+        .color-option.active { border-color: var(--text-primary); transform: scale(1.1); }
+        
+        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--card-bg); color: var(--text-primary); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999; opacity: 0; transition: opacity 0.3s; font-size: calc(13px * var(--font-scale)); }
         .toast.show { opacity: 1; }
         
-        .night-mode .section-card, .night-mode .project-card, .night-mode .kanban-column, .night-mode .focus-section, .night-mode .finance-card, .night-mode .gantt-container { background: var(--card-bg); }
-        .night-mode .task-item, .night-mode .transaction-item, .night-mode .kanban-task, .night-mode .project-summary-item { background: #3a3a42; color: var(--text-primary); }
-        .night-mode .modal-content, .night-mode .settings-panel { background: var(--card-bg); color: var(--text-primary); }
-        .night-mode input, .night-mode select, .night-mode textarea { background: #25252b; color: var(--text-primary); }
+        #cloudStatus { position: fixed; top: 120px; left: 50%; transform: translateX(-50%); background: var(--primary-color); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.8125rem; z-index: 1000; transition: all 0.3s; opacity: 0; pointer-events: none; max-width: 90%; text-align: center; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+        #cloudStatus.show { opacity: 1; }
         
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: calc(13px * var(--font-scale)); }
+        #startup-sync-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
+        .sync-overlay-content { background: var(--card-bg); padding: 2rem; border-radius: 1rem; text-align: center; max-width: 340px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
+        .sync-spinner { font-size: 3rem; margin-bottom: 1rem; animation: spin 2s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
         
-        /* Desktop & Tablet Responsive */
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
+        
         @media (min-width: 768px) {
-            .header h1 { font-size: calc(20px * var(--font-scale)); }
-            .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-            .finance-cards { grid-template-columns: repeat(4, 1fr); gap: 15px; }
-            .projects-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
-            .gantt-label { width: 200px; min-width: 200px; }
-        }
-        
-        @media (min-width: 1200px) {
-            .projects-grid { grid-template-columns: repeat(3, 1fr); }
-            .container { padding: 25px; }
-        }
-        
-        /* iPhone 15 Pro Max specific */
-        @media (max-width: 430px) {
-            .header h1 { font-size: calc(16px * var(--font-scale)); }
-            .finance-card-value { font-size: calc(20px * var(--font-scale)); }
-            .gantt-label { width: 120px; min-width: 120px; font-size: calc(10px * var(--font-scale)); }
+            .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+            .stats-bar { grid-template-columns: repeat(4, 1fr); padding: 15px; }
+            .settings-panel { max-width: 450px; padding: 1.5rem; }
         }
     </style>
 </head>
@@ -242,22 +225,25 @@
     <div class="app-container">
         <div class="header">
             <div class="header-content">
-                <div class="header-left">
-                    <h1>🏗️ Builder Pro</h1>
+                <div class="header-left" onclick="showProfileModal()">
+                    <div>
+                        <h1 id="headerName">🏗️ Builder Pro</h1>
+                        <div class="header-subtitle" id="headerPosition">Project Manager</div>
+                    </div>
                 </div>
                 <div class="header-controls">
-                    <button class="header-btn" onclick="manualSync()" title="Sync Now" id="syncBtn">☁️</button>
-                    <button class="header-btn" onclick="toggleSettings()" title="Settings">⚙️<span class="badge" id="conflictBadge" style="display: none;">!</span></button>
+                    <button class="header-btn" onclick="manualStartupSync()" title="Smart Sync - Pull, Merge & Push">
+                        🔄
+                        <span class="sync-indicator" id="syncIndicator"></span>
+                    </button>
+                    <button class="header-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
                 </div>
             </div>
-        </div>
-        
-        <div class="sync-status-bar" id="syncStatusBar">
-            <div class="sync-status-left">
-                <span class="sync-icon" id="syncIcon">✅</span>
-                <span id="syncText">Synced</span>
+            <div class="sync-status-bar" id="syncStatusBar">
+                <span id="deviceType"></span> • 
+                <span id="lastSyncTime">Never synced</span> • 
+                <span id="syncMode">Offline</span>
             </div>
-            <span class="sync-badge online" id="onlineStatus">Online</span>
         </div>
         
         <div class="tabs">
@@ -267,52 +253,98 @@
             <div class="tab" onclick="switchView('schedule')">Schedule</div>
         </div>
 
+        <div class="stats-bar">
+            <div class="stat-card">
+                <h3 id="totalProjects">0</h3>
+                <p>Projects</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="totalTasks">0</h3>
+                <p>Tasks</p>
+            </div>
+            <div class="stat-card income">
+                <h3 id="totalIncome">$0</h3>
+                <p>Income</p>
+            </div>
+            <div class="stat-card expense">
+                <h3 id="totalExpenses">$0</h3>
+                <p>Expenses</p>
+            </div>
+        </div>
+
         <div class="container" id="mainContent"></div>
     </div>
 
-    <div class="settings-panel" id="settingsPanel">
+    <!-- Settings Panel - EXACT COPY FROM RENOVATION APP -->
+    <div class="settings-panel" id="settings-panel">
         <div class="settings-header">
             <span class="settings-title">Settings</span>
-            <button class="close-settings" onclick="toggleSettings()">×</button>
+            <button class="close-settings" onclick="toggleSettings()">✕</button>
         </div>
         
-        <div class="user-profile-section">
-            <div class="user-profile-name" id="userProfileName">Loading...</div>
-            <div class="user-profile-role">Team Member</div>
-            <button class="change-name-btn" onclick="changeUserName()">Change Name</button>
-        </div>
-        
-        <div class="settings-section">
-            <label class="settings-label">Auto-Sync</label>
-            <div class="auto-sync-options">
-                <div class="toggle-switch">
-                    <span style="font-size: 12px;">Enable Auto-Sync</span>
-                    <input type="checkbox" id="autoSyncToggle" onchange="toggleAutoSync()">
-                </div>
-                <div class="form-group" style="margin-bottom: 0;">
-                    <label style="font-size: 11px; margin-bottom: 5px;">Sync Interval</label>
-                    <select class="sync-interval-select" id="syncInterval" onchange="updateSyncInterval()">
-                        <option value="30">Every 30 seconds</option>
-                        <option value="60" selected>Every 1 minute</option>
-                        <option value="120">Every 2 minutes</option>
-                        <option value="300">Every 5 minutes</option>
-                    </select>
-                </div>
+        <!-- DEBUG INFO -->
+        <div style="background: #dbeafe; border: 2px solid #3b82f6; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1rem; font-size: 0.75rem;">
+            <strong>📊 System Status:</strong><br>
+            API Key: <span id="debug-api-key">Not set</span><br>
+            Device: <span id="debug-device">Unknown</span><br>
+            Local Data: <span id="debug-local-count">0 projects, 0 tasks</span><br>
+            <strong style="color: #16a34a;">✨ Smart Merge: Data never lost!</strong><br>
+            <strong style="color: #3b82f6;" id="debug-auto-sync-info">Auto-sync: Disabled</strong><br>
+            <br>
+            <div style="background: #fef3c7; padding: 0.5rem; border-radius: 0.25rem; margin-top: 0.5rem; font-size: 0.6875rem; color: #92400e;">
+                <strong>💡 Tip:</strong> Check browser console (F12) for detailed sync logs
             </div>
         </div>
         
+        <!-- 1. API Key Setup - FORCED VISIBLE -->
+        <div class="settings-section api-section-highlight">
+            <label class="settings-label" style="font-size: 1rem; margin-bottom: 0.75rem;">🔑 API Key Setup</label>
+            <div class="api-status" id="apiStatus">Not Connected</div>
+            
+            <div class="api-input-group">
+                <input type="password" id="apiKeyInput" placeholder="Enter JSONBin API Key" class="form-input">
+                <button class="btn btn-primary" onclick="saveApiKey()" style="width: auto;">Save</button>
+            </div>
+            
+            <div class="settings-info">
+                Get your free API key from <a href="https://jsonbin.io" target="_blank" style="color: var(--primary-color); text-decoration: underline;">jsonbin.io</a>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="removeApiKey()" style="font-size: 0.8125rem;">Remove API Key</button>
+        </div>
+        
+        <!-- 2. Auto-Sync Toggle -->
         <div class="settings-section">
-            <label class="settings-label">Font Size</label>
-            <div class="font-size-buttons">
-                <button class="font-btn" onclick="setFontSize('small')" id="font-small">S</button>
-                <button class="font-btn" onclick="setFontSize('normal')" id="font-normal">M</button>
-                <button class="font-btn" onclick="setFontSize('large')" id="font-large">L</button>
-                <button class="font-btn" onclick="setFontSize('xlarge')" id="font-xlarge">XL</button>
+            <label class="settings-label">⚡ Auto Sync</label>
+            <div class="toggle-switch">
+                <span class="settings-info" style="margin: 0; flex: 1;">Sync on app open + every 5 minutes</span>
+                <input type="checkbox" id="auto-sync-toggle" onchange="toggleAutoSync()">
+            </div>
+            <div class="settings-info" id="autoSyncStatus">Auto-sync is disabled</div>
+            <div class="settings-info" style="background: #dbeafe; padding: 0.5rem; border-radius: 0.375rem; margin-top: 0.5rem;">
+                <strong>💡 When enabled:</strong><br>
+                • Syncs automatically when you open the app<br>
+                • Syncs every 5 minutes in background<br>
+                • Always have latest data from all users<br>
+                • No manual checking needed!
             </div>
         </div>
         
+        <!-- Sync Status -->
         <div class="settings-section">
-            <label class="settings-label">Page Contrast</label>
+            <label class="settings-label">📊 Sync Status</label>
+            <div class="settings-info">
+                Device: <strong id="settingsDevice">Mobile</strong><br>
+                Mode: <strong id="settingsMode">Manual Sync Only</strong><br>
+                Last Sync: <strong id="settingsLastSync">Never</strong>
+            </div>
+            <button class="btn btn-primary" onclick="syncData()" style="margin-bottom: 0.5rem;">Manual Sync Now</button>
+            <button class="btn btn-secondary" onclick="forceCloudPull()">Force Pull from Cloud</button>
+        </div>
+        
+        <!-- Page Contrast -->
+        <div class="settings-section">
+            <label class="settings-label">🎨 Page Contrast</label>
             <div class="contrast-buttons">
                 <button class="contrast-btn" onclick="setContrast('normal')" id="contrast-normal">Normal</button>
                 <button class="contrast-btn" onclick="setContrast('low')" id="contrast-low">Low</button>
@@ -321,28 +353,42 @@
             </div>
         </div>
         
+        <!-- Night Mode -->
         <div class="settings-section">
             <div class="toggle-switch">
-                <span class="settings-label" style="margin: 0;">Night Mode</span>
-                <input type="checkbox" id="nightToggle" onchange="toggleDayNight()">
+                <span class="settings-label" style="margin: 0;">🌙 Night Mode</span>
+                <input type="checkbox" id="night-toggle" onchange="toggleNightMode()">
             </div>
         </div>
         
+        <!-- Color Theme -->
         <div class="settings-section">
-            <label class="settings-label">Data Management</label>
-            <button class="btn btn-export" onclick="exportData()">📤 Export Data</button>
-            <label class="btn btn-import" style="display: block; text-align: center; cursor: pointer;">
+            <label class="settings-label">🎨 Color Theme</label>
+            <div class="color-grid" id="colorGrid"></div>
+        </div>
+        
+        <!-- Export/Import -->
+        <div class="settings-section">
+            <button class="btn btn-primary" onclick="exportData()">📤 Export Data</button>
+            <label class="btn btn-success" style="display: block; text-align: center; margin-top: 10px;">
                 📥 Import Data
                 <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
             </label>
         </div>
-        
-        <div class="settings-section">
-            <label class="settings-label">Cloud Sync Setup</label>
-            <button class="btn btn-secondary" onclick="resetApiKey()" style="width: 100%; margin-bottom: 8px;">🔑 Change API Key</button>
-            <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.4;">
-                Get free API key from <a href="https://jsonbin.io" target="_blank" style="color: var(--primary-color);">jsonbin.io</a>
+    </div>
+
+    <div id="cloudStatus"></div>
+    
+    <!-- Startup Sync Loading Overlay -->
+    <div id="startup-sync-overlay">
+        <div class="sync-overlay-content">
+            <div class="sync-spinner">🔄</div>
+            <div style="font-size: 1.25rem; font-weight: bold; color: var(--text-primary); margin-bottom: 0.5rem;">Smart Sync in Progress</div>
+            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;" id="sync-progress-text">Pulling latest data from cloud...</div>
+            <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden; margin-bottom: 0.75rem;">
+                <div style="width: 100%; height: 100%; background: var(--primary-color); animation: progress 2s ease-in-out infinite;"></div>
             </div>
+            <div style="font-size: 0.75rem; color: var(--text-secondary);">Merging data from all users...</div>
         </div>
     </div>
 
@@ -360,14 +406,34 @@
             <div class="fab-option" onclick="showTransactionModal('expense')">
                 <span>💸</span>Add Expense
             </div>
-            <div class="fab-option" onclick="showUserModal()">
-                <span>👥</span>Manage Users
-            </div>
         </div>
         <button class="fab" onclick="toggleFabMenu()">+</button>
     </div>
 
-    <!-- Project Modal -->
+    <!-- Modals -->
+    <div class="modal" id="profileModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Profile Settings</h2>
+                <span class="modal-close" onclick="closeModal('profileModal')">×</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Your Name</label>
+                    <input type="text" id="profileName" placeholder="John Doe">
+                </div>
+                <div class="form-group">
+                    <label>Position/Title</label>
+                    <input type="text" id="profilePosition" placeholder="Project Manager">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('profileModal')">Cancel</button>
+                <button class="btn btn-primary" onclick="saveProfile()">Save</button>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="projectModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -380,7 +446,7 @@
                     <input type="text" id="projectName" placeholder="Kitchen Renovation">
                 </div>
                 <div class="form-group">
-                    <label>Client Name</label>
+                    <label>Client Name *</label>
                     <input type="text" id="projectClient" placeholder="John Doe">
                 </div>
                 <div class="form-row">
@@ -394,10 +460,6 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label>Project Lead</label>
-                    <select id="projectLead"></select>
-                </div>
-                <div class="form-group">
                     <label>Description</label>
                     <textarea id="projectDescription" rows="3"></textarea>
                 </div>
@@ -409,7 +471,6 @@
         </div>
     </div>
 
-    <!-- Task Modal -->
     <div class="modal" id="taskModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -427,16 +488,20 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label>Assignee</label>
-                        <select id="taskAssignee"></select>
-                    </div>
-                    <div class="form-group">
                         <label>Priority</label>
                         <select id="taskPriority">
                             <option value="Low">Low</option>
                             <option value="Medium" selected>Medium</option>
                             <option value="High">High</option>
                             <option value="Critical">Critical</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Status</label>
+                        <select id="taskStatus">
+                            <option value="Get Ready">Get Ready</option>
+                            <option value="In Progress">In Progress</option>
+                            <option value="Completed">Completed</option>
                         </select>
                     </div>
                 </div>
@@ -451,6 +516,10 @@
                     </div>
                 </div>
                 <div class="form-group">
+                    <label>Assignee</label>
+                    <input type="text" id="taskAssignee" placeholder="Worker name">
+                </div>
+                <div class="form-group">
                     <label>Description</label>
                     <textarea id="taskDescription" rows="3"></textarea>
                 </div>
@@ -462,7 +531,6 @@
         </div>
     </div>
 
-    <!-- Transaction Modal -->
     <div class="modal" id="transactionModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -505,7 +573,6 @@
         </div>
     </div>
 
-    <!-- Project Detail Modal -->
     <div class="modal" id="projectDetailModal">
         <div class="modal-content" style="max-width: 600px;">
             <div class="modal-header">
@@ -519,109 +586,159 @@
         </div>
     </div>
 
-    <!-- User Modal -->
-    <div class="modal" id="userModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Manage Team Members</h2>
-                <span class="modal-close" onclick="closeModal('userModal')">×</span>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label>Current Team Members</label>
-                    <div id="userList" style="margin: 10px 0;"></div>
-                </div>
-                <div class="form-group">
-                    <label>Add New Member</label>
-                    <div style="display: flex; gap: 8px;">
-                        <input type="text" id="newUserName" placeholder="Enter name" style="flex: 1;">
-                        <button class="btn btn-primary" onclick="addUser()">Add</button>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" onclick="closeModal('userModal')">Done</button>
-            </div>
-        </div>
-    </div>
-
     <div class="toast" id="toast"></div>
 
     <script>
-        class EnhancedCloudSync {
+        // EXACT CLOUD SYNC FROM RENOVATION APP
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const deviceType = isMobile ? 'Mobile' : 'Laptop';
+        
+        let autoSyncInterval = null;
+        const AUTO_SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
+        
+        class MobileFirstCloudSync {
             constructor() {
-                this.binId = '68e06018d0ea881f4094852b';
-                this.apiKey = localStorage.getItem('syncApiKey') || '';
+                this.binId = '68e121b8ae596e708f05df17';
+                this.apiKey = localStorage.getItem('builderProSyncApiKey') || '';
                 this.baseUrl = 'https://api.jsonbin.io/v3';
+                this.lastSyncTime = parseInt(localStorage.getItem('lastSyncTime')) || 0;
+                this.isMobile = isMobile;
                 this.isSyncing = false;
-                this.lastSyncTime = null;
-                this.autoSyncInterval = null;
+                this.syncQueue = false;
             }
             
             async setup() {
-                if (!this.apiKey) {
-                    const apiKey = prompt('🔑 Enter your JSONBin API Key:\n\nGet one free at jsonbin.io');
-                    if (!apiKey) {
-                        showToast('Sync cancelled');
-                        return false;
-                    }
-                    this.apiKey = apiKey.trim();
-                    localStorage.setItem('syncApiKey', this.apiKey);
-                    showToast('✅ Sync connected!');
-                }
+                if (!this.apiKey) return false;
                 return true;
             }
             
-            async push(silent = false) {
-                if (!await this.setup()) return false;
-                if (this.isSyncing) return false;
+            async push(forceUpdate = false) {
+                if (this.isSyncing) {
+                    this.syncQueue = true;
+                    return false;
+                }
+                
+                if (!await this.setup()) {
+                    this.showStatus('⚠️ No API key set');
+                    alert('Please set up your API key first in Settings');
+                    return false;
+                }
                 
                 this.isSyncing = true;
-                updateSyncStatus('syncing', 'Syncing...');
+                updateSyncStatus('Syncing...', true);
                 
                 try {
-                    const dataToSync = {
-                        ...data,
+                    console.log('Step 1: Pulling latest cloud data before push...');
+                    const pullResponse = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
+                        headers: { 'X-Master-Key': this.apiKey }
+                    });
+                    
+                    let cloudData = { projects: [], tasks: [], transactions: [] };
+                    if (pullResponse.ok) {
+                        const result = await pullResponse.json();
+                        cloudData = result.record;
+                        console.log('Cloud data retrieved:', cloudData);
+                    }
+                    
+                    console.log('Step 2: Merging local and cloud data...');
+                    const mergedProjects = this.mergeData(cloudData.projects || [], data.projects, 'id');
+                    const mergedTasks = this.mergeData(cloudData.tasks || [], data.tasks, 'id');
+                    const mergedTransactions = this.mergeData(cloudData.transactions || [], data.transactions, 'id');
+                    
+                    console.log('Merge complete:', {
+                        projects: mergedProjects.length,
+                        tasks: mergedTasks.length,
+                        transactions: mergedTransactions.length
+                    });
+                    
+                    const pushData = {
+                        projects: mergedProjects,
+                        tasks: mergedTasks,
+                        transactions: mergedTransactions,
+                        currentUser: data.currentUser,
+                        userPosition: data.userPosition,
+                        themeColor: data.themeColor,
+                        nightMode: data.nightMode,
+                        contrast: localStorage.getItem('contrast'),
                         lastUpdated: new Date().toISOString(),
-                        syncVersion: (data.syncVersion || 0) + 1
+                        lastUpdateDevice: deviceType,
+                        version: '1.0'
                     };
                     
+                    console.log('Step 3: Pushing merged data to cloud...');
                     const response = await fetch(`${this.baseUrl}/b/${this.binId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-Master-Key': this.apiKey
                         },
-                        body: JSON.stringify(dataToSync)
+                        body: JSON.stringify(pushData)
                     });
                     
                     if (response.ok) {
-                        this.lastSyncTime = new Date();
-                        data.syncVersion = dataToSync.syncVersion;
-                        data.lastUpdated = dataToSync.lastUpdated;
-                        updateSyncStatus('synced', 'Synced');
-                        if (!silent) showToast('✅ Saved to cloud');
+                        data.projects = mergedProjects;
+                        data.tasks = mergedTasks;
+                        data.transactions = mergedTransactions;
+                        
+                        saveData();
+                        renderView();
+                        
+                        console.log('✅ Sync complete!');
+                        
+                        this.lastSyncTime = Date.now();
+                        localStorage.setItem('lastSyncTime', this.lastSyncTime.toString());
+                        this.showStatus('☁️ Synced & Merged');
+                        updateSyncStatus('Synced', false);
+                        updateLastSyncDisplay();
+                        this.isSyncing = false;
+                        
+                        if (this.syncQueue) {
+                            this.syncQueue = false;
+                            setTimeout(() => this.push(), 2000);
+                        }
+                        
                         return true;
                     } else {
-                        updateSyncStatus('error', 'Failed');
-                        if (!silent) showToast('⚠️ Sync failed');
+                        console.error('Push failed:', response.status);
+                        this.showStatus(`⚠️ Sync failed (${response.status})`);
+                        updateSyncStatus('Sync Failed', false);
+                        this.isSyncing = false;
                         return false;
                     }
                 } catch (error) {
-                    updateSyncStatus('offline', 'Offline');
-                    if (!silent) showToast('📵 No connection');
-                    return false;
-                } finally {
+                    console.error('Push error:', error);
+                    this.showStatus('🔵 Offline - Data saved locally');
+                    updateSyncStatus('Offline', false);
                     this.isSyncing = false;
+                    return false;
                 }
             }
             
-            async pull(silent = false) {
-                if (!await this.setup()) return false;
-                if (this.isSyncing) return false;
+            mergeData(cloudArray, localArray, uniqueKey) {
+                const merged = [...cloudArray];
+                const cloudIds = new Set(cloudArray.map(item => item[uniqueKey]));
                 
-                this.isSyncing = true;
-                updateSyncStatus('syncing', 'Loading...');
+                localArray.forEach(localItem => {
+                    if (!cloudIds.has(localItem[uniqueKey])) {
+                        merged.push(localItem);
+                    } else {
+                        const cloudItem = merged.find(item => item[uniqueKey] === localItem[uniqueKey]);
+                        if (cloudItem && localItem.timestamp && (!cloudItem.timestamp || new Date(localItem.timestamp) > new Date(cloudItem.timestamp))) {
+                            Object.assign(cloudItem, localItem);
+                        }
+                    }
+                });
+                
+                return merged;
+            }
+            
+            async pull(force = false) {
+                if (!await this.setup()) {
+                    this.showStatus('⚠️ No API key set');
+                    return false;
+                }
+                
+                updateSyncStatus('Loading...', true);
                 
                 try {
                     const response = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
@@ -632,59 +749,90 @@
                         const result = await response.json();
                         const cloudData = result.record;
                         
-                        data = { ...data, ...cloudData };
-                        localStorage.setItem('builderProData', JSON.stringify(data));
-                        
-                        this.lastSyncTime = new Date();
-                        updateSyncStatus('synced', 'Synced');
-                        if (!silent) showToast('☁️ Loaded from cloud');
-                        
-                        applyThemeSettings();
-                        renderView();
-                        updateUserProfile();
-                        return true;
+                        if (force || confirm(`Replace local data with cloud data from ${cloudData.lastUpdateDevice || 'unknown'}?`)) {
+                            this.applyCloudData(cloudData);
+                            this.lastSyncTime = Date.now();
+                            localStorage.setItem('lastSyncTime', this.lastSyncTime.toString());
+                            this.showStatus('☁️ Loaded from cloud');
+                            updateSyncStatus('Synced', false);
+                            updateLastSyncDisplay();
+                            return true;
+                        }
                     }
+                    return false;
                 } catch (error) {
-                    updateSyncStatus('offline', 'Offline');
-                } finally {
-                    this.isSyncing = false;
+                    console.error('Pull error:', error);
+                    this.showStatus('🔵 Offline');
+                    updateSyncStatus('Offline', false);
+                    return false;
                 }
             }
             
-            startAutoSync(intervalSeconds = 60) {
-                this.stopAutoSync();
-                this.autoSyncInterval = setInterval(() => {
-                    if (navigator.onLine && !this.isSyncing) {
-                        this.pull(true);
-                    }
-                }, intervalSeconds * 1000);
+            applyCloudData(cloudData) {
+                data.projects = cloudData.projects || [];
+                data.tasks = cloudData.tasks || [];
+                data.transactions = cloudData.transactions || [];
+                data.currentUser = cloudData.currentUser || 'Builder Pro';
+                data.userPosition = cloudData.userPosition || 'Project Manager';
+                data.themeColor = cloudData.themeColor || 0;
+                data.nightMode = cloudData.nightMode || false;
+                
+                saveData();
+                applyThemeColor(data.themeColor);
+                updateHeader();
+                if (data.nightMode) {
+                    document.body.classList.add('night-mode');
+                    document.getElementById('night-toggle').checked = true;
+                }
+                renderView();
             }
             
-            stopAutoSync() {
-                if (this.autoSyncInterval) {
-                    clearInterval(this.autoSyncInterval);
-                    this.autoSyncInterval = null;
+            showStatus(message) {
+                const status = document.getElementById('cloudStatus');
+                if (status) {
+                    status.textContent = message;
+                    status.classList.add('show');
+                    setTimeout(() => status.classList.remove('show'), 3000);
                 }
             }
         }
 
-        const cloudSync = new EnhancedCloudSync();
+        const cloudSync = new MobileFirstCloudSync();
 
         let data = {
-            currentUser: '',
+            currentUser: 'Builder Pro',
+            userPosition: 'Project Manager',
             currentView: 'home',
             projects: [],
             tasks: [],
             transactions: [],
-            users: ['John Doe', 'Jane Smith', 'Mike Johnson'],
             nightMode: false,
-            contrast: 'normal',
-            fontSize: 'normal',
-            autoSyncEnabled: false,
-            autoSyncInterval: 60,
+            themeColor: 0,
             lastUpdated: null,
-            syncVersion: 0
+            syncVersion: 0,
+            timelineFilter: 'all'
         };
+
+        const themeColors = [
+            { name: 'Pebble Brown Grey', primary: '#6b5d56', gradient: 'linear-gradient(135deg, #6b5d56 0%, #8a7a72 100%)' },
+            { name: 'Deep Ocean', primary: '#0f4c81', gradient: 'linear-gradient(135deg, #0f4c81 0%, #1e6fa8 100%)' },
+            { name: 'Forest Green', primary: '#2d5016', gradient: 'linear-gradient(135deg, #2d5016 0%, #4a7c2d 100%)' },
+            { name: 'Royal Purple', primary: '#6b46c1', gradient: 'linear-gradient(135deg, #6b46c1 0%, #9333ea 100%)' },
+            { name: 'Sunset Orange', primary: '#d97706', gradient: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' },
+            { name: 'Rose Pink', primary: '#be185d', gradient: 'linear-gradient(135deg, #be185d 0%, #db2777 100%)' },
+            { name: 'Steel Blue', primary: '#475569', gradient: 'linear-gradient(135deg, #475569 0%, #64748b 100%)' },
+            { name: 'Teal', primary: '#0f766e', gradient: 'linear-gradient(135deg, #0f766e 0%, #14b8a6 100%)' },
+            { name: 'Burgundy', primary: '#881337', gradient: 'linear-gradient(135deg, #881337 0%, #be123c 100%)' },
+            { name: 'Olive', primary: '#4d5f1a', gradient: 'linear-gradient(135deg, #4d5f1a 0%, #6b8e23 100%)' },
+            { name: 'Navy', primary: '#1e3a8a', gradient: 'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)' },
+            { name: 'Plum', primary: '#701a75', gradient: 'linear-gradient(135deg, #701a75 0%, #a21caf 100%)' },
+            { name: 'Charcoal', primary: '#374151', gradient: 'linear-gradient(135deg, #374151 0%, #4b5563 100%)' },
+            { name: 'Copper', primary: '#9a3412', gradient: 'linear-gradient(135deg, #9a3412 0%, #c2410c 100%)' },
+            { name: 'Emerald', primary: '#065f46', gradient: 'linear-gradient(135deg, #065f46 0%, #10b981 100%)' },
+            { name: 'Indigo', primary: '#4338ca', gradient: 'linear-gradient(135deg, #4338ca 0%, #6366f1 100%)' },
+            { name: 'Crimson', primary: '#9f1239', gradient: 'linear-gradient(135deg, #9f1239 0%, #e11d48 100%)' },
+            { name: 'Slate', primary: '#1e293b', gradient: 'linear-gradient(135deg, #1e293b 0%, #334155 100%)' }
+        ];
 
         const expenseCategories = ['Materials', 'Labor', 'Tools & Equipment', 'Transportation', 'Permits', 'Subcontractors', 'Other'];
         const incomeCategories = ['Project Payment', 'Deposit', 'Final Payment', 'Other Income'];
@@ -693,203 +841,325 @@
         let editingTaskId = null;
         let editingTransactionId = null;
         let draggedElement = null;
-        let currentProjectId = null;
 
+        // API KEY MANAGEMENT
+        function saveApiKey() {
+            const apiKey = document.getElementById('apiKeyInput').value.trim();
+            if (!apiKey) {
+                alert('Please enter an API key');
+                return;
+            }
+            
+            cloudSync.apiKey = apiKey;
+            fetch(`${cloudSync.baseUrl}/b/${cloudSync.binId}/latest`, {
+                headers: { 'X-Master-Key': apiKey }
+            })
+            .then(response => {
+                if (response.ok) {
+                    localStorage.setItem('builderProSyncApiKey', apiKey);
+                    document.getElementById('apiKeyInput').value = '';
+                    updateApiStatus();
+                    alert('✅ API Key saved successfully!');
+                } else {
+                    cloudSync.apiKey = '';
+                    alert('❌ Invalid API key');
+                }
+            })
+            .catch(() => {
+                cloudSync.apiKey = '';
+                alert('❌ Invalid API key');
+            });
+        }
+        
+        function removeApiKey() {
+            if (confirm('Remove API key? This will disable cloud sync.')) {
+                localStorage.removeItem('builderProSyncApiKey');
+                cloudSync.apiKey = '';
+                stopAutoSync();
+                document.getElementById('auto-sync-toggle').checked = false;
+                localStorage.setItem('autoSyncEnabled', 'false');
+                updateApiStatus();
+                updateAutoSyncStatus();
+                alert('API key removed');
+            }
+        }
+        
+        function updateApiStatus() {
+            const statusEl = document.getElementById('apiStatus');
+            const hasKey = !!cloudSync.apiKey;
+            statusEl.textContent = hasKey ? '✅ Connected' : '❌ Not Connected';
+            statusEl.className = hasKey ? 'api-status connected' : 'api-status disconnected';
+        }
+        
+        // AUTO-SYNC FUNCTIONS
+        function toggleAutoSync() {
+            const enabled = document.getElementById('auto-sync-toggle').checked;
+            if (enabled && !cloudSync.apiKey) {
+                alert('Please set up your API key first');
+                document.getElementById('auto-sync-toggle').checked = false;
+                return;
+            }
+            
+            if (enabled) {
+                startAutoSync();
+                localStorage.setItem('autoSyncEnabled', 'true');
+            } else {
+                stopAutoSync();
+                localStorage.setItem('autoSyncEnabled', 'false');
+            }
+            updateAutoSyncStatus();
+            updateDebugInfo();
+        }
+        
+        function startAutoSync() {
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            autoSyncInterval = setInterval(async () => {
+                console.log('🔄 Auto-syncing...');
+                const success = await cloudSync.push();
+                if (success) {
+                    renderView();
+                    showToast('🔄 Auto-synced');
+                }
+                updateDebugInfo();
+            }, AUTO_SYNC_INTERVAL);
+            console.log('✅ Auto-sync enabled');
+        }
+        
+        function stopAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+            }
+        }
+        
+        function updateAutoSyncStatus() {
+            const enabled = document.getElementById('auto-sync-toggle').checked;
+            const statusEl = document.getElementById('autoSyncStatus');
+            const settingsModeEl = document.getElementById('settingsMode');
+            
+            if (enabled) {
+                statusEl.textContent = '✅ Auto-sync active (on open + every 5 minutes)';
+                statusEl.style.color = '#065f46';
+                settingsModeEl.textContent = 'Auto Sync (Smart Mode)';
+            } else {
+                statusEl.textContent = '⏸️ Auto-sync is disabled';
+                statusEl.style.color = 'var(--text-secondary)';
+                settingsModeEl.textContent = 'Manual Sync Only';
+            }
+        }
+        
+        function initializeSettings() {
+            updateApiStatus();
+            const autoSyncEnabled = localStorage.getItem('autoSyncEnabled') === 'true';
+            document.getElementById('auto-sync-toggle').checked = autoSyncEnabled;
+            if (autoSyncEnabled && cloudSync.apiKey) startAutoSync();
+            updateAutoSyncStatus();
+        }
+        
+        function updateSyncStatus(status, isLoading) {
+            const statusBar = document.getElementById('syncStatusBar');
+            const syncMode = document.getElementById('syncMode');
+            const settingsDevice = document.getElementById('settingsDevice');
+            
+            document.getElementById('deviceType').textContent = deviceType;
+            settingsDevice.textContent = deviceType;
+            syncMode.textContent = status;
+            
+            statusBar.classList.remove('syncing', 'success', 'error');
+            if (isLoading) {
+                statusBar.classList.add('syncing');
+            } else if (status === 'Synced') {
+                statusBar.classList.add('success');
+                setTimeout(() => statusBar.classList.remove('success'), 2000);
+            }
+        }
+        
+        function updateLastSyncDisplay() {
+            const lastSync = localStorage.getItem('lastSyncTime');
+            if (lastSync) {
+                const date = new Date(parseInt(lastSync));
+                const timeStr = date.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = date.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                document.getElementById('lastSyncTime').textContent = `${dateStr} ${timeStr}`;
+                document.getElementById('settingsLastSync').textContent = `${dateStr} ${timeStr}`;
+            }
+        }
+        
+        async function performStartupSync() {
+            const overlay = document.getElementById('startup-sync-overlay');
+            const progressText = document.getElementById('sync-progress-text');
+            overlay.style.display = 'flex';
+            
+            try {
+                progressText.textContent = 'Pulling latest data from cloud...';
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                progressText.textContent = 'Merging data from all users...';
+                const success = await cloudSync.push();
+                
+                if (success) {
+                    renderView();
+                    progressText.textContent = `✅ Loaded ${data.projects.length} projects, ${data.tasks.length} tasks`;
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                    showToast(`Synced: ${data.projects.length} projects, ${data.tasks.length} tasks`);
+                } else {
+                    progressText.textContent = '⚠️ Sync failed - using local data';
+                    await new Promise(resolve => setTimeout(resolve, 1500));
+                }
+            } catch (error) {
+                progressText.textContent = '⚠️ Sync failed - using local data';
+                await new Promise(resolve => setTimeout(resolve, 1500));
+            } finally {
+                overlay.style.display = 'none';
+                updateLastSyncDisplay();
+                updateDebugInfo();
+            }
+        }
+        
+        async function syncData() {
+            if (!cloudSync.apiKey) {
+                alert('Please set up your API key first');
+                toggleSettings();
+                return;
+            }
+            const success = await cloudSync.push();
+            if (success) {
+                renderView();
+                showToast('✅ Synced successfully');
+            }
+            updateDebugInfo();
+        }
+        
+        async function manualStartupSync() {
+            if (!cloudSync.apiKey) {
+                alert('Please set up your API key first');
+                return;
+            }
+            await performStartupSync();
+        }
+        
+        async function forceCloudPull() {
+            if (!cloudSync.apiKey) {
+                alert('Please set up your API key first');
+                return;
+            }
+            if (confirm('Replace ALL local data with cloud data?')) {
+                await cloudSync.pull(true);
+                toggleSettings();
+            }
+        }
+        
+        function updateDebugInfo() {
+            document.getElementById('debug-api-key').textContent = cloudSync.apiKey ? `Set (${cloudSync.apiKey.substring(0, 8)}...)` : 'Not set';
+            document.getElementById('debug-device').textContent = deviceType;
+            document.getElementById('debug-local-count').textContent = `${data.projects.length} projects, ${data.tasks.length} tasks, ${data.transactions.length} transactions`;
+            
+            const autoSyncEnabled = document.getElementById('auto-sync-toggle').checked;
+            const autoSyncInfo = document.getElementById('debug-auto-sync-info');
+            if (autoSyncEnabled) {
+                autoSyncInfo.textContent = 'Auto-sync: ✅ Active (on open + every 5 min)';
+                autoSyncInfo.style.color = '#16a34a';
+            } else {
+                autoSyncInfo.textContent = 'Auto-sync: ⏸️ Disabled';
+                autoSyncInfo.style.color = '#6b7280';
+            }
+        }
+        
+        // INITIALIZATION
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
+            initColorPicker();
+            initializeSettings();
             renderView();
-            setupOnlineDetection();
-            applyThemeSettings();
-            updateUserProfile();
-            populateDropdowns();
-            
-            if (data.autoSyncEnabled) {
-                document.getElementById('autoSyncToggle').checked = true;
-                cloudSync.startAutoSync(data.autoSyncInterval);
-            }
-            document.getElementById('syncInterval').value = data.autoSyncInterval;
+            updateStats();
         });
 
-        function loadData() {
+        async function loadData() {
             const saved = localStorage.getItem('builderProData');
             if (saved) {
                 data = { ...data, ...JSON.parse(saved) };
-                if (!data.currentUser) {
-                    data.currentUser = prompt('Welcome! Enter your name:') || 'Team Member';
-                    if (!data.users.includes(data.currentUser)) {
-                        data.users.push(data.currentUser);
-                    }
-                    saveData();
-                }
+            }
+            
+            if (data.nightMode) {
+                document.body.classList.add('night-mode');
+                document.getElementById('night-toggle').checked = true;
+            }
+            
+            applyThemeColor(data.themeColor || 0);
+            updateHeader();
+            renderView();
+            
+            const autoSyncEnabled = localStorage.getItem('autoSyncEnabled') === 'true';
+            if (cloudSync.apiKey && autoSyncEnabled) {
+                await performStartupSync();
             } else {
-                data.currentUser = prompt('Welcome! Enter your name:') || 'Team Member';
-                if (!data.users.includes(data.currentUser)) {
-                    data.users.push(data.currentUser);
-                }
-                createSampleData();
+                updateLastSyncDisplay();
             }
         }
 
         function saveData() {
             data.lastUpdated = new Date().toISOString();
+            data.syncVersion++;
             localStorage.setItem('builderProData', JSON.stringify(data));
         }
 
-        function createSampleData() {
-            const today = new Date().toISOString().split('T')[0];
-            const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-            
-            data.projects = [{
-                id: Date.now(),
-                name: 'Kitchen Renovation',
-                client: 'Jane Smith',
-                startDate: today,
-                endDate: nextWeek,
-                lead: 'John Doe',
-                description: 'Complete kitchen remodel'
-            }];
-            
-            saveData();
-        }
-
-        function setupOnlineDetection() {
-            window.addEventListener('online', () => {
-                document.getElementById('onlineStatus').textContent = 'Online';
-                document.getElementById('onlineStatus').className = 'sync-badge online';
-                if (data.autoSyncEnabled) cloudSync.pull(true);
-            });
-            
-            window.addEventListener('offline', () => {
-                document.getElementById('onlineStatus').textContent = 'Offline';
-                document.getElementById('onlineStatus').className = 'sync-badge offline';
+        function initColorPicker() {
+            const grid = document.getElementById('colorGrid');
+            grid.innerHTML = '';
+            themeColors.forEach((color, index) => {
+                const div = document.createElement('div');
+                div.className = 'color-option' + (index === data.themeColor ? ' active' : '');
+                div.style.background = color.gradient;
+                div.title = color.name;
+                div.onclick = () => {
+                    data.themeColor = index;
+                    applyThemeColor(index);
+                    saveData();
+                    document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
+                    div.classList.add('active');
+                    showToast('✅ Theme updated');
+                };
+                grid.appendChild(div);
             });
         }
 
-        function updateSyncStatus(status, text) {
-            const statusBar = document.getElementById('syncStatusBar');
-            const icon = document.getElementById('syncIcon');
-            const textEl = document.getElementById('syncText');
-            
-            statusBar.classList.add('show');
-            textEl.textContent = text;
-            
-            if (status === 'syncing') {
-                icon.textContent = '🔄';
-                icon.classList.add('syncing');
-            } else if (status === 'synced') {
-                icon.textContent = '✅';
-                icon.classList.remove('syncing');
-                setTimeout(() => statusBar.classList.remove('show'), 3000);
-            } else {
-                icon.textContent = '⚠️';
-                icon.classList.remove('syncing');
-            }
+        function applyThemeColor(index) {
+            const color = themeColors[index];
+            document.documentElement.style.setProperty('--primary-color', color.primary);
+            document.documentElement.style.setProperty('--primary-gradient', color.gradient);
         }
 
-        function toggleAutoSync() {
-            data.autoSyncEnabled = document.getElementById('autoSyncToggle').checked;
-            if (data.autoSyncEnabled) {
-                cloudSync.startAutoSync(data.autoSyncInterval);
-                showToast('✅ Auto-sync enabled');
-            } else {
-                cloudSync.stopAutoSync();
-                showToast('⏸️ Auto-sync disabled');
-            }
+        function updateHeader() {
+            document.getElementById('headerName').textContent = '🏗️ ' + data.currentUser;
+            document.getElementById('headerPosition').textContent = data.userPosition;
+        }
+
+        function showProfileModal() {
+            document.getElementById('profileName').value = data.currentUser;
+            document.getElementById('profilePosition').value = data.userPosition;
+            document.getElementById('profileModal').classList.add('show');
+        }
+
+        function saveProfile() {
+            data.currentUser = document.getElementById('profileName').value || 'Builder Pro';
+            data.userPosition = document.getElementById('profilePosition').value || 'Project Manager';
+            updateHeader();
             saveData();
-        }
-
-        function updateSyncInterval() {
-            data.autoSyncInterval = parseInt(document.getElementById('syncInterval').value);
-            if (data.autoSyncEnabled) {
-                cloudSync.startAutoSync(data.autoSyncInterval);
-            }
-            saveData();
-        }
-
-        function manualSync() {
-            const action = confirm('OK = Pull from cloud\nCancel = Push to cloud');
-            if (action) {
-                cloudSync.pull();
-            } else {
-                cloudSync.push();
-            }
-        }
-
-        function resetApiKey() {
-            if (confirm('Remove API key?')) {
-                localStorage.removeItem('syncApiKey');
-                cloudSync.apiKey = '';
-                cloudSync.stopAutoSync();
-                data.autoSyncEnabled = false;
-                document.getElementById('autoSyncToggle').checked = false;
-                showToast('🔑 API key removed');
-                saveData();
-            }
-        }
-
-        function changeUserName() {
-            const newName = prompt('Enter your name:', data.currentUser);
-            if (newName && newName.trim()) {
-                data.currentUser = newName.trim();
-                if (!data.users.includes(data.currentUser)) {
-                    data.users.push(data.currentUser);
-                }
-                saveData();
-                updateUserProfile();
-                showToast(`👤 Name: ${data.currentUser}`);
-            }
-        }
-
-        function updateUserProfile() {
-            document.getElementById('userProfileName').textContent = data.currentUser || 'Set Your Name';
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
-        }
-
-        function applyThemeSettings() {
-            document.body.className = '';
-            if (data.nightMode) {
-                document.body.classList.add('night-mode');
-                document.getElementById('nightToggle').checked = true;
-            }
-            if (data.contrast && data.contrast !== 'normal') {
-                if (data.contrast === 'low') document.body.classList.add('low-contrast');
-                else if (data.contrast === 'high') document.body.classList.add('high-contrast');
-                else if (data.contrast === 'extra') document.body.classList.add('extra-high-contrast');
-            }
-            if (data.fontSize && data.fontSize !== 'normal') {
-                document.body.classList.add('font-' + data.fontSize);
-            }
-            setContrast(data.contrast);
-            setFontSize(data.fontSize);
+            closeModal('profileModal');
+            showToast('✅ Profile updated');
         }
 
         function toggleSettings() {
-            document.getElementById('settingsPanel').classList.toggle('show');
+            const panel = document.getElementById('settings-panel');
+            panel.classList.toggle('show');
+            if (panel.classList.contains('show')) {
+                updateDebugInfo();
+            }
         }
 
-        function setFontSize(size) {
-            document.body.classList.remove('font-small', 'font-large', 'font-xlarge');
-            document.querySelectorAll('.font-btn').forEach(btn => btn.classList.remove('active'));
-            
-            if (size === 'small') {
-                document.body.classList.add('font-small');
-                document.getElementById('font-small').classList.add('active');
-            } else if (size === 'large') {
-                document.body.classList.add('font-large');
-                document.getElementById('font-large').classList.add('active');
-            } else if (size === 'xlarge') {
-                document.body.classList.add('font-xlarge');
-                document.getElementById('font-xlarge').classList.add('active');
-            } else {
-                document.getElementById('font-normal').classList.add('active');
-            }
-            data.fontSize = size;
+        function toggleNightMode() {
+            document.body.classList.toggle('night-mode');
+            data.nightMode = document.body.classList.contains('night-mode');
             saveData();
         }
 
@@ -909,15 +1179,8 @@
             } else {
                 document.getElementById('contrast-normal').classList.add('active');
             }
-            data.contrast = level;
-            saveData();
-        }
-
-        function toggleDayNight() {
-            document.body.classList.toggle('night-mode');
-            data.nightMode = document.body.classList.contains('night-mode');
-            document.getElementById('nightToggle').checked = data.nightMode;
-            saveData();
+            
+            localStorage.setItem('contrast', level);
         }
 
         function exportData() {
@@ -928,7 +1191,7 @@
             a.download = 'builder-pro-' + new Date().toISOString().split('T')[0] + '.json';
             a.click();
             URL.revokeObjectURL(url);
-            showToast('📤 Data exported');
+            showToast('✅ Data exported');
             toggleSettings();
         }
 
@@ -939,48 +1202,31 @@
                 reader.onload = function(e) {
                     try {
                         const importedData = JSON.parse(e.target.result);
-                        if (confirm('Replace all data? (Cancel to merge)')) {
+                        if (confirm('Replace all data?')) {
                             data = { ...data, ...importedData };
                         } else {
                             data.projects = [...data.projects, ...(importedData.projects || [])];
                             data.tasks = [...data.tasks, ...(importedData.tasks || [])];
                             data.transactions = [...data.transactions, ...(importedData.transactions || [])];
-                            data.users = [...new Set([...data.users, ...(importedData.users || [])])];
                         }
                         saveData();
                         renderView();
+                        updateStats();
                         showToast('✅ Data imported');
                         toggleSettings();
                     } catch (error) {
-                        showToast('❌ Import error');
+                        showToast('❌ Error importing data');
                     }
                 };
                 reader.readAsText(file);
             }
         }
 
-        function populateDropdowns() {
-            const userSelects = ['taskAssignee', 'projectLead'];
-            userSelects.forEach(id => {
-                const select = document.getElementById(id);
-                if (select) {
-                    select.innerHTML = '<option value="">Unassigned</option>';
-                    data.users.forEach(user => {
-                        select.innerHTML += `<option value="${user}">${user}</option>`;
-                    });
-                }
-            });
-
-            const projectSelects = ['taskProject', 'transProject'];
-            projectSelects.forEach(id => {
-                const select = document.getElementById(id);
-                if (select) {
-                    select.innerHTML = '<option value="">Select Project</option>';
-                    data.projects.forEach(project => {
-                        select.innerHTML += `<option value="${project.id}">${project.name}</option>`;
-                    });
-                }
-            });
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
         function switchView(view) {
@@ -1000,6 +1246,56 @@
             }
         }
 
+        function filterTasksByTimeline(tasks) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (data.timelineFilter === 'all') return tasks;
+            
+            return tasks.filter(task => {
+                const dueDate = new Date(task.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                
+                if (data.timelineFilter === 'day') {
+                    return dueDate.getTime() === today.getTime();
+                } else if (data.timelineFilter === 'week') {
+                    const weekEnd = new Date(today);
+                    weekEnd.setDate(today.getDate() + 7);
+                    return dueDate >= today && dueDate <= weekEnd;
+                } else if (data.timelineFilter === 'month') {
+                    const monthEnd = new Date(today);
+                    monthEnd.setMonth(today.getMonth() + 1);
+                    return dueDate >= today && dueDate <= monthEnd;
+                }
+                return true;
+            });
+        }
+
+        function renderTimelineFilters() {
+            return `
+                <div class="timeline-filters">
+                    <button class="filter-btn ${data.timelineFilter === 'all' ? 'active' : ''}" onclick="setTimelineFilter('all')">All</button>
+                    <button class="filter-btn ${data.timelineFilter === 'day' ? 'active' : ''}" onclick="setTimelineFilter('day')">Today</button>
+                    <button class="filter-btn ${data.timelineFilter === 'week' ? 'active' : ''}" onclick="setTimelineFilter('week')">This Week</button>
+                    <button class="filter-btn ${data.timelineFilter === 'month' ? 'active' : ''}" onclick="setTimelineFilter('month')">This Month</button>
+                </div>
+            `;
+        }
+
+        function setTimelineFilter(filter) {
+            data.timelineFilter = filter;
+            renderView();
+        }
+
+        function calculateTaskDuration(startDate, dueDate) {
+            if (!startDate || !dueDate) return null;
+            const start = new Date(startDate);
+            const due = new Date(dueDate);
+            const diffTime = Math.abs(due - start);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            return diffDays;
+        }
+
         function renderHome(container) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -1008,104 +1304,79 @@
             const totalExpenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
             const netProfit = totalIncome - totalExpenses;
             
-            const dueTasks = data.tasks.filter(t => {
+            const allDueTasks = data.tasks.filter(t => {
                 const dueDate = new Date(t.dueDate);
                 dueDate.setHours(0, 0, 0, 0);
                 return dueDate <= today && t.status !== 'Completed';
             });
             
+            const dueTasks = filterTasksByTimeline(allDueTasks);
+            
             let html = '';
             
-            // Finance Summary Cards
             html += `
-                <div class="finance-cards">
-                    <div class="finance-card">
-                        <div class="finance-card-label">Total Projects</div>
-                        <div class="finance-card-value" style="color: var(--primary-color);">${data.projects.length}</div>
+                <div class="finance-summary">
+                    <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">💰 Finance Summary</h3>
+                    <div class="finance-row">
+                        <span class="finance-label">Total Income</span>
+                        <span class="finance-value" style="color: var(--income-color);">$${totalIncome.toFixed(2)}</span>
                     </div>
-                    <div class="finance-card income">
-                        <div class="finance-card-label">Total Income</div>
-                        <div class="finance-card-value">$${totalIncome.toFixed(0)}</div>
+                    <div class="finance-row">
+                        <span class="finance-label">Total Expenses</span>
+                        <span class="finance-value" style="color: var(--expense-color);">$${totalExpenses.toFixed(2)}</span>
                     </div>
-                    <div class="finance-card expense">
-                        <div class="finance-card-label">Total Expenses</div>
-                        <div class="finance-card-value">$${totalExpenses.toFixed(0)}</div>
-                    </div>
-                    <div class="finance-card profit">
-                        <div class="finance-card-label">Net Profit</div>
-                        <div class="finance-card-value" style="color: ${netProfit >= 0 ? 'var(--success)' : 'var(--danger)'};">$${netProfit.toFixed(0)}</div>
+                    <div class="finance-row">
+                        <span class="finance-label">Net Profit</span>
+                        <span class="finance-value" style="color: ${netProfit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${netProfit.toFixed(2)}</span>
                     </div>
                 </div>
             `;
             
-            // Project Summary
-            html += '<div class="section-card"><div class="section-title">📁 Project Summary</div>';
-            if (data.projects.length === 0) {
-                html += '<div class="empty-state" style="padding: 20px;">No projects yet. Click + to create one!</div>';
+            html += renderTimelineFilters();
+            
+            html += `
+                <div class="focus-section">
+                    <div class="focus-header">🎯 Priority Tasks (${dueTasks.length} Due)</div>
+            `;
+            
+            if (dueTasks.length === 0) {
+                html += '<p class="empty-state" style="padding: 20px;">No tasks due in this period!</p>';
             } else {
-                data.projects.forEach(project => {
-                    const projectTasks = data.tasks.filter(t => t.projectId === project.id);
-                    const projectTransactions = data.transactions.filter(t => t.projectId === project.id);
-                    const income = projectTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-                    const expenses = projectTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-                    const profit = income - expenses;
-                    
+                dueTasks.forEach(task => {
+                    const project = data.projects.find(p => p.id === task.projectId);
+                    const duration = calculateTaskDuration(task.startDate, task.dueDate);
                     html += `
-                        <div class="project-summary-item" onclick="showProjectDetail(${project.id})">
-                            <div class="project-summary-name">${project.name}</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">Client: ${project.client || 'N/A'}</div>
-                            <div class="project-summary-stats">
-                                <div class="project-summary-stat">
-                                    <div class="project-summary-stat-label">Tasks</div>
-                                    <div class="project-summary-stat-value">${projectTasks.length}</div>
+                        <div class="task-item overdue">
+                            <div class="task-info">
+                                <div class="task-title">${task.name}</div>
+                                <div class="task-meta">
+                                    ${project ? project.name : 'No Project'} • Due: ${task.dueDate} • ${task.priority} Priority
                                 </div>
-                                <div class="project-summary-stat">
-                                    <div class="project-summary-stat-label">Income</div>
-                                    <div class="project-summary-stat-value" style="color: var(--income-color);">$${income.toFixed(0)}</div>
-                                </div>
-                                <div class="project-summary-stat">
-                                    <div class="project-summary-stat-label">Profit</div>
-                                    <div class="project-summary-stat-value" style="color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${profit.toFixed(0)}</div>
-                                </div>
+                                ${duration ? `<div class="task-duration">📅 Duration: ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
+                            </div>
+                            <div class="task-actions">
+                                <button class="icon-btn" onclick="editTask(${task.id})" title="Edit">✏️</button>
+                                <button class="icon-btn danger" onclick="deleteTask(${task.id})" title="Delete">🗑️</button>
                             </div>
                         </div>
                     `;
                 });
             }
-            html += '</div>';
             
-            // Today's Focus
-            html += `<div class="focus-section"><div class="focus-header">🎯 Today's Focus (${dueTasks.length} Due Tasks)</div>`;
-            if (dueTasks.length === 0) {
-                html += '<div class="empty-state" style="padding: 20px;">No tasks due today!</div>';
-            } else {
-                dueTasks.forEach(task => {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    html += `
-                        <div class="task-item overdue">
-                            <div class="task-title">${task.name}</div>
-                            <div class="task-meta">${project ? project.name : 'No Project'} • Due: ${task.dueDate} • ${task.priority}</div>
-                        </div>
-                    `;
-                });
-            }
             html += '</div>';
-            
-            // Gantt Chart with Projects and Tasks
             html += renderGanttChart();
             
             container.innerHTML = html;
         }
 
         function renderGanttChart() {
-            if (data.projects.length === 0) return '';
+            if (data.projects.length === 0) return '<div class="empty-state">No projects to display</div>';
             
-            let html = '<div class="gantt-container"><div class="gantt-header">📅 Projects & Tasks Timeline</div>';
+            let html = '<div class="gantt-container"><div class="gantt-header">📅 Project Timeline</div>';
             
             let minDate = new Date();
             let maxDate = new Date();
             
-            // Calculate date range
             data.projects.forEach(p => {
                 if (p.startDate) {
                     const start = new Date(p.startDate);
@@ -1117,20 +1388,8 @@
                 }
             });
             
-            data.tasks.forEach(t => {
-                if (t.startDate) {
-                    const start = new Date(t.startDate);
-                    if (start < minDate) minDate = start;
-                }
-                if (t.dueDate) {
-                    const due = new Date(t.dueDate);
-                    if (due > maxDate) maxDate = due;
-                }
-            });
-            
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
-            // Render projects
             data.projects.forEach(project => {
                 if (project.startDate && project.endDate) {
                     const start = new Date(project.startDate);
@@ -1142,32 +1401,12 @@
                     
                     html += `
                         <div class="gantt-row">
-                            <div class="gantt-label">📁 ${project.name}</div>
+                            <div class="gantt-label">${project.name}</div>
                             <div class="gantt-timeline">
-                                <div class="gantt-bar project" style="left: ${left}%; width: ${width}%;">${duration}d</div>
+                                <div class="gantt-bar" style="left: ${left}%; width: ${width}%;">${duration}d</div>
                             </div>
                         </div>
                     `;
-                    
-                    // Render tasks for this project
-                    const projectTasks = data.tasks.filter(t => t.projectId === project.id && t.startDate && t.dueDate);
-                    projectTasks.forEach(task => {
-                        const taskStart = new Date(task.startDate);
-                        const taskEnd = new Date(task.dueDate);
-                        const taskStartOffset = Math.ceil((taskStart - minDate) / (1000 * 60 * 60 * 24));
-                        const taskDuration = Math.ceil((taskEnd - taskStart) / (1000 * 60 * 60 * 24)) + 1;
-                        const taskWidth = (taskDuration / totalDays) * 100;
-                        const taskLeft = (taskStartOffset / totalDays) * 100;
-                        
-                        html += `
-                            <div class="gantt-row">
-                                <div class="gantt-label" style="padding-left: 20px;">└ ${task.name}</div>
-                                <div class="gantt-timeline">
-                                    <div class="gantt-bar task" style="left: ${taskLeft}%; width: ${taskWidth}%;">${taskDuration}d</div>
-                                </div>
-                            </div>
-                        `;
-                    });
                 }
             });
             
@@ -1186,28 +1425,32 @@
             });
             
             const inProgressTasks = data.tasks.filter(t => t.status === 'In Progress');
-            const notStartedTasks = data.tasks.filter(t => t.status === 'Not Started' || !t.status);
-            const completedTasks = data.tasks.filter(t => t.status === 'Completed');
+            const getReadyTasks = data.tasks.filter(t => t.status === 'Get Ready' || !t.status || t.status === 'Not Started');
             
             const columns = [
-                { title: 'Due', tasks: dueTasks, status: 'Due' },
+                { title: 'Due Now', tasks: dueTasks, status: 'Due' },
                 { title: 'In Progress', tasks: inProgressTasks, status: 'In Progress' },
-                { title: 'Not Started', tasks: notStartedTasks, status: 'Not Started' },
-                { title: 'Completed', tasks: completedTasks, status: 'Completed' }
+                { title: 'Get Ready', tasks: getReadyTasks, status: 'Get Ready' }
             ];
             
             let html = '<div class="kanban-view">';
             columns.forEach(column => {
-                html += `<div class="kanban-column"><div class="kanban-header">${column.title} (${column.tasks.length})</div><div class="kanban-tasks" data-status="${column.status}">`;
+                html += `
+                    <div class="kanban-column">
+                        <div class="kanban-header">${column.title} (${column.tasks.length})</div>
+                        <div class="kanban-tasks" data-status="${column.status}">
+                `;
                 
                 column.tasks.forEach(task => {
                     const project = data.projects.find(p => p.id === task.projectId);
+                    const duration = calculateTaskDuration(task.startDate, task.dueDate);
                     html += `
                         <div class="kanban-task" draggable="true" data-task-id="${task.id}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
                             <div style="font-weight: 500; margin-bottom: 5px;">${task.name}</div>
-                            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px;">${project ? project.name : 'No Project'}</div>
-                            <div style="font-size: 10px;">📅 ${task.dueDate}</div>
-                            <div style="font-size: 10px; margin-top: 3px;">${task.priority} Priority</div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">${project ? project.name : 'No Project'}</div>
+                            <div style="margin-top: 5px; font-size: 10px;">📅 ${task.dueDate}</div>
+                            ${duration ? `<div style="margin-top: 3px; font-size: 10px; color: var(--primary-color); font-weight: 600;">⏱️ ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
+                            <div style="margin-top: 5px; font-size: 10px;">${task.priority} Priority</div>
                         </div>
                     `;
                 });
@@ -1230,7 +1473,7 @@
                 return;
             }
             
-            let html = '<div class="projects-grid">';
+            let html = '';
             data.projects.forEach(project => {
                 const projectTasks = data.tasks.filter(t => t.projectId === project.id);
                 const projectTransactions = data.transactions.filter(t => t.projectId === project.id);
@@ -1240,11 +1483,11 @@
                 const profit = income - expenses;
                 
                 html += `
-                    <div class="project-card" onclick="showProjectDetail(${project.id})">
-                        <div class="project-header">
+                    <div class="project-card">
+                        <div class="project-header" onclick="showProjectDetail(${project.id})">
                             <div>
                                 <h3>${project.name}</h3>
-                                <div class="project-meta">Client: ${project.client || 'N/A'}</div>
+                                <div class="project-meta">Client: ${project.client}</div>
                                 ${project.startDate ? `<div class="project-meta">${project.startDate} to ${project.endDate || 'Ongoing'}</div>` : ''}
                             </div>
                             <div class="project-stats">
@@ -1269,20 +1512,62 @@
                     </div>
                 `;
             });
-            html += '</div>';
             
             container.innerHTML = html;
         }
 
         function renderSchedule(container) {
-            container.innerHTML = renderGanttChart();
+            const allSortedTasks = [...data.tasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            const sortedTasks = filterTasksByTimeline(allSortedTasks);
+            
+            let html = renderTimelineFilters();
+            
+            if (sortedTasks.length === 0) {
+                html += '<div class="empty-state">No tasks scheduled for this period</div>';
+                container.innerHTML = html;
+                return;
+            }
+            
+            html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
+            html += '<h3 style="font-size: 14px; font-weight: 600; margin-bottom: 15px;">📅 Task Schedule</h3>';
+            
+            sortedTasks.forEach(task => {
+                const project = data.projects.find(p => p.id === task.projectId);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const dueDate = new Date(task.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                const isOverdue = dueDate < today && task.status !== 'Completed';
+                const duration = calculateTaskDuration(task.startDate, task.dueDate);
+                
+                html += `
+                    <div class="task-item ${task.status === 'Completed' ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
+                        <div class="task-info">
+                            <div class="task-title">${task.name}</div>
+                            <div class="task-meta">
+                                ${project ? project.name : 'No Project'} • 
+                                ${task.startDate ? `${task.startDate} to ` : ''}${task.dueDate} • 
+                                ${task.status || 'Get Ready'} • 
+                                ${task.priority} Priority
+                            </div>
+                            ${duration ? `<div class="task-duration">📅 Duration: ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
+                        </div>
+                        <div class="task-actions">
+                            <button class="icon-btn" onclick="editTask(${task.id})" title="Edit">✏️</button>
+                            <button class="icon-btn danger" onclick="deleteTask(${task.id})" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            container.innerHTML = html;
         }
 
         function showProjectDetail(projectId) {
             const project = data.projects.find(p => p.id === projectId);
             if (!project) return;
             
-            currentProjectId = projectId;
             const projectTasks = data.tasks.filter(t => t.projectId === projectId);
             const projectTransactions = data.transactions.filter(t => t.projectId === projectId);
             
@@ -1292,55 +1577,59 @@
             
             document.getElementById('projectDetailTitle').textContent = project.name;
             
-            let html = '<div style="max-height: 65vh; overflow-y: auto;">';
+            let html = '<div style="max-height: 60vh; overflow-y: auto;">';
             
-            // Financial Summary
             html += `
-                <div style="background: var(--bg-color); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="font-size: 14px; margin-bottom: 12px;">💰 Financial Summary</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="font-size: 13px; margin-bottom: 10px;">💰 Finances</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                         <div>
-                            <div style="font-size: 11px; color: var(--text-secondary);">Income</div>
-                            <div style="font-size: 18px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Income</div>
+                            <div style="font-size: 16px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
                         </div>
                         <div>
-                            <div style="font-size: 11px; color: var(--text-secondary);">Expenses</div>
-                            <div style="font-size: 18px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Expenses</div>
+                            <div style="font-size: 16px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
                         </div>
                         <div>
-                            <div style="font-size: 11px; color: var(--text-secondary);">Profit</div>
-                            <div style="font-size: 18px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${profit.toFixed(2)}</div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Profit</div>
+                            <div style="font-size: 16px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${profit.toFixed(2)}</div>
                         </div>
                     </div>
                 </div>
             `;
             
-            // Quick Actions
             html += `
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
                     <button class="btn btn-success" onclick="closeModal('projectDetailModal'); showTransactionModal('income', ${projectId})">+ Income</button>
                     <button class="btn btn-danger" onclick="closeModal('projectDetailModal'); showTransactionModal('expense', ${projectId})">+ Expense</button>
-                    <button class="btn btn-primary" onclick="closeModal('projectDetailModal'); showTaskModal(${projectId})">+ Task</button>
                 </div>
+                <button class="btn btn-primary" style="width: 100%; margin-bottom: 15px;" onclick="closeModal('projectDetailModal'); showTaskModal(${projectId})">+ Add Task</button>
             `;
             
-            // Tasks Section
-            html += '<h4 style="font-size: 14px; margin-bottom: 10px;">📋 Tasks (' + projectTasks.length + ')</h4>';
+            html += '<h4 style="font-size: 13px; margin-bottom: 10px;">📋 Tasks (' + projectTasks.length + ')</h4>';
             if (projectTasks.length === 0) {
                 html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No tasks yet</p>';
             } else {
                 projectTasks.forEach(task => {
+                    const duration = calculateTaskDuration(task.startDate, task.dueDate);
                     html += `
                         <div class="task-item ${task.status === 'Completed' ? 'completed' : ''}">
-                            <div class="task-title">${task.name}</div>
-                            <div class="task-meta">${task.dueDate} • ${task.priority} • ${task.status || 'Not Started'}</div>
+                            <div class="task-info">
+                                <div class="task-title">${task.name}</div>
+                                <div class="task-meta">${task.dueDate} • ${task.priority} • ${task.status || 'Get Ready'}</div>
+                                ${duration ? `<div class="task-duration">📅 ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
+                            </div>
+                            <div class="task-actions">
+                                <button class="icon-btn" onclick="editTask(${task.id}); closeModal('projectDetailModal');" title="Edit">✏️</button>
+                                <button class="icon-btn danger" onclick="deleteTask(${task.id}); closeModal('projectDetailModal');" title="Delete">🗑️</button>
+                            </div>
                         </div>
                     `;
                 });
             }
             
-            // Transactions Section
-            html += '<h4 style="font-size: 14px; margin: 15px 0 10px;">💳 Transactions (' + projectTransactions.length + ')</h4>';
+            html += '<h4 style="font-size: 13px; margin: 15px 0 10px;">💳 Transactions (' + projectTransactions.length + ')</h4>';
             if (projectTransactions.length === 0) {
                 html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No transactions yet</p>';
             } else {
@@ -1352,6 +1641,10 @@
                                 <div class="transaction-date">${trans.date}</div>
                             </div>
                             <div class="transaction-amount ${trans.type}">${trans.type === 'income' ? '+' : '-'}$${trans.amount.toFixed(2)}</div>
+                            <div class="transaction-actions">
+                                <button class="icon-btn" onclick="editTransaction(${trans.id}); closeModal('projectDetailModal');" title="Edit">✏️</button>
+                                <button class="icon-btn danger" onclick="deleteTransaction(${trans.id}); closeModal('projectDetailModal');" title="Delete">🗑️</button>
+                            </div>
                         </div>
                     `;
                 });
@@ -1361,6 +1654,17 @@
             
             document.getElementById('projectDetailBody').innerHTML = html;
             document.getElementById('projectDetailModal').classList.add('show');
+        }
+
+        function updateStats() {
+            document.getElementById('totalProjects').textContent = data.projects.length;
+            document.getElementById('totalTasks').textContent = data.tasks.length;
+            
+            const totalIncome = data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const totalExpenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            
+            document.getElementById('totalIncome').textContent = '$' + totalIncome.toFixed(0);
+            document.getElementById('totalExpenses').textContent = '$' + totalExpenses.toFixed(0);
         }
 
         function toggleFabMenu() {
@@ -1374,9 +1678,7 @@
             document.getElementById('projectClient').value = '';
             document.getElementById('projectStart').value = new Date().toISOString().split('T')[0];
             document.getElementById('projectEnd').value = '';
-            document.getElementById('projectLead').value = '';
             document.getElementById('projectDescription').value = '';
-            populateDropdowns();
             document.getElementById('projectModal').classList.add('show');
             toggleFabMenu();
         }
@@ -1389,9 +1691,7 @@
             document.getElementById('projectClient').value = project.client || '';
             document.getElementById('projectStart').value = project.startDate || '';
             document.getElementById('projectEnd').value = project.endDate || '';
-            document.getElementById('projectLead').value = project.lead || '';
             document.getElementById('projectDescription').value = project.description || '';
-            populateDropdowns();
             document.getElementById('projectModal').classList.add('show');
         }
 
@@ -1401,12 +1701,14 @@
                 client: document.getElementById('projectClient').value,
                 startDate: document.getElementById('projectStart').value,
                 endDate: document.getElementById('projectEnd').value,
-                lead: document.getElementById('projectLead').value,
-                description: document.getElementById('projectDescription').value
+                description: document.getElementById('projectDescription').value,
+                status: 'active',
+                lastModified: new Date().toISOString(),
+                timestamp: new Date().toISOString()
             };
             
-            if (!projectData.name) {
-                showToast('⚠️ Enter project name');
+            if (!projectData.name || !projectData.client) {
+                showToast('⚠️ Please fill required fields');
                 return;
             }
             
@@ -1416,25 +1718,24 @@
                 showToast('✅ Project updated');
             } else {
                 projectData.id = Date.now();
-                projectData.createdBy = data.currentUser;
                 data.projects.push(projectData);
                 showToast('✅ Project created');
             }
             
             saveData();
-            if (data.autoSyncEnabled) cloudSync.push(true);
             renderView();
+            updateStats();
             closeModal('projectModal');
         }
 
         function deleteProject(projectId) {
-            if (confirm('Delete project, tasks & transactions?')) {
+            if (confirm('Delete project and all its tasks & transactions?')) {
                 data.projects = data.projects.filter(p => p.id !== projectId);
                 data.tasks = data.tasks.filter(t => t.projectId !== projectId);
                 data.transactions = data.transactions.filter(t => t.projectId !== projectId);
                 saveData();
-                if (data.autoSyncEnabled) cloudSync.push(true);
                 renderView();
+                updateStats();
                 showToast('🗑️ Project deleted');
             }
         }
@@ -1444,34 +1745,63 @@
             document.getElementById('taskModalTitle').textContent = 'New Task';
             document.getElementById('taskName').value = '';
             document.getElementById('taskPriority').value = 'Medium';
+            document.getElementById('taskStatus').value = 'Get Ready';
             document.getElementById('taskStart').value = new Date().toISOString().split('T')[0];
             document.getElementById('taskDue').value = '';
+            document.getElementById('taskAssignee').value = '';
             document.getElementById('taskDescription').value = '';
             
-            populateDropdowns();
+            const projectSelect = document.getElementById('taskProject');
+            projectSelect.innerHTML = '<option value="">Select Project</option>';
+            data.projects.forEach(p => {
+                projectSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
             
             if (projectId) {
-                document.getElementById('taskProject').value = projectId;
+                projectSelect.value = projectId;
             }
             
             document.getElementById('taskModal').classList.add('show');
             toggleFabMenu();
         }
 
+        function editTask(taskId) {
+            editingTaskId = taskId;
+            const task = data.tasks.find(t => t.id === taskId);
+            document.getElementById('taskModalTitle').textContent = 'Edit Task';
+            document.getElementById('taskName').value = task.name;
+            document.getElementById('taskPriority').value = task.priority;
+            document.getElementById('taskStatus').value = task.status || 'Get Ready';
+            document.getElementById('taskStart').value = task.startDate || '';
+            document.getElementById('taskDue').value = task.dueDate;
+            document.getElementById('taskAssignee').value = task.assignee || '';
+            document.getElementById('taskDescription').value = task.description || '';
+            
+            const projectSelect = document.getElementById('taskProject');
+            projectSelect.innerHTML = '<option value="">Select Project</option>';
+            data.projects.forEach(p => {
+                projectSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
+            projectSelect.value = task.projectId;
+            
+            document.getElementById('taskModal').classList.add('show');
+        }
+
         function saveTask() {
             const taskData = {
                 name: document.getElementById('taskName').value,
                 projectId: parseInt(document.getElementById('taskProject').value),
-                assignee: document.getElementById('taskAssignee').value,
                 priority: document.getElementById('taskPriority').value,
-                status: 'Not Started',
+                status: document.getElementById('taskStatus').value,
                 startDate: document.getElementById('taskStart').value,
                 dueDate: document.getElementById('taskDue').value,
-                description: document.getElementById('taskDescription').value
+                assignee: document.getElementById('taskAssignee').value,
+                description: document.getElementById('taskDescription').value,
+                timestamp: new Date().toISOString()
             };
             
             if (!taskData.name || !taskData.projectId || !taskData.dueDate) {
-                showToast('⚠️ Fill required fields');
+                showToast('⚠️ Please fill required fields');
                 return;
             }
             
@@ -1481,15 +1811,24 @@
                 showToast('✅ Task updated');
             } else {
                 taskData.id = Date.now();
-                taskData.createdBy = data.currentUser;
                 data.tasks.push(taskData);
                 showToast('✅ Task created');
             }
             
             saveData();
-            if (data.autoSyncEnabled) cloudSync.push(true);
             renderView();
+            updateStats();
             closeModal('taskModal');
+        }
+
+        function deleteTask(taskId) {
+            if (confirm('Delete this task?')) {
+                data.tasks = data.tasks.filter(t => t.id !== taskId);
+                saveData();
+                renderView();
+                updateStats();
+                showToast('🗑️ Task deleted');
+            }
         }
 
         function showTransactionModal(type, projectId = null) {
@@ -1500,15 +1839,40 @@
             document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('transDescription').value = '';
             
-            populateDropdowns();
+            const projectSelect = document.getElementById('transProject');
+            projectSelect.innerHTML = '<option value="">Select Project</option>';
+            data.projects.forEach(p => {
+                projectSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
             
             if (projectId) {
-                document.getElementById('transProject').value = projectId;
+                projectSelect.value = projectId;
             }
             
             updateCategories();
             document.getElementById('transactionModal').classList.add('show');
             toggleFabMenu();
+        }
+
+        function editTransaction(transId) {
+            editingTransactionId = transId;
+            const trans = data.transactions.find(t => t.id === transId);
+            document.getElementById('transactionModalTitle').textContent = trans.type === 'income' ? 'Edit Income' : 'Edit Expense';
+            document.getElementById('transType').value = trans.type;
+            document.getElementById('transAmount').value = trans.amount;
+            document.getElementById('transDate').value = trans.date;
+            document.getElementById('transDescription').value = trans.description || '';
+            
+            const projectSelect = document.getElementById('transProject');
+            projectSelect.innerHTML = '<option value="">Select Project</option>';
+            data.projects.forEach(p => {
+                projectSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
+            projectSelect.value = trans.projectId;
+            
+            updateCategories();
+            document.getElementById('transCategory').value = trans.category;
+            document.getElementById('transactionModal').classList.add('show');
         }
 
         function updateCategories() {
@@ -1529,11 +1893,12 @@
                 category: document.getElementById('transCategory').value,
                 amount: parseFloat(document.getElementById('transAmount').value),
                 date: document.getElementById('transDate').value,
-                description: document.getElementById('transDescription').value
+                description: document.getElementById('transDescription').value,
+                timestamp: new Date().toISOString()
             };
             
             if (!transData.projectId || !transData.category || !transData.amount) {
-                showToast('⚠️ Fill required fields');
+                showToast('⚠️ Please fill required fields');
                 return;
             }
             
@@ -1548,43 +1913,18 @@
             }
             
             saveData();
-            if (data.autoSyncEnabled) cloudSync.push(true);
             renderView();
+            updateStats();
             closeModal('transactionModal');
         }
 
-        function showUserModal() {
-            const userList = document.getElementById('userList');
-            userList.innerHTML = '';
-            data.users.forEach(user => {
-                const isCurrent = user === data.currentUser;
-                userList.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--bg-color); border-radius: 6px; margin-bottom: 5px;">
-                        <span style="font-size: 13px;">${user} ${isCurrent ? '(You)' : ''}</span>
-                        ${!isCurrent ? `<button class="btn btn-secondary" onclick="removeUser('${user}')" style="padding: 3px 8px; font-size: 11px;">Remove</button>` : ''}
-                    </div>`;
-            });
-            document.getElementById('userModal').classList.add('show');
-            toggleFabMenu();
-        }
-
-        function addUser() {
-            const newUserName = document.getElementById('newUserName').value.trim();
-            if (newUserName && !data.users.includes(newUserName)) {
-                data.users.push(newUserName);
+        function deleteTransaction(transId) {
+            if (confirm('Delete this transaction?')) {
+                data.transactions = data.transactions.filter(t => t.id !== transId);
                 saveData();
-                document.getElementById('newUserName').value = '';
-                showUserModal();
-                showToast(`✅ ${newUserName} added`);
-            }
-        }
-
-        function removeUser(userName) {
-            if (confirm(`Remove ${userName}?`)) {
-                data.users = data.users.filter(u => u !== userName);
-                saveData();
-                showUserModal();
-                showToast(`🗑️ ${userName} removed`);
+                renderView();
+                updateStats();
+                showToast('🗑️ Transaction deleted');
             }
         }
 
@@ -1614,7 +1954,6 @@
                 if (task) {
                     task.status = newStatus;
                     saveData();
-                    if (data.autoSyncEnabled) cloudSync.push(true);
                     renderKanban(document.getElementById('mainContent'));
                     showToast(`✅ Task moved to ${newStatus}`);
                 }
