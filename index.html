@@ -57,42 +57,91 @@
         .header { background: var(--primary-gradient); color: white; padding: 10px 12px; box-shadow: 0 2px 10px var(--shadow-color); position: sticky; top: 0; z-index: 100; }
         .header-content { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 10px; flex: 1; }
-        .header h1 { font-size: calc(16px * var(--font-scale)); font-weight: 600; }
+        .header h1 { font-size: calc(18px * var(--font-scale)); font-weight: 600; }
         .header-controls { display: flex; gap: 8px; align-items: center; }
-        .header-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: calc(14px * var(--font-scale)); display: flex; align-items: center; justify-content: center; }
+        .header-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: calc(14px * var(--font-scale)); display: flex; align-items: center; justify-content: center; position: relative; }
         .header-btn:active { transform: scale(0.9); }
+        .header-btn .badge { position: absolute; top: -4px; right: -4px; background: #ff4444; color: white; border-radius: 10px; padding: 2px 5px; font-size: 9px; min-width: 16px; text-align: center; }
+        
+        /* Sync Status Bar */
+        .sync-status-bar { position: fixed; top: 52px; left: 0; right: 0; background: var(--card-bg); border-bottom: 1px solid var(--border-color); padding: 8px 12px; display: flex; align-items: center; justify-content: space-between; z-index: 90; font-size: calc(11px * var(--font-scale)); color: var(--text-secondary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); transform: translateY(-100%); transition: transform 0.3s; }
+        .sync-status-bar.show { transform: translateY(0); }
+        .sync-status-left { display: flex; align-items: center; gap: 8px; }
+        .sync-icon { font-size: 16px; }
+        .sync-icon.syncing { animation: spin 1s linear infinite; }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .sync-badge { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 500; }
+        .sync-badge.online { background: #d4edda; color: #155724; }
+        .sync-badge.offline { background: #f8d7da; color: #721c24; }
         
         .tabs { background: var(--card-bg); display: flex; border-bottom: 2px solid var(--border-color); position: sticky; top: 52px; z-index: 90; overflow-x: auto; }
-        .tab { flex: 1; min-width: 80px; padding: 10px 8px; text-align: center; cursor: pointer; font-weight: 500; color: var(--text-secondary); border-bottom: 3px solid transparent; font-size: calc(12px * var(--font-scale)); }
+        .tab { flex: 1; min-width: 80px; padding: 12px 8px; text-align: center; cursor: pointer; font-weight: 500; color: var(--text-secondary); border-bottom: 3px solid transparent; font-size: calc(13px * var(--font-scale)); }
         .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
         
-        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; background: var(--bg-color); }
-        .stat-card { background: var(--card-bg); padding: 10px; border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color); text-align: center; }
-        .stat-card h3 { font-size: calc(16px * var(--font-scale)); color: var(--primary-color); margin-bottom: 2px; font-weight: 700; }
-        .stat-card p { font-size: calc(10px * var(--font-scale)); color: var(--text-secondary); }
-        .stat-card.income h3 { color: var(--income-color); }
-        .stat-card.expense h3 { color: var(--expense-color); }
+        .container { flex: 1; padding: 12px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
         
-        .container { flex: 1; padding: 10px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
+        /* Finance Summary Cards */
+        .finance-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 15px; }
+        .finance-card { background: var(--card-bg); padding: 15px; border-radius: 10px; box-shadow: 0 2px 8px var(--shadow-color); text-align: center; }
+        .finance-card-label { font-size: calc(11px * var(--font-scale)); color: var(--text-secondary); margin-bottom: 5px; }
+        .finance-card-value { font-size: calc(22px * var(--font-scale)); font-weight: bold; }
+        .finance-card.income .finance-card-value { color: var(--income-color); }
+        .finance-card.expense .finance-card-value { color: var(--expense-color); }
+        .finance-card.profit .finance-card-value { color: var(--success); }
         
-        /* Project Cards */
-        .project-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 2px 10px var(--shadow-color); overflow: hidden; margin-bottom: 12px; }
-        .project-header { background: var(--primary-gradient); color: white; padding: 12px; cursor: pointer; }
-        .project-header h3 { font-size: calc(15px * var(--font-scale)); margin-bottom: 3px; }
-        .project-meta { font-size: calc(10px * var(--font-scale)); opacity: 0.9; }
-        .project-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; background: rgba(0,0,0,0.1); }
-        .project-stat { text-align: center; }
-        .project-stat-label { font-size: calc(9px * var(--font-scale)); opacity: 0.8; }
-        .project-stat-value { font-size: calc(13px * var(--font-scale)); font-weight: bold; }
-        .project-actions { display: flex; gap: 5px; margin-top: 8px; }
-        .action-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: calc(10px * var(--font-scale)); }
+        /* Project Summary */
+        .section-card { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 8px var(--shadow-color); margin-bottom: 15px; }
+        .section-title { font-size: calc(15px * var(--font-scale)); font-weight: 600; margin-bottom: 12px; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+        
+        .project-summary-item { background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 10px; cursor: pointer; transition: transform 0.2s; border-left: 4px solid var(--primary-color); }
+        .project-summary-item:active { transform: scale(0.98); }
+        .project-summary-name { font-weight: 600; font-size: calc(14px * var(--font-scale)); margin-bottom: 5px; }
+        .project-summary-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 8px; }
+        .project-summary-stat { text-align: center; }
+        .project-summary-stat-label { font-size: calc(10px * var(--font-scale)); color: var(--text-secondary); }
+        .project-summary-stat-value { font-size: calc(13px * var(--font-scale)); font-weight: bold; }
+        
+        /* Today's Focus */
+        .focus-section { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 8px var(--shadow-color); margin-bottom: 15px; }
+        .focus-header { font-size: calc(15px * var(--font-scale)); font-weight: 600; margin-bottom: 12px; color: var(--danger); display: flex; align-items: center; gap: 8px; }
         
         /* Task Items */
-        .task-item { padding: 10px; margin-bottom: 8px; background: var(--bg-color); border-radius: 8px; border-left: 3px solid var(--primary-color); }
+        .task-item { padding: 12px; margin-bottom: 8px; background: var(--bg-color); border-radius: 8px; border-left: 3px solid var(--primary-color); }
         .task-item.completed { opacity: 0.7; border-left-color: var(--success); }
         .task-item.overdue { border-left-color: var(--danger); }
         .task-title { font-weight: 500; margin-bottom: 5px; font-size: calc(13px * var(--font-scale)); }
-        .task-meta { font-size: calc(10px * var(--font-scale)); color: var(--text-secondary); }
+        .task-meta { font-size: calc(11px * var(--font-scale)); color: var(--text-secondary); }
+        
+        /* Gantt Chart */
+        .gantt-container { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 8px var(--shadow-color); overflow-x: auto; margin-bottom: 15px; }
+        .gantt-header { font-size: calc(15px * var(--font-scale)); font-weight: 600; margin-bottom: 15px; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+        .gantt-row { display: flex; align-items: center; margin-bottom: 12px; min-height: 32px; }
+        .gantt-label { width: 150px; min-width: 150px; font-size: calc(11px * var(--font-scale)); font-weight: 500; color: var(--text-primary); }
+        .gantt-timeline { flex: 1; position: relative; height: 32px; background: var(--bg-color); border-radius: 6px; margin-left: 10px; }
+        .gantt-bar { position: absolute; height: 100%; border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: calc(9px * var(--font-scale)); color: white; font-weight: 500; }
+        .gantt-bar.project { background: var(--primary-gradient); }
+        .gantt-bar.task { background: linear-gradient(135deg, #10b981 0%, #059669 100%); height: 60%; top: 20%; }
+        
+        /* Project Cards */
+        .projects-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+        .project-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 2px 8px var(--shadow-color); overflow: hidden; cursor: pointer; transition: transform 0.2s; }
+        .project-card:active { transform: scale(0.98); }
+        .project-header { background: var(--primary-gradient); color: white; padding: 15px; }
+        .project-header h3 { font-size: calc(16px * var(--font-scale)); margin-bottom: 5px; }
+        .project-meta { font-size: calc(11px * var(--font-scale)); opacity: 0.9; }
+        .project-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; padding: 12px; background: rgba(0,0,0,0.1); }
+        .project-stat { text-align: center; }
+        .project-stat-label { font-size: calc(10px * var(--font-scale)); opacity: 0.8; }
+        .project-stat-value { font-size: calc(14px * var(--font-scale)); font-weight: bold; }
+        .project-actions { display: flex; gap: 8px; padding: 12px; background: rgba(255,255,255,0.1); }
+        .action-btn { background: rgba(255,255,255,0.3); border: none; color: white; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: calc(11px * var(--font-scale)); flex: 1; }
+        
+        /* Kanban */
+        .kanban-view { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
+        .kanban-column { min-width: 260px; background: var(--card-bg); border-radius: 10px; padding: 12px; box-shadow: 0 2px 8px var(--shadow-color); }
+        .kanban-header { font-weight: 600; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); font-size: calc(14px * var(--font-scale)); }
+        .kanban-task { background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 10px; cursor: move; font-size: calc(12px * var(--font-scale)); border: 2px solid transparent; }
+        .kanban-task.dragging { opacity: 0.5; }
         
         /* Transaction Items */
         .transaction-item { display: flex; justify-content: space-between; padding: 10px; background: var(--bg-color); border-radius: 8px; margin-bottom: 8px; align-items: center; }
@@ -103,44 +152,41 @@
         .transaction-amount.income { color: var(--income-color); }
         .transaction-amount.expense { color: var(--expense-color); }
         
-        /* Kanban */
-        .kanban-view { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .kanban-column { min-width: 260px; background: var(--card-bg); border-radius: 10px; padding: 10px; box-shadow: 0 2px 10px var(--shadow-color); }
-        .kanban-header { font-weight: 600; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); font-size: calc(13px * var(--font-scale)); }
-        .kanban-task { background: var(--bg-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: move; font-size: calc(12px * var(--font-scale)); border: 2px solid transparent; }
-        .kanban-task.dragging { opacity: 0.5; }
+        .settings-panel { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: var(--card-bg); box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s; z-index: 3000; overflow-y: auto; padding: 20px; }
+        .settings-panel.show { right: 0; }
+        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
+        .settings-title { font-size: calc(18px * var(--font-scale)); font-weight: 600; color: var(--text-primary); }
+        .close-settings { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-secondary); }
+        .settings-section { margin-bottom: 25px; }
+        .settings-label { font-size: calc(13px * var(--font-scale)); font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; display: block; }
+        .user-profile-section { background: var(--primary-gradient); color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .user-profile-name { font-size: calc(16px * var(--font-scale)); font-weight: 600; margin-bottom: 5px; }
+        .user-profile-role { font-size: calc(11px * var(--font-scale)); opacity: 0.9; }
+        .change-name-btn { background: rgba(255,255,255,0.2); color: white; border: none; padding: 6px 12px; border-radius: 6px; font-size: calc(11px * var(--font-scale)); cursor: pointer; margin-top: 8px; }
+        .auto-sync-options { display: flex; flex-direction: column; gap: 10px; }
+        .sync-interval-select { width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-primary); font-size: calc(13px * var(--font-scale)); }
+        .contrast-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .contrast-btn { padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; font-size: calc(12px * var(--font-scale)); cursor: pointer; }
+        .contrast-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .font-size-buttons { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; margin-bottom: 15px; }
+        .font-btn { padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; font-size: 12px; cursor: pointer; }
+        .font-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        .toggle-switch { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .toggle-switch input[type="checkbox"] { width: 44px; height: 24px; -webkit-appearance: none; background: #cbd5e0; border-radius: 12px; position: relative; cursor: pointer; }
+        .toggle-switch input[type="checkbox"]:checked { background: var(--primary-color); }
+        .toggle-switch input[type="checkbox"]::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: left 0.3s; }
+        .toggle-switch input[type="checkbox"]:checked::after { left: 22px; }
         
-        /* Gantt Chart */
-        .gantt-container { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); overflow-x: auto; }
-        .gantt-header { font-size: calc(14px * var(--font-scale)); font-weight: 600; margin-bottom: 15px; color: var(--text-primary); }
-        .gantt-row { display: flex; align-items: center; margin-bottom: 10px; min-height: 30px; }
-        .gantt-label { width: 150px; font-size: calc(11px * var(--font-scale)); font-weight: 500; color: var(--text-primary); }
-        .gantt-timeline { flex: 1; position: relative; height: 30px; background: var(--bg-color); border-radius: 4px; }
-        .gantt-bar { position: absolute; height: 100%; background: var(--primary-gradient); border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: calc(9px * var(--font-scale)); color: white; font-weight: 500; }
-        
-        /* Today's Focus */
-        .focus-section { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); margin-bottom: 15px; }
-        .focus-header { font-size: calc(14px * var(--font-scale)); font-weight: 600; margin-bottom: 12px; color: var(--danger); }
-        
-        /* Finance Summary */
-        .finance-summary { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); margin-bottom: 15px; }
-        .finance-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
-        .finance-row:last-child { border-bottom: none; font-weight: 600; }
-        .finance-label { font-size: calc(12px * var(--font-scale)); color: var(--text-secondary); }
-        .finance-value { font-size: calc(14px * var(--font-scale)); font-weight: 600; }
-        
-        /* FAB */
         .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
-        .fab { width: 50px; height: 50px; border-radius: 50%; background: var(--primary-gradient); color: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color); }
+        .fab { width: 56px; height: 56px; border-radius: 50%; background: var(--primary-gradient); color: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color); }
         .fab:active { transform: scale(0.95); }
-        .fab-menu { position: absolute; bottom: 60px; right: 0; display: none; flex-direction: column; gap: 8px; }
+        .fab-menu { position: absolute; bottom: 68px; right: 0; display: none; flex-direction: column; gap: 8px; }
         .fab-menu.show { display: flex; }
-        .fab-option { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 10px var(--shadow-color); cursor: pointer; white-space: nowrap; font-size: calc(12px * var(--font-scale)); }
+        .fab-option { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 10px var(--shadow-color); cursor: pointer; white-space: nowrap; font-size: calc(13px * var(--font-scale)); }
         
-        /* Modal */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
         .modal.show { display: flex; }
-        .modal-content { background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
+        .modal-content { background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 450px; max-height: 85vh; overflow-y: auto; }
         .modal-header { padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .modal-header h2 { font-size: calc(16px * var(--font-scale)); color: var(--text-primary); }
         .modal-close { font-size: 24px; color: var(--text-secondary); cursor: pointer; }
@@ -149,43 +195,46 @@
         
         .form-group { margin-bottom: 12px; }
         .form-group label { display: block; margin-bottom: 4px; font-size: calc(12px * var(--font-scale)); color: var(--text-secondary); font-weight: 500; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: calc(13px * var(--font-scale)); background: var(--bg-color); color: var(--text-primary); }
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: calc(13px * var(--font-scale)); background: var(--bg-color); color: var(--text-primary); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         
-        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: calc(13px * var(--font-scale)); cursor: pointer; }
+        .btn { padding: 10px 16px; border: none; border-radius: 6px; font-size: calc(13px * var(--font-scale)); cursor: pointer; }
         .btn-primary { background: var(--primary-gradient); color: white; }
         .btn-secondary { background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); }
         .btn-success { background: var(--success); color: white; }
         .btn-danger { background: var(--danger); color: white; }
+        .btn-export { background: #7fa67f; color: white; width: 100%; margin-bottom: 10px; }
+        .btn-import { background: #7899b3; color: white; width: 100%; margin-bottom: 10px; }
         
-        .badge { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: calc(10px * var(--font-scale)); font-weight: 500; }
-        .badge-income { background: #d1fae5; color: #065f46; }
-        .badge-expense { background: #fee2e2; color: #991b1b; }
-        
-        .settings-panel { position: fixed; top: 0; right: -320px; width: 320px; height: 100%; background: var(--card-bg); box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s; z-index: 3000; overflow-y: auto; padding: 20px; }
-        .settings-panel.show { right: 0; }
-        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
-        .settings-section { margin-bottom: 20px; }
-        .settings-label { font-size: calc(13px * var(--font-scale)); font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; display: block; }
-        .toggle-switch { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .toggle-switch input[type="checkbox"] { width: 44px; height: 24px; -webkit-appearance: none; background: #cbd5e0; border-radius: 12px; position: relative; cursor: pointer; }
-        .toggle-switch input[type="checkbox"]:checked { background: var(--primary-color); }
-        .toggle-switch input[type="checkbox"]::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: left 0.3s; }
-        .toggle-switch input[type="checkbox"]:checked::after { left: 22px; }
-        
-        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--card-bg); color: var(--text-primary); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999; opacity: 0; transition: opacity 0.3s; font-size: calc(13px * var(--font-scale)); }
+        .toast { position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%); background: var(--card-bg); color: var(--text-primary); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999; opacity: 0; transition: opacity 0.3s; font-size: calc(13px * var(--font-scale)); max-width: 90%; }
         .toast.show { opacity: 1; }
         
-        .night-mode .stat-card, .night-mode .project-card, .night-mode .kanban-column, .night-mode .focus-section, .night-mode .finance-summary, .night-mode .gantt-container { background: var(--card-bg); }
-        .night-mode .task-item, .night-mode .transaction-item, .night-mode .kanban-task { background: #3a3a42; color: var(--text-primary); }
+        .night-mode .section-card, .night-mode .project-card, .night-mode .kanban-column, .night-mode .focus-section, .night-mode .finance-card, .night-mode .gantt-container { background: var(--card-bg); }
+        .night-mode .task-item, .night-mode .transaction-item, .night-mode .kanban-task, .night-mode .project-summary-item { background: #3a3a42; color: var(--text-primary); }
         .night-mode .modal-content, .night-mode .settings-panel { background: var(--card-bg); color: var(--text-primary); }
         .night-mode input, .night-mode select, .night-mode textarea { background: #25252b; color: var(--text-primary); }
         
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); font-size: calc(13px * var(--font-scale)); }
         
+        /* Desktop & Tablet Responsive */
         @media (min-width: 768px) {
-            .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
-            .stats-bar { grid-template-columns: repeat(4, 1fr); padding: 15px; }
+            .header h1 { font-size: calc(20px * var(--font-scale)); }
+            .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+            .finance-cards { grid-template-columns: repeat(4, 1fr); gap: 15px; }
+            .projects-grid { grid-template-columns: repeat(2, 1fr); gap: 15px; }
+            .gantt-label { width: 200px; min-width: 200px; }
+        }
+        
+        @media (min-width: 1200px) {
+            .projects-grid { grid-template-columns: repeat(3, 1fr); }
+            .container { padding: 25px; }
+        }
+        
+        /* iPhone 15 Pro Max specific */
+        @media (max-width: 430px) {
+            .header h1 { font-size: calc(16px * var(--font-scale)); }
+            .finance-card-value { font-size: calc(20px * var(--font-scale)); }
+            .gantt-label { width: 120px; min-width: 120px; font-size: calc(10px * var(--font-scale)); }
         }
     </style>
 </head>
@@ -197,10 +246,18 @@
                     <h1>🏗️ Builder Pro</h1>
                 </div>
                 <div class="header-controls">
-                    <button class="header-btn" onclick="manualSync()" title="Sync Now">☁️</button>
-                    <button class="header-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
+                    <button class="header-btn" onclick="manualSync()" title="Sync Now" id="syncBtn">☁️</button>
+                    <button class="header-btn" onclick="toggleSettings()" title="Settings">⚙️<span class="badge" id="conflictBadge" style="display: none;">!</span></button>
                 </div>
             </div>
+        </div>
+        
+        <div class="sync-status-bar" id="syncStatusBar">
+            <div class="sync-status-left">
+                <span class="sync-icon" id="syncIcon">✅</span>
+                <span id="syncText">Synced</span>
+            </div>
+            <span class="sync-badge online" id="onlineStatus">Online</span>
         </div>
         
         <div class="tabs">
@@ -210,47 +267,82 @@
             <div class="tab" onclick="switchView('schedule')">Schedule</div>
         </div>
 
-        <div class="stats-bar">
-            <div class="stat-card">
-                <h3 id="totalProjects">0</h3>
-                <p>Projects</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="totalTasks">0</h3>
-                <p>Tasks</p>
-            </div>
-            <div class="stat-card income">
-                <h3 id="totalIncome">$0</h3>
-                <p>Income</p>
-            </div>
-            <div class="stat-card expense">
-                <h3 id="totalExpenses">$0</h3>
-                <p>Expenses</p>
-            </div>
-        </div>
-
         <div class="container" id="mainContent"></div>
     </div>
 
     <div class="settings-panel" id="settingsPanel">
         <div class="settings-header">
-            <span style="font-size: 18px; font-weight: 600;">Settings</span>
-            <button style="background: none; border: none; font-size: 24px; cursor: pointer;" onclick="toggleSettings()">×</button>
+            <span class="settings-title">Settings</span>
+            <button class="close-settings" onclick="toggleSettings()">×</button>
+        </div>
+        
+        <div class="user-profile-section">
+            <div class="user-profile-name" id="userProfileName">Loading...</div>
+            <div class="user-profile-role">Team Member</div>
+            <button class="change-name-btn" onclick="changeUserName()">Change Name</button>
+        </div>
+        
+        <div class="settings-section">
+            <label class="settings-label">Auto-Sync</label>
+            <div class="auto-sync-options">
+                <div class="toggle-switch">
+                    <span style="font-size: 12px;">Enable Auto-Sync</span>
+                    <input type="checkbox" id="autoSyncToggle" onchange="toggleAutoSync()">
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label style="font-size: 11px; margin-bottom: 5px;">Sync Interval</label>
+                    <select class="sync-interval-select" id="syncInterval" onchange="updateSyncInterval()">
+                        <option value="30">Every 30 seconds</option>
+                        <option value="60" selected>Every 1 minute</option>
+                        <option value="120">Every 2 minutes</option>
+                        <option value="300">Every 5 minutes</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <label class="settings-label">Font Size</label>
+            <div class="font-size-buttons">
+                <button class="font-btn" onclick="setFontSize('small')" id="font-small">S</button>
+                <button class="font-btn" onclick="setFontSize('normal')" id="font-normal">M</button>
+                <button class="font-btn" onclick="setFontSize('large')" id="font-large">L</button>
+                <button class="font-btn" onclick="setFontSize('xlarge')" id="font-xlarge">XL</button>
+            </div>
+        </div>
+        
+        <div class="settings-section">
+            <label class="settings-label">Page Contrast</label>
+            <div class="contrast-buttons">
+                <button class="contrast-btn" onclick="setContrast('normal')" id="contrast-normal">Normal</button>
+                <button class="contrast-btn" onclick="setContrast('low')" id="contrast-low">Low</button>
+                <button class="contrast-btn" onclick="setContrast('high')" id="contrast-high">High</button>
+                <button class="contrast-btn" onclick="setContrast('extra')" id="contrast-extra">Extra High</button>
+            </div>
         </div>
         
         <div class="settings-section">
             <div class="toggle-switch">
                 <span class="settings-label" style="margin: 0;">Night Mode</span>
-                <input type="checkbox" id="nightToggle" onchange="toggleNightMode()">
+                <input type="checkbox" id="nightToggle" onchange="toggleDayNight()">
             </div>
         </div>
         
         <div class="settings-section">
-            <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="exportData()">📤 Export Data</button>
-            <label class="btn btn-secondary" style="width: 100%; display: block; text-align: center; cursor: pointer;">
+            <label class="settings-label">Data Management</label>
+            <button class="btn btn-export" onclick="exportData()">📤 Export Data</button>
+            <label class="btn btn-import" style="display: block; text-align: center; cursor: pointer;">
                 📥 Import Data
                 <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
             </label>
+        </div>
+        
+        <div class="settings-section">
+            <label class="settings-label">Cloud Sync Setup</label>
+            <button class="btn btn-secondary" onclick="resetApiKey()" style="width: 100%; margin-bottom: 8px;">🔑 Change API Key</button>
+            <div style="font-size: 10px; color: var(--text-secondary); line-height: 1.4;">
+                Get free API key from <a href="https://jsonbin.io" target="_blank" style="color: var(--primary-color);">jsonbin.io</a>
+            </div>
         </div>
     </div>
 
@@ -267,6 +359,9 @@
             </div>
             <div class="fab-option" onclick="showTransactionModal('expense')">
                 <span>💸</span>Add Expense
+            </div>
+            <div class="fab-option" onclick="showUserModal()">
+                <span>👥</span>Manage Users
             </div>
         </div>
         <button class="fab" onclick="toggleFabMenu()">+</button>
@@ -285,7 +380,7 @@
                     <input type="text" id="projectName" placeholder="Kitchen Renovation">
                 </div>
                 <div class="form-group">
-                    <label>Client Name *</label>
+                    <label>Client Name</label>
                     <input type="text" id="projectClient" placeholder="John Doe">
                 </div>
                 <div class="form-row">
@@ -297,6 +392,10 @@
                         <label>End Date</label>
                         <input type="date" id="projectEnd">
                     </div>
+                </div>
+                <div class="form-group">
+                    <label>Project Lead</label>
+                    <select id="projectLead"></select>
                 </div>
                 <div class="form-group">
                     <label>Description</label>
@@ -328,20 +427,16 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group">
+                        <label>Assignee</label>
+                        <select id="taskAssignee"></select>
+                    </div>
+                    <div class="form-group">
                         <label>Priority</label>
                         <select id="taskPriority">
                             <option value="Low">Low</option>
                             <option value="Medium" selected>Medium</option>
                             <option value="High">High</option>
                             <option value="Critical">Critical</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select id="taskStatus">
-                            <option value="Not Started">Not Started</option>
-                            <option value="In Progress">In Progress</option>
-                            <option value="Completed">Completed</option>
                         </select>
                     </div>
                 </div>
@@ -354,10 +449,6 @@
                         <label>Due Date *</label>
                         <input type="date" id="taskDue">
                     </div>
-                </div>
-                <div class="form-group">
-                    <label>Assignee</label>
-                    <input type="text" id="taskAssignee" placeholder="Worker name">
                 </div>
                 <div class="form-group">
                     <label>Description</label>
@@ -428,17 +519,169 @@
         </div>
     </div>
 
+    <!-- User Modal -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Manage Team Members</h2>
+                <span class="modal-close" onclick="closeModal('userModal')">×</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Current Team Members</label>
+                    <div id="userList" style="margin: 10px 0;"></div>
+                </div>
+                <div class="form-group">
+                    <label>Add New Member</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="newUserName" placeholder="Enter name" style="flex: 1;">
+                        <button class="btn btn-primary" onclick="addUser()">Add</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" onclick="closeModal('userModal')">Done</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
-        // Enhanced Data Structure
+        class EnhancedCloudSync {
+            constructor() {
+                this.binId = '68e06018d0ea881f4094852b';
+                this.apiKey = localStorage.getItem('syncApiKey') || '';
+                this.baseUrl = 'https://api.jsonbin.io/v3';
+                this.isSyncing = false;
+                this.lastSyncTime = null;
+                this.autoSyncInterval = null;
+            }
+            
+            async setup() {
+                if (!this.apiKey) {
+                    const apiKey = prompt('🔑 Enter your JSONBin API Key:\n\nGet one free at jsonbin.io');
+                    if (!apiKey) {
+                        showToast('Sync cancelled');
+                        return false;
+                    }
+                    this.apiKey = apiKey.trim();
+                    localStorage.setItem('syncApiKey', this.apiKey);
+                    showToast('✅ Sync connected!');
+                }
+                return true;
+            }
+            
+            async push(silent = false) {
+                if (!await this.setup()) return false;
+                if (this.isSyncing) return false;
+                
+                this.isSyncing = true;
+                updateSyncStatus('syncing', 'Syncing...');
+                
+                try {
+                    const dataToSync = {
+                        ...data,
+                        lastUpdated: new Date().toISOString(),
+                        syncVersion: (data.syncVersion || 0) + 1
+                    };
+                    
+                    const response = await fetch(`${this.baseUrl}/b/${this.binId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': this.apiKey
+                        },
+                        body: JSON.stringify(dataToSync)
+                    });
+                    
+                    if (response.ok) {
+                        this.lastSyncTime = new Date();
+                        data.syncVersion = dataToSync.syncVersion;
+                        data.lastUpdated = dataToSync.lastUpdated;
+                        updateSyncStatus('synced', 'Synced');
+                        if (!silent) showToast('✅ Saved to cloud');
+                        return true;
+                    } else {
+                        updateSyncStatus('error', 'Failed');
+                        if (!silent) showToast('⚠️ Sync failed');
+                        return false;
+                    }
+                } catch (error) {
+                    updateSyncStatus('offline', 'Offline');
+                    if (!silent) showToast('📵 No connection');
+                    return false;
+                } finally {
+                    this.isSyncing = false;
+                }
+            }
+            
+            async pull(silent = false) {
+                if (!await this.setup()) return false;
+                if (this.isSyncing) return false;
+                
+                this.isSyncing = true;
+                updateSyncStatus('syncing', 'Loading...');
+                
+                try {
+                    const response = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
+                        headers: { 'X-Master-Key': this.apiKey }
+                    });
+                    
+                    if (response.ok) {
+                        const result = await response.json();
+                        const cloudData = result.record;
+                        
+                        data = { ...data, ...cloudData };
+                        localStorage.setItem('builderProData', JSON.stringify(data));
+                        
+                        this.lastSyncTime = new Date();
+                        updateSyncStatus('synced', 'Synced');
+                        if (!silent) showToast('☁️ Loaded from cloud');
+                        
+                        applyThemeSettings();
+                        renderView();
+                        updateUserProfile();
+                        return true;
+                    }
+                } catch (error) {
+                    updateSyncStatus('offline', 'Offline');
+                } finally {
+                    this.isSyncing = false;
+                }
+            }
+            
+            startAutoSync(intervalSeconds = 60) {
+                this.stopAutoSync();
+                this.autoSyncInterval = setInterval(() => {
+                    if (navigator.onLine && !this.isSyncing) {
+                        this.pull(true);
+                    }
+                }, intervalSeconds * 1000);
+            }
+            
+            stopAutoSync() {
+                if (this.autoSyncInterval) {
+                    clearInterval(this.autoSyncInterval);
+                    this.autoSyncInterval = null;
+                }
+            }
+        }
+
+        const cloudSync = new EnhancedCloudSync();
+
         let data = {
-            currentUser: 'Admin',
+            currentUser: '',
             currentView: 'home',
             projects: [],
             tasks: [],
             transactions: [],
+            users: ['John Doe', 'Jane Smith', 'Mike Johnson'],
             nightMode: false,
+            contrast: 'normal',
+            fontSize: 'normal',
+            autoSyncEnabled: false,
+            autoSyncInterval: 60,
             lastUpdated: null,
             syncVersion: 0
         };
@@ -450,25 +693,40 @@
         let editingTaskId = null;
         let editingTransactionId = null;
         let draggedElement = null;
+        let currentProjectId = null;
 
-        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
             renderView();
-            updateStats();
+            setupOnlineDetection();
+            applyThemeSettings();
+            updateUserProfile();
+            populateDropdowns();
+            
+            if (data.autoSyncEnabled) {
+                document.getElementById('autoSyncToggle').checked = true;
+                cloudSync.startAutoSync(data.autoSyncInterval);
+            }
+            document.getElementById('syncInterval').value = data.autoSyncInterval;
         });
 
         function loadData() {
             const saved = localStorage.getItem('builderProData');
             if (saved) {
                 data = { ...data, ...JSON.parse(saved) };
+                if (!data.currentUser) {
+                    data.currentUser = prompt('Welcome! Enter your name:') || 'Team Member';
+                    if (!data.users.includes(data.currentUser)) {
+                        data.users.push(data.currentUser);
+                    }
+                    saveData();
+                }
             } else {
+                data.currentUser = prompt('Welcome! Enter your name:') || 'Team Member';
+                if (!data.users.includes(data.currentUser)) {
+                    data.users.push(data.currentUser);
+                }
                 createSampleData();
-            }
-            
-            if (data.nightMode) {
-                document.body.classList.add('night-mode');
-                document.getElementById('nightToggle').checked = true;
             }
         }
 
@@ -481,32 +739,184 @@
             const today = new Date().toISOString().split('T')[0];
             const nextWeek = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
             
-            data.projects = [
-                { 
-                    id: Date.now(), 
-                    name: 'Kitchen Renovation', 
-                    client: 'Jane Smith',
-                    startDate: today,
-                    endDate: nextWeek,
-                    description: 'Complete kitchen remodel',
-                    status: 'active'
-                }
-            ];
+            data.projects = [{
+                id: Date.now(),
+                name: 'Kitchen Renovation',
+                client: 'Jane Smith',
+                startDate: today,
+                endDate: nextWeek,
+                lead: 'John Doe',
+                description: 'Complete kitchen remodel'
+            }];
             
             saveData();
         }
 
+        function setupOnlineDetection() {
+            window.addEventListener('online', () => {
+                document.getElementById('onlineStatus').textContent = 'Online';
+                document.getElementById('onlineStatus').className = 'sync-badge online';
+                if (data.autoSyncEnabled) cloudSync.pull(true);
+            });
+            
+            window.addEventListener('offline', () => {
+                document.getElementById('onlineStatus').textContent = 'Offline';
+                document.getElementById('onlineStatus').className = 'sync-badge offline';
+            });
+        }
+
+        function updateSyncStatus(status, text) {
+            const statusBar = document.getElementById('syncStatusBar');
+            const icon = document.getElementById('syncIcon');
+            const textEl = document.getElementById('syncText');
+            
+            statusBar.classList.add('show');
+            textEl.textContent = text;
+            
+            if (status === 'syncing') {
+                icon.textContent = '🔄';
+                icon.classList.add('syncing');
+            } else if (status === 'synced') {
+                icon.textContent = '✅';
+                icon.classList.remove('syncing');
+                setTimeout(() => statusBar.classList.remove('show'), 3000);
+            } else {
+                icon.textContent = '⚠️';
+                icon.classList.remove('syncing');
+            }
+        }
+
+        function toggleAutoSync() {
+            data.autoSyncEnabled = document.getElementById('autoSyncToggle').checked;
+            if (data.autoSyncEnabled) {
+                cloudSync.startAutoSync(data.autoSyncInterval);
+                showToast('✅ Auto-sync enabled');
+            } else {
+                cloudSync.stopAutoSync();
+                showToast('⏸️ Auto-sync disabled');
+            }
+            saveData();
+        }
+
+        function updateSyncInterval() {
+            data.autoSyncInterval = parseInt(document.getElementById('syncInterval').value);
+            if (data.autoSyncEnabled) {
+                cloudSync.startAutoSync(data.autoSyncInterval);
+            }
+            saveData();
+        }
+
         function manualSync() {
-            showToast('Sync functionality - connect to cloud storage');
+            const action = confirm('OK = Pull from cloud\nCancel = Push to cloud');
+            if (action) {
+                cloudSync.pull();
+            } else {
+                cloudSync.push();
+            }
+        }
+
+        function resetApiKey() {
+            if (confirm('Remove API key?')) {
+                localStorage.removeItem('syncApiKey');
+                cloudSync.apiKey = '';
+                cloudSync.stopAutoSync();
+                data.autoSyncEnabled = false;
+                document.getElementById('autoSyncToggle').checked = false;
+                showToast('🔑 API key removed');
+                saveData();
+            }
+        }
+
+        function changeUserName() {
+            const newName = prompt('Enter your name:', data.currentUser);
+            if (newName && newName.trim()) {
+                data.currentUser = newName.trim();
+                if (!data.users.includes(data.currentUser)) {
+                    data.users.push(data.currentUser);
+                }
+                saveData();
+                updateUserProfile();
+                showToast(`👤 Name: ${data.currentUser}`);
+            }
+        }
+
+        function updateUserProfile() {
+            document.getElementById('userProfileName').textContent = data.currentUser || 'Set Your Name';
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        }
+
+        function applyThemeSettings() {
+            document.body.className = '';
+            if (data.nightMode) {
+                document.body.classList.add('night-mode');
+                document.getElementById('nightToggle').checked = true;
+            }
+            if (data.contrast && data.contrast !== 'normal') {
+                if (data.contrast === 'low') document.body.classList.add('low-contrast');
+                else if (data.contrast === 'high') document.body.classList.add('high-contrast');
+                else if (data.contrast === 'extra') document.body.classList.add('extra-high-contrast');
+            }
+            if (data.fontSize && data.fontSize !== 'normal') {
+                document.body.classList.add('font-' + data.fontSize);
+            }
+            setContrast(data.contrast);
+            setFontSize(data.fontSize);
         }
 
         function toggleSettings() {
             document.getElementById('settingsPanel').classList.toggle('show');
         }
 
-        function toggleNightMode() {
+        function setFontSize(size) {
+            document.body.classList.remove('font-small', 'font-large', 'font-xlarge');
+            document.querySelectorAll('.font-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (size === 'small') {
+                document.body.classList.add('font-small');
+                document.getElementById('font-small').classList.add('active');
+            } else if (size === 'large') {
+                document.body.classList.add('font-large');
+                document.getElementById('font-large').classList.add('active');
+            } else if (size === 'xlarge') {
+                document.body.classList.add('font-xlarge');
+                document.getElementById('font-xlarge').classList.add('active');
+            } else {
+                document.getElementById('font-normal').classList.add('active');
+            }
+            data.fontSize = size;
+            saveData();
+        }
+
+        function setContrast(level) {
+            document.body.classList.remove('low-contrast', 'high-contrast', 'extra-high-contrast');
+            document.querySelectorAll('.contrast-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (level === 'low') {
+                document.body.classList.add('low-contrast');
+                document.getElementById('contrast-low').classList.add('active');
+            } else if (level === 'high') {
+                document.body.classList.add('high-contrast');
+                document.getElementById('contrast-high').classList.add('active');
+            } else if (level === 'extra') {
+                document.body.classList.add('extra-high-contrast');
+                document.getElementById('contrast-extra').classList.add('active');
+            } else {
+                document.getElementById('contrast-normal').classList.add('active');
+            }
+            data.contrast = level;
+            saveData();
+        }
+
+        function toggleDayNight() {
             document.body.classList.toggle('night-mode');
             data.nightMode = document.body.classList.contains('night-mode');
+            document.getElementById('nightToggle').checked = data.nightMode;
             saveData();
         }
 
@@ -518,7 +928,7 @@
             a.download = 'builder-pro-' + new Date().toISOString().split('T')[0] + '.json';
             a.click();
             URL.revokeObjectURL(url);
-            showToast('✅ Data exported');
+            showToast('📤 Data exported');
             toggleSettings();
         }
 
@@ -535,25 +945,42 @@
                             data.projects = [...data.projects, ...(importedData.projects || [])];
                             data.tasks = [...data.tasks, ...(importedData.tasks || [])];
                             data.transactions = [...data.transactions, ...(importedData.transactions || [])];
+                            data.users = [...new Set([...data.users, ...(importedData.users || [])])];
                         }
                         saveData();
                         renderView();
-                        updateStats();
                         showToast('✅ Data imported');
                         toggleSettings();
                     } catch (error) {
-                        showToast('❌ Error importing data');
+                        showToast('❌ Import error');
                     }
                 };
                 reader.readAsText(file);
             }
         }
 
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+        function populateDropdowns() {
+            const userSelects = ['taskAssignee', 'projectLead'];
+            userSelects.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '<option value="">Unassigned</option>';
+                    data.users.forEach(user => {
+                        select.innerHTML += `<option value="${user}">${user}</option>`;
+                    });
+                }
+            });
+
+            const projectSelects = ['taskProject', 'transProject'];
+            projectSelects.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = '<option value="">Select Project</option>';
+                    data.projects.forEach(project => {
+                        select.innerHTML += `<option value="${project.id}">${project.name}</option>`;
+                    });
+                }
+            });
         }
 
         function switchView(view) {
@@ -577,12 +1004,10 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // Calculate finance summary
             const totalIncome = data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
             const totalExpenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
             const netProfit = totalIncome - totalExpenses;
             
-            // Get due tasks
             const dueTasks = data.tasks.filter(t => {
                 const dueDate = new Date(t.dueDate);
                 dueDate.setHours(0, 0, 0, 0);
@@ -591,64 +1016,96 @@
             
             let html = '';
             
-            // Finance Summary
+            // Finance Summary Cards
             html += `
-                <div class="finance-summary">
-                    <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">💰 Finance Summary</h3>
-                    <div class="finance-row">
-                        <span class="finance-label">Total Income</span>
-                        <span class="finance-value" style="color: var(--income-color);">$${totalIncome.toFixed(2)}</span>
+                <div class="finance-cards">
+                    <div class="finance-card">
+                        <div class="finance-card-label">Total Projects</div>
+                        <div class="finance-card-value" style="color: var(--primary-color);">${data.projects.length}</div>
                     </div>
-                    <div class="finance-row">
-                        <span class="finance-label">Total Expenses</span>
-                        <span class="finance-value" style="color: var(--expense-color);">$${totalExpenses.toFixed(2)}</span>
+                    <div class="finance-card income">
+                        <div class="finance-card-label">Total Income</div>
+                        <div class="finance-card-value">$${totalIncome.toFixed(0)}</div>
                     </div>
-                    <div class="finance-row">
-                        <span class="finance-label">Net Profit</span>
-                        <span class="finance-value" style="color: ${netProfit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${netProfit.toFixed(2)}</span>
+                    <div class="finance-card expense">
+                        <div class="finance-card-label">Total Expenses</div>
+                        <div class="finance-card-value">$${totalExpenses.toFixed(0)}</div>
+                    </div>
+                    <div class="finance-card profit">
+                        <div class="finance-card-label">Net Profit</div>
+                        <div class="finance-card-value" style="color: ${netProfit >= 0 ? 'var(--success)' : 'var(--danger)'};">$${netProfit.toFixed(0)}</div>
                     </div>
                 </div>
             `;
             
-            // Today's Focus
-            html += `
-                <div class="focus-section">
-                    <div class="focus-header">🎯 Today's Focus (${dueTasks.length} Due Tasks)</div>
-            `;
+            // Project Summary
+            html += '<div class="section-card"><div class="section-title">📁 Project Summary</div>';
+            if (data.projects.length === 0) {
+                html += '<div class="empty-state" style="padding: 20px;">No projects yet. Click + to create one!</div>';
+            } else {
+                data.projects.forEach(project => {
+                    const projectTasks = data.tasks.filter(t => t.projectId === project.id);
+                    const projectTransactions = data.transactions.filter(t => t.projectId === project.id);
+                    const income = projectTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+                    const expenses = projectTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+                    const profit = income - expenses;
+                    
+                    html += `
+                        <div class="project-summary-item" onclick="showProjectDetail(${project.id})">
+                            <div class="project-summary-name">${project.name}</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">Client: ${project.client || 'N/A'}</div>
+                            <div class="project-summary-stats">
+                                <div class="project-summary-stat">
+                                    <div class="project-summary-stat-label">Tasks</div>
+                                    <div class="project-summary-stat-value">${projectTasks.length}</div>
+                                </div>
+                                <div class="project-summary-stat">
+                                    <div class="project-summary-stat-label">Income</div>
+                                    <div class="project-summary-stat-value" style="color: var(--income-color);">$${income.toFixed(0)}</div>
+                                </div>
+                                <div class="project-summary-stat">
+                                    <div class="project-summary-stat-label">Profit</div>
+                                    <div class="project-summary-stat-value" style="color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${profit.toFixed(0)}</div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            html += '</div>';
             
+            // Today's Focus
+            html += `<div class="focus-section"><div class="focus-header">🎯 Today's Focus (${dueTasks.length} Due Tasks)</div>`;
             if (dueTasks.length === 0) {
-                html += '<p class="empty-state" style="padding: 20px;">No tasks due today!</p>';
+                html += '<div class="empty-state" style="padding: 20px;">No tasks due today!</div>';
             } else {
                 dueTasks.forEach(task => {
                     const project = data.projects.find(p => p.id === task.projectId);
                     html += `
                         <div class="task-item overdue">
                             <div class="task-title">${task.name}</div>
-                            <div class="task-meta">
-                                ${project ? project.name : 'No Project'} • Due: ${task.dueDate} • ${task.priority} Priority
-                            </div>
+                            <div class="task-meta">${project ? project.name : 'No Project'} • Due: ${task.dueDate} • ${task.priority}</div>
                         </div>
                     `;
                 });
             }
-            
             html += '</div>';
             
-            // Gantt Chart
+            // Gantt Chart with Projects and Tasks
             html += renderGanttChart();
             
             container.innerHTML = html;
         }
 
         function renderGanttChart() {
-            if (data.projects.length === 0) return '<div class="empty-state">No projects to display</div>';
+            if (data.projects.length === 0) return '';
             
-            let html = '<div class="gantt-container"><div class="gantt-header">📅 Project Timeline</div>';
+            let html = '<div class="gantt-container"><div class="gantt-header">📅 Projects & Tasks Timeline</div>';
             
-            // Find date range
             let minDate = new Date();
             let maxDate = new Date();
             
+            // Calculate date range
             data.projects.forEach(p => {
                 if (p.startDate) {
                     const start = new Date(p.startDate);
@@ -660,8 +1117,20 @@
                 }
             });
             
+            data.tasks.forEach(t => {
+                if (t.startDate) {
+                    const start = new Date(t.startDate);
+                    if (start < minDate) minDate = start;
+                }
+                if (t.dueDate) {
+                    const due = new Date(t.dueDate);
+                    if (due > maxDate) maxDate = due;
+                }
+            });
+            
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
+            // Render projects
             data.projects.forEach(project => {
                 if (project.startDate && project.endDate) {
                     const start = new Date(project.startDate);
@@ -673,12 +1142,32 @@
                     
                     html += `
                         <div class="gantt-row">
-                            <div class="gantt-label">${project.name}</div>
+                            <div class="gantt-label">📁 ${project.name}</div>
                             <div class="gantt-timeline">
-                                <div class="gantt-bar" style="left: ${left}%; width: ${width}%;">${duration}d</div>
+                                <div class="gantt-bar project" style="left: ${left}%; width: ${width}%;">${duration}d</div>
                             </div>
                         </div>
                     `;
+                    
+                    // Render tasks for this project
+                    const projectTasks = data.tasks.filter(t => t.projectId === project.id && t.startDate && t.dueDate);
+                    projectTasks.forEach(task => {
+                        const taskStart = new Date(task.startDate);
+                        const taskEnd = new Date(task.dueDate);
+                        const taskStartOffset = Math.ceil((taskStart - minDate) / (1000 * 60 * 60 * 24));
+                        const taskDuration = Math.ceil((taskEnd - taskStart) / (1000 * 60 * 60 * 24)) + 1;
+                        const taskWidth = (taskDuration / totalDays) * 100;
+                        const taskLeft = (taskStartOffset / totalDays) * 100;
+                        
+                        html += `
+                            <div class="gantt-row">
+                                <div class="gantt-label" style="padding-left: 20px;">└ ${task.name}</div>
+                                <div class="gantt-timeline">
+                                    <div class="gantt-bar task" style="left: ${taskLeft}%; width: ${taskWidth}%;">${taskDuration}d</div>
+                                </div>
+                            </div>
+                        `;
+                    });
                 }
             });
             
@@ -709,20 +1198,16 @@
             
             let html = '<div class="kanban-view">';
             columns.forEach(column => {
-                html += `
-                    <div class="kanban-column">
-                        <div class="kanban-header">${column.title} (${column.tasks.length})</div>
-                        <div class="kanban-tasks" data-status="${column.status}">
-                `;
+                html += `<div class="kanban-column"><div class="kanban-header">${column.title} (${column.tasks.length})</div><div class="kanban-tasks" data-status="${column.status}">`;
                 
                 column.tasks.forEach(task => {
                     const project = data.projects.find(p => p.id === task.projectId);
                     html += `
                         <div class="kanban-task" draggable="true" data-task-id="${task.id}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
                             <div style="font-weight: 500; margin-bottom: 5px;">${task.name}</div>
-                            <div style="font-size: 11px; color: var(--text-secondary);">${project ? project.name : 'No Project'}</div>
-                            <div style="margin-top: 5px; font-size: 10px;">📅 ${task.dueDate}</div>
-                            <div style="margin-top: 5px; font-size: 10px;">${task.priority} Priority</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 5px;">${project ? project.name : 'No Project'}</div>
+                            <div style="font-size: 10px;">📅 ${task.dueDate}</div>
+                            <div style="font-size: 10px; margin-top: 3px;">${task.priority} Priority</div>
                         </div>
                     `;
                 });
@@ -745,7 +1230,7 @@
                 return;
             }
             
-            let html = '';
+            let html = '<div class="projects-grid">';
             data.projects.forEach(project => {
                 const projectTasks = data.tasks.filter(t => t.projectId === project.id);
                 const projectTransactions = data.transactions.filter(t => t.projectId === project.id);
@@ -755,11 +1240,11 @@
                 const profit = income - expenses;
                 
                 html += `
-                    <div class="project-card">
-                        <div class="project-header" onclick="showProjectDetail(${project.id})">
+                    <div class="project-card" onclick="showProjectDetail(${project.id})">
+                        <div class="project-header">
                             <div>
                                 <h3>${project.name}</h3>
-                                <div class="project-meta">Client: ${project.client}</div>
+                                <div class="project-meta">Client: ${project.client || 'N/A'}</div>
                                 ${project.startDate ? `<div class="project-meta">${project.startDate} to ${project.endDate || 'Ongoing'}</div>` : ''}
                             </div>
                             <div class="project-stats">
@@ -784,50 +1269,20 @@
                     </div>
                 `;
             });
+            html += '</div>';
             
             container.innerHTML = html;
         }
 
         function renderSchedule(container) {
-            const sortedTasks = [...data.tasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-            
-            if (sortedTasks.length === 0) {
-                container.innerHTML = '<div class="empty-state">No tasks scheduled</div>';
-                return;
-            }
-            
-            let html = '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
-            html += '<h3 style="font-size: 14px; font-weight: 600; margin-bottom: 15px;">📅 Task Schedule</h3>';
-            
-            sortedTasks.forEach(task => {
-                const project = data.projects.find(p => p.id === task.projectId);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const dueDate = new Date(task.dueDate);
-                dueDate.setHours(0, 0, 0, 0);
-                const isOverdue = dueDate < today && task.status !== 'Completed';
-                
-                html += `
-                    <div class="task-item ${task.status === 'Completed' ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
-                        <div class="task-title">${task.name}</div>
-                        <div class="task-meta">
-                            ${project ? project.name : 'No Project'} • 
-                            ${task.startDate ? `${task.startDate} to ` : ''}${task.dueDate} • 
-                            ${task.status || 'Not Started'} • 
-                            ${task.priority} Priority
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            container.innerHTML = html;
+            container.innerHTML = renderGanttChart();
         }
 
         function showProjectDetail(projectId) {
             const project = data.projects.find(p => p.id === projectId);
             if (!project) return;
             
+            currentProjectId = projectId;
             const projectTasks = data.tasks.filter(t => t.projectId === projectId);
             const projectTransactions = data.transactions.filter(t => t.projectId === projectId);
             
@@ -837,24 +1292,24 @@
             
             document.getElementById('projectDetailTitle').textContent = project.name;
             
-            let html = '<div style="max-height: 60vh; overflow-y: auto;">';
+            let html = '<div style="max-height: 65vh; overflow-y: auto;">';
             
             // Financial Summary
             html += `
-                <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="font-size: 13px; margin-bottom: 10px;">💰 Finances</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                <div style="background: var(--bg-color); padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="font-size: 14px; margin-bottom: 12px;">💰 Financial Summary</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
                         <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Income</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">Income</div>
+                            <div style="font-size: 18px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
                         </div>
                         <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Expenses</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">Expenses</div>
+                            <div style="font-size: 18px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
                         </div>
                         <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Profit</div>
-                            <div style="font-size: 16px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${profit.toFixed(2)}</div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">Profit</div>
+                            <div style="font-size: 18px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${profit.toFixed(2)}</div>
                         </div>
                     </div>
                 </div>
@@ -862,15 +1317,15 @@
             
             // Quick Actions
             html += `
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                     <button class="btn btn-success" onclick="closeModal('projectDetailModal'); showTransactionModal('income', ${projectId})">+ Income</button>
                     <button class="btn btn-danger" onclick="closeModal('projectDetailModal'); showTransactionModal('expense', ${projectId})">+ Expense</button>
+                    <button class="btn btn-primary" onclick="closeModal('projectDetailModal'); showTaskModal(${projectId})">+ Task</button>
                 </div>
-                <button class="btn btn-primary" style="width: 100%; margin-bottom: 15px;" onclick="closeModal('projectDetailModal'); showTaskModal(${projectId})">+ Add Task</button>
             `;
             
             // Tasks Section
-            html += '<h4 style="font-size: 13px; margin-bottom: 10px;">📋 Tasks (' + projectTasks.length + ')</h4>';
+            html += '<h4 style="font-size: 14px; margin-bottom: 10px;">📋 Tasks (' + projectTasks.length + ')</h4>';
             if (projectTasks.length === 0) {
                 html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No tasks yet</p>';
             } else {
@@ -885,7 +1340,7 @@
             }
             
             // Transactions Section
-            html += '<h4 style="font-size: 13px; margin: 15px 0 10px;">💳 Transactions (' + projectTransactions.length + ')</h4>';
+            html += '<h4 style="font-size: 14px; margin: 15px 0 10px;">💳 Transactions (' + projectTransactions.length + ')</h4>';
             if (projectTransactions.length === 0) {
                 html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No transactions yet</p>';
             } else {
@@ -908,17 +1363,6 @@
             document.getElementById('projectDetailModal').classList.add('show');
         }
 
-        function updateStats() {
-            document.getElementById('totalProjects').textContent = data.projects.length;
-            document.getElementById('totalTasks').textContent = data.tasks.length;
-            
-            const totalIncome = data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-            const totalExpenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-            
-            document.getElementById('totalIncome').textContent = '$' + totalIncome.toFixed(0);
-            document.getElementById('totalExpenses').textContent = '$' + totalExpenses.toFixed(0);
-        }
-
         function toggleFabMenu() {
             document.getElementById('fabMenu').classList.toggle('show');
         }
@@ -930,7 +1374,9 @@
             document.getElementById('projectClient').value = '';
             document.getElementById('projectStart').value = new Date().toISOString().split('T')[0];
             document.getElementById('projectEnd').value = '';
+            document.getElementById('projectLead').value = '';
             document.getElementById('projectDescription').value = '';
+            populateDropdowns();
             document.getElementById('projectModal').classList.add('show');
             toggleFabMenu();
         }
@@ -943,7 +1389,9 @@
             document.getElementById('projectClient').value = project.client || '';
             document.getElementById('projectStart').value = project.startDate || '';
             document.getElementById('projectEnd').value = project.endDate || '';
+            document.getElementById('projectLead').value = project.lead || '';
             document.getElementById('projectDescription').value = project.description || '';
+            populateDropdowns();
             document.getElementById('projectModal').classList.add('show');
         }
 
@@ -953,12 +1401,12 @@
                 client: document.getElementById('projectClient').value,
                 startDate: document.getElementById('projectStart').value,
                 endDate: document.getElementById('projectEnd').value,
-                description: document.getElementById('projectDescription').value,
-                status: 'active'
+                lead: document.getElementById('projectLead').value,
+                description: document.getElementById('projectDescription').value
             };
             
-            if (!projectData.name || !projectData.client) {
-                showToast('⚠️ Please fill required fields');
+            if (!projectData.name) {
+                showToast('⚠️ Enter project name');
                 return;
             }
             
@@ -968,24 +1416,25 @@
                 showToast('✅ Project updated');
             } else {
                 projectData.id = Date.now();
+                projectData.createdBy = data.currentUser;
                 data.projects.push(projectData);
                 showToast('✅ Project created');
             }
             
             saveData();
+            if (data.autoSyncEnabled) cloudSync.push(true);
             renderView();
-            updateStats();
             closeModal('projectModal');
         }
 
         function deleteProject(projectId) {
-            if (confirm('Delete project and all its tasks & transactions?')) {
+            if (confirm('Delete project, tasks & transactions?')) {
                 data.projects = data.projects.filter(p => p.id !== projectId);
                 data.tasks = data.tasks.filter(t => t.projectId !== projectId);
                 data.transactions = data.transactions.filter(t => t.projectId !== projectId);
                 saveData();
+                if (data.autoSyncEnabled) cloudSync.push(true);
                 renderView();
-                updateStats();
                 showToast('🗑️ Project deleted');
             }
         }
@@ -995,20 +1444,14 @@
             document.getElementById('taskModalTitle').textContent = 'New Task';
             document.getElementById('taskName').value = '';
             document.getElementById('taskPriority').value = 'Medium';
-            document.getElementById('taskStatus').value = 'Not Started';
             document.getElementById('taskStart').value = new Date().toISOString().split('T')[0];
             document.getElementById('taskDue').value = '';
-            document.getElementById('taskAssignee').value = '';
             document.getElementById('taskDescription').value = '';
             
-            const projectSelect = document.getElementById('taskProject');
-            projectSelect.innerHTML = '<option value="">Select Project</option>';
-            data.projects.forEach(p => {
-                projectSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-            });
+            populateDropdowns();
             
             if (projectId) {
-                projectSelect.value = projectId;
+                document.getElementById('taskProject').value = projectId;
             }
             
             document.getElementById('taskModal').classList.add('show');
@@ -1019,16 +1462,16 @@
             const taskData = {
                 name: document.getElementById('taskName').value,
                 projectId: parseInt(document.getElementById('taskProject').value),
+                assignee: document.getElementById('taskAssignee').value,
                 priority: document.getElementById('taskPriority').value,
-                status: document.getElementById('taskStatus').value,
+                status: 'Not Started',
                 startDate: document.getElementById('taskStart').value,
                 dueDate: document.getElementById('taskDue').value,
-                assignee: document.getElementById('taskAssignee').value,
                 description: document.getElementById('taskDescription').value
             };
             
             if (!taskData.name || !taskData.projectId || !taskData.dueDate) {
-                showToast('⚠️ Please fill required fields');
+                showToast('⚠️ Fill required fields');
                 return;
             }
             
@@ -1038,13 +1481,14 @@
                 showToast('✅ Task updated');
             } else {
                 taskData.id = Date.now();
+                taskData.createdBy = data.currentUser;
                 data.tasks.push(taskData);
                 showToast('✅ Task created');
             }
             
             saveData();
+            if (data.autoSyncEnabled) cloudSync.push(true);
             renderView();
-            updateStats();
             closeModal('taskModal');
         }
 
@@ -1056,14 +1500,10 @@
             document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
             document.getElementById('transDescription').value = '';
             
-            const projectSelect = document.getElementById('transProject');
-            projectSelect.innerHTML = '<option value="">Select Project</option>';
-            data.projects.forEach(p => {
-                projectSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-            });
+            populateDropdowns();
             
             if (projectId) {
-                projectSelect.value = projectId;
+                document.getElementById('transProject').value = projectId;
             }
             
             updateCategories();
@@ -1093,7 +1533,7 @@
             };
             
             if (!transData.projectId || !transData.category || !transData.amount) {
-                showToast('⚠️ Please fill required fields');
+                showToast('⚠️ Fill required fields');
                 return;
             }
             
@@ -1108,9 +1548,44 @@
             }
             
             saveData();
+            if (data.autoSyncEnabled) cloudSync.push(true);
             renderView();
-            updateStats();
             closeModal('transactionModal');
+        }
+
+        function showUserModal() {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+            data.users.forEach(user => {
+                const isCurrent = user === data.currentUser;
+                userList.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--bg-color); border-radius: 6px; margin-bottom: 5px;">
+                        <span style="font-size: 13px;">${user} ${isCurrent ? '(You)' : ''}</span>
+                        ${!isCurrent ? `<button class="btn btn-secondary" onclick="removeUser('${user}')" style="padding: 3px 8px; font-size: 11px;">Remove</button>` : ''}
+                    </div>`;
+            });
+            document.getElementById('userModal').classList.add('show');
+            toggleFabMenu();
+        }
+
+        function addUser() {
+            const newUserName = document.getElementById('newUserName').value.trim();
+            if (newUserName && !data.users.includes(newUserName)) {
+                data.users.push(newUserName);
+                saveData();
+                document.getElementById('newUserName').value = '';
+                showUserModal();
+                showToast(`✅ ${newUserName} added`);
+            }
+        }
+
+        function removeUser(userName) {
+            if (confirm(`Remove ${userName}?`)) {
+                data.users = data.users.filter(u => u !== userName);
+                saveData();
+                showUserModal();
+                showToast(`🗑️ ${userName} removed`);
+            }
         }
 
         function closeModal(modalId) {
@@ -1139,6 +1614,7 @@
                 if (task) {
                     task.status = newStatus;
                     saveData();
+                    if (data.autoSyncEnabled) cloudSync.push(true);
                     renderKanban(document.getElementById('mainContent'));
                     showToast(`✅ Task moved to ${newStatus}`);
                 }
