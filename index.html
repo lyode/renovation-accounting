@@ -290,6 +290,8 @@
             display: flex;
             gap: 6px;
             margin-left: 10px;
+            z-index: 10;
+            position: relative;
         }
         
         .project-action-btn {
@@ -302,10 +304,17 @@
             font-size: calc(11px * var(--font-scale));
             font-weight: 500;
             transform: scale(var(--btn-scale));
+            -webkit-user-select: none;
+            user-select: none;
         }
         
         .project-action-btn:active {
             transform: scale(calc(var(--btn-scale) * 0.95));
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .project-action-btn:hover {
+            background: rgba(255,255,255,0.3);
         }
         
         .project-stats {
@@ -2008,15 +2017,24 @@
         }
         
         function deleteProject(projectId) {
-            if (confirm('Delete this project and all its transactions and tasks?')) {
+            if (confirm('⚠️ Delete this project?\n\nThis will also delete:\n• All transactions\n• All tasks\n\nThis cannot be undone!')) {
                 const project = data.projects.find(p => p.id === projectId);
+                const projectName = project ? project.name : 'Project';
+                
                 data.projects = data.projects.filter(p => p.id !== projectId);
                 data.transactions = data.transactions.filter(t => t.projectId !== projectId);
                 data.tasks = data.tasks.filter(t => t.projectId !== projectId);
-                addActivityLog(`Deleted project: ${project.name}`, 'project');
+                
+                addActivityLog(`Deleted project: ${projectName}`, 'project');
                 saveData();
+                
+                // If we're in project detail, go back
+                if (data.currentProject === projectId) {
+                    data.currentProject = null;
+                }
+                
                 renderView();
-                showStatus('🗑️ Project deleted');
+                showStatus('🗑️ Project deleted successfully');
             }
         }
         
@@ -2071,9 +2089,23 @@
         }
         
         function quickAddTransaction(type) {
+            editingId = null;
+            document.getElementById('transactionModalTitle').textContent = `Add ${type === 'income' ? 'Income' : 'Expense'}`;
             document.getElementById('transType').value = type;
-            document.getElementById('transProject').value = data.currentProject;
-            showTransactionModal();
+            populateProjectSelect('transProject');
+            
+            // Auto-select current project if we're in project detail
+            if (data.currentProject) {
+                document.getElementById('transProject').value = data.currentProject;
+            }
+            
+            updateTransCategories();
+            document.getElementById('transAmount').value = '';
+            document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('transDescription').value = '';
+            currentReceiptData = null;
+            document.getElementById('receiptPreview').style.display = 'none';
+            document.getElementById('transactionModal').classList.add('show');
         }
         
         function updateTransCategories() {
@@ -2124,13 +2156,17 @@
         }
         
         function deleteTransaction(transId) {
-            if (confirm('Delete this transaction?')) {
+            if (confirm('⚠️ Delete this transaction?\n\nThis cannot be undone!')) {
                 const trans = data.transactions.find(t => t.id === transId);
+                const amount = trans ? trans.amount : 0;
+                const type = trans ? trans.type : 'transaction';
+                
                 data.transactions = data.transactions.filter(t => t.id !== transId);
-                addActivityLog(`Deleted ${trans.type}: $${trans.amount}`, 'transaction');
+                
+                addActivityLog(`Deleted ${type}: ${amount.toFixed(2)}`, 'transaction');
                 saveData();
                 renderView();
-                showStatus('🗑️ Transaction deleted');
+                showStatus('🗑️ Transaction deleted successfully');
             }
         }
         
@@ -2189,8 +2225,22 @@
         }
         
         function quickAddTask() {
-            document.getElementById('taskProject').value = data.currentProject;
-            showTaskModal();
+            editingId = null;
+            document.getElementById('taskModalTitle').textContent = 'Add Task';
+            document.getElementById('taskName').value = '';
+            populateProjectSelect('taskProject');
+            
+            // Auto-select current project if we're in project detail
+            if (data.currentProject) {
+                document.getElementById('taskProject').value = data.currentProject;
+            }
+            
+            populateTaskAssignee();
+            document.getElementById('taskPriority').value = 'Medium';
+            document.getElementById('taskDue').value = new Date().toISOString().split('T')[0];
+            document.getElementById('taskStatus').value = 'Not Started';
+            document.getElementById('taskDescription').value = '';
+            document.getElementById('taskModal').classList.add('show');
         }
         
         function populateProjectSelect(selectId) {
@@ -2230,13 +2280,16 @@
         }
         
         function deleteTask(taskId) {
-            if (confirm('Delete this task?')) {
+            if (confirm('⚠️ Delete this task?\n\nThis cannot be undone!')) {
                 const task = data.tasks.find(t => t.id === taskId);
+                const taskName = task ? task.name : 'Task';
+                
                 data.tasks = data.tasks.filter(t => t.id !== taskId);
-                addActivityLog(`Deleted task: ${task.name}`, 'task');
+                
+                addActivityLog(`Deleted task: ${taskName}`, 'task');
                 saveData();
                 renderView();
-                showStatus('🗑️ Task deleted');
+                showStatus('🗑️ Task deleted successfully');
             }
         }
         
