@@ -173,28 +173,43 @@
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
+            gap: 8px;
             margin-bottom: 20px;
         }
         
         .stat-card {
             background: var(--card-bg);
-            padding: 15px;
+            padding: 12px 8px;
             border-radius: 10px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             text-align: center;
         }
         
         .stat-value {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
             color: var(--primary-color);
-            margin-bottom: 5px;
+            margin-bottom: 3px;
         }
         
         .stat-label {
-            font-size: 11px;
+            font-size: 10px;
             color: var(--text-secondary);
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                gap: 6px;
+            }
+            .stat-card {
+                padding: 10px 6px;
+            }
+            .stat-value {
+                font-size: 18px;
+            }
+            .stat-label {
+                font-size: 9px;
+            }
         }
         
         .stat-value.green { color: var(--success); }
@@ -229,7 +244,6 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             overflow: hidden;
             margin-bottom: 15px;
-            cursor: pointer;
             transition: transform 0.2s;
         }
         
@@ -239,6 +253,35 @@
             background: var(--primary-gradient);
             color: white;
             padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+        
+        .project-header-left {
+            flex: 1;
+            cursor: pointer;
+        }
+        
+        .project-header-actions {
+            display: flex;
+            gap: 6px;
+            margin-left: 10px;
+        }
+        
+        .project-action-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .project-action-btn:active {
+            transform: scale(0.95);
         }
         
         .project-name {
@@ -620,6 +663,62 @@
         }
         
         .hidden { display: none; }
+        
+        /* Kanban Board Styles */
+        .kanban-container {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .kanban-column {
+            min-width: 280px;
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .kanban-header {
+            font-weight: 600;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-color);
+        }
+        
+        .kanban-task {
+            background: var(--bg-color);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            border-left: 3px solid var(--primary-color);
+            transition: transform 0.2s;
+        }
+        
+        .kanban-task:active {
+            transform: scale(0.98);
+        }
+        
+        .kanban-task.completed {
+            border-left-color: var(--success);
+            opacity: 0.7;
+        }
+        
+        .kanban-task.overdue {
+            border-left-color: var(--danger);
+        }
+        
+        @media (max-width: 768px) {
+            .kanban-column {
+                min-width: 250px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1045,14 +1144,20 @@
                             const completed = tasks.filter(t => t.status === 'Completed').length;
                             
                             return `
-                                <div class="project-card" onclick="openProject(${project.id})">
+                                <div class="project-card">
                                     <div class="project-header">
-                                        <div class="project-name">${project.name}</div>
-                                        <div class="project-client">${project.client}</div>
+                                        <div class="project-header-left" onclick="openProject(${project.id})">
+                                            <div class="project-name">${project.name}</div>
+                                            <div class="project-client">${project.client}</div>
+                                        </div>
+                                        <div class="project-header-actions">
+                                            <button class="project-action-btn" onclick="event.stopPropagation(); editProject(${project.id})">Edit</button>
+                                            <button class="project-action-btn" onclick="event.stopPropagation(); deleteProject(${project.id})">Del</button>
+                                        </div>
                                     </div>
-                                    <div class="project-stats">
+                                    <div class="project-stats" onclick="openProject(${project.id})">
                                         <div class="project-stat">
-                                            <div class="project-stat-value" style="color: ${profit >= 0 ? '#10b981' : '#ef4444'}">$${profit.toFixed(0)}</div>
+                                            <div class="project-stat-value" style="color: ${profit >= 0 ? '#10b981' : '#ef4444'}">${profit.toFixed(0)}</div>
                                             <div class="project-stat-label">Profit</div>
                                         </div>
                                         <div class="project-stat">
@@ -1060,11 +1165,11 @@
                                             <div class="project-stat-label">Tasks</div>
                                         </div>
                                         <div class="project-stat">
-                                            <div class="project-stat-value">$${income.toFixed(0)}</div>
+                                            <div class="project-stat-value">${income.toFixed(0)}</div>
                                             <div class="project-stat-label">Income</div>
                                         </div>
                                         <div class="project-stat">
-                                            <div class="project-stat-value">$${expenses.toFixed(0)}</div>
+                                            <div class="project-stat-value">${expenses.toFixed(0)}</div>
                                             <div class="project-stat-label">Expenses</div>
                                         </div>
                                     </div>
@@ -1092,14 +1197,20 @@
                     const completed = tasks.filter(t => t.status === 'Completed').length;
                     
                     html += `
-                        <div class="project-card" onclick="openProject(${project.id})">
+                        <div class="project-card">
                             <div class="project-header">
-                                <div class="project-name">${project.name}</div>
-                                <div class="project-client">${project.client}</div>
+                                <div class="project-header-left" onclick="openProject(${project.id})">
+                                    <div class="project-name">${project.name}</div>
+                                    <div class="project-client">${project.client}</div>
+                                </div>
+                                <div class="project-header-actions">
+                                    <button class="project-action-btn" onclick="event.stopPropagation(); editProject(${project.id})">Edit</button>
+                                    <button class="project-action-btn" onclick="event.stopPropagation(); deleteProject(${project.id})">Del</button>
+                                </div>
                             </div>
-                            <div class="project-stats">
+                            <div class="project-stats" onclick="openProject(${project.id})">
                                 <div class="project-stat">
-                                    <div class="project-stat-value" style="color: ${profit >= 0 ? '#10b981' : '#ef4444'}">$${profit.toFixed(0)}</div>
+                                    <div class="project-stat-value" style="color: ${profit >= 0 ? '#10b981' : '#ef4444'}">${profit.toFixed(0)}</div>
                                     <div class="project-stat-label">Profit</div>
                                 </div>
                                 <div class="project-stat">
@@ -1107,11 +1218,11 @@
                                     <div class="project-stat-label">Tasks</div>
                                 </div>
                                 <div class="project-stat">
-                                    <div class="project-stat-value">$${income.toFixed(0)}</div>
+                                    <div class="project-stat-value">${income.toFixed(0)}</div>
                                     <div class="project-stat-label">Income</div>
                                 </div>
                                 <div class="project-stat">
-                                    <div class="project-stat-value">$${expenses.toFixed(0)}</div>
+                                    <div class="project-stat-value">${expenses.toFixed(0)}</div>
                                     <div class="project-stat-label">Expenses</div>
                                 </div>
                             </div>
@@ -1295,29 +1406,91 @@
         }
         
         function renderTasks(container) {
-            const today = new Date().toISOString().split('T')[0];
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Categorize tasks
+            const dueTasks = data.tasks.filter(t => {
+                const dueDate = new Date(t.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                return (dueDate <= today && t.status !== 'Completed');
+            });
+            
+            const inProgressTasks = data.tasks.filter(t => t.status === 'In Progress');
+            
+            const comingActionTasks = data.tasks.filter(t => {
+                const dueDate = new Date(t.dueDate);
+                dueDate.setHours(0, 0, 0, 0);
+                return (t.status === 'Not Started' || !t.status) && dueDate > today;
+            });
             
             let html = `
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">All Tasks</div>
+                <div class="kanban-container">
+                    <div class="kanban-column">
+                        <div class="kanban-header">Due (${dueTasks.length})</div>
+                        ${dueTasks.length === 0 ? 
+                            '<div class="empty-state" style="padding: 20px;">No overdue tasks</div>' :
+                            dueTasks.map(t => {
+                                const project = data.projects.find(p => p.id === t.projectId);
+                                return `
+                                    <div class="kanban-task overdue" onclick="editTask(${t.id})">
+                                        <div style="font-weight: 500; margin-bottom: 5px;">${t.name}</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">
+                                            ${project ? project.name : 'No Project'}
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                                            <span style="font-size: 10px;">${t.assignee || 'Unassigned'}</span>
+                                            <span style="font-size: 10px;">📅 ${t.dueDate}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')
+                        }
                     </div>
-                    ${data.tasks.length === 0 ?
-                        '<div class="empty-state">No tasks yet</div>' :
-                        data.tasks.map(t => {
-                            const project = data.projects.find(p => p.id === t.projectId);
-                            const isOverdue = new Date(t.dueDate) < new Date() && t.status !== 'Completed';
-                            const isDueToday = t.dueDate === today;
-                            
-                            return `
-                                <div class="task-item ${t.status === 'Completed' ? 'completed' : isOverdue ? 'overdue' : ''}">
-                                    <span class="badge badge-${t.status === 'Completed' ? 'completed' : 'pending'}">${t.status}</span>
-                                    <div class="item-title">${t.name} ${isDueToday ? '⚠️' : ''}</div>
-                                    <div class="item-meta">${project ? project.name : 'No Project'} • ${t.assignee || 'Unassigned'} • Due: ${t.dueDate}</div>
-                                </div>
-                            `;
-                        }).join('')
-                    }
+                    
+                    <div class="kanban-column">
+                        <div class="kanban-header">In Progress (${inProgressTasks.length})</div>
+                        ${inProgressTasks.length === 0 ?
+                            '<div class="empty-state" style="padding: 20px;">No tasks in progress</div>' :
+                            inProgressTasks.map(t => {
+                                const project = data.projects.find(p => p.id === t.projectId);
+                                return `
+                                    <div class="kanban-task" onclick="editTask(${t.id})">
+                                        <div style="font-weight: 500; margin-bottom: 5px;">${t.name}</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">
+                                            ${project ? project.name : 'No Project'}
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                                            <span style="font-size: 10px;">${t.assignee || 'Unassigned'}</span>
+                                            <span style="font-size: 10px;">📅 ${t.dueDate}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')
+                        }
+                    </div>
+                    
+                    <div class="kanban-column">
+                        <div class="kanban-header">Coming Action (${comingActionTasks.length})</div>
+                        ${comingActionTasks.length === 0 ?
+                            '<div class="empty-state" style="padding: 20px;">No upcoming tasks</div>' :
+                            comingActionTasks.map(t => {
+                                const project = data.projects.find(p => p.id === t.projectId);
+                                return `
+                                    <div class="kanban-task" onclick="editTask(${t.id})">
+                                        <div style="font-weight: 500; margin-bottom: 5px;">${t.name}</div>
+                                        <div style="font-size: 11px; color: var(--text-secondary);">
+                                            ${project ? project.name : 'No Project'}
+                                        </div>
+                                        <div style="display: flex; justify-content: space-between; margin-top: 5px;">
+                                            <span style="font-size: 10px;">${t.assignee || 'Unassigned'}</span>
+                                            <span style="font-size: 10px;">📅 ${t.dueDate}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')
+                        }
+                    </div>
                 </div>
             `;
             
@@ -1325,33 +1498,100 @@
         }
         
         function renderSchedule(container) {
+            if (data.projects.length === 0) {
+                container.innerHTML = '<div class="card"><div class="empty-state">No projects to schedule</div></div>';
+                return;
+            }
+            
             let html = `
                 <div class="card">
                     <div class="card-header">
                         <div class="card-title">📅 Project Timeline</div>
                     </div>
-                    ${data.projects.length === 0 ?
-                        '<div class="empty-state">No projects to schedule</div>' :
-                        data.projects.map(project => {
-                            const tasks = data.tasks.filter(t => t.projectId === project.id);
-                            return `
-                                <div style="background: var(--bg-color); padding: 15px; border-radius: 8px; margin-bottom: 12px;">
-                                    <div style="font-weight: 600; margin-bottom: 8px;">${project.name}</div>
-                                    <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
-                                        Start: ${project.startDate || 'Not set'}
+                    ${data.projects.map(project => {
+                        const tasks = data.tasks.filter(t => t.projectId === project.id);
+                        const totalTasks = tasks.length;
+                        const completedTasks = tasks.filter(t => t.status === 'Completed').length;
+                        const inProgressTasks = tasks.filter(t => t.status === 'In Progress').length;
+                        
+                        // Calculate project duration
+                        let startDate = project.startDate;
+                        let endDate = project.startDate;
+                        
+                        if (tasks.length > 0) {
+                            const taskDates = tasks.map(t => new Date(t.dueDate));
+                            const maxDate = new Date(Math.max(...taskDates));
+                            endDate = maxDate.toISOString().split('T')[0];
+                        }
+                        
+                        const start = new Date(startDate);
+                        const end = new Date(endDate);
+                        const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                        
+                        return `
+                            <div style="background: var(--bg-color); padding: 15px; border-radius: 8px; margin-bottom: 12px; cursor: pointer;" onclick="openProject(${project.id})">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                    <div>
+                                        <div style="font-weight: 600; margin-bottom: 4px;">${project.name}</div>
+                                        <div style="font-size: 12px; color: var(--text-secondary);">
+                                            ${project.client} | ${startDate} → ${endDate} (${duration} days)
+                                        </div>
                                     </div>
-                                    ${tasks.length === 0 ? 
-                                        '<div style="font-size: 12px; color: var(--text-secondary);">No tasks scheduled</div>' :
-                                        tasks.map(t => `
-                                            <div style="font-size: 12px; padding: 6px 0; border-left: 3px solid ${t.status === 'Completed' ? '#10b981' : '#6b7280'}; padding-left: 10px; margin-bottom: 5px;">
-                                                ${t.name} - Due: ${t.dueDate}
-                                            </div>
-                                        `).join('')
-                                    }
+                                    <div style="display: flex; gap: 8px;">
+                                        <button class="btn btn-small btn-edit" onclick="event.stopPropagation(); editProject(${project.id})">Edit</button>
+                                    </div>
                                 </div>
-                            `;
-                        }).join('')
-                    }
+                                
+                                <div style="background: var(--card-bg); padding: 10px; border-radius: 6px; margin-bottom: 10px;">
+                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+                                        <div>
+                                            <div style="font-size: 18px; font-weight: bold; color: var(--primary-color);">${totalTasks}</div>
+                                            <div style="font-size: 10px; color: var(--text-secondary);">Total Tasks</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 18px; font-weight: bold; color: #f39c12;">${inProgressTasks}</div>
+                                            <div style="font-size: 10px; color: var(--text-secondary);">In Progress</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 18px; font-weight: bold; color: #10b981;">${completedTasks}</div>
+                                            <div style="font-size: 10px; color: var(--text-secondary);">Completed</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                ${tasks.length === 0 ? 
+                                    '<div style="font-size: 12px; color: var(--text-secondary); text-align: center; padding: 10px;">No tasks scheduled</div>' :
+                                    '<div style="font-size: 12px; font-weight: 600; margin-bottom: 8px; color: var(--text-color);">Tasks:</div>' +
+                                    tasks.slice(0, 5).map(t => {
+                                        const dueDate = new Date(t.dueDate);
+                                        const today = new Date();
+                                        today.setHours(0, 0, 0, 0);
+                                        const isOverdue = dueDate < today && t.status !== 'Completed';
+                                        const daysUntil = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                                        
+                                        let statusColor = '#6b7280';
+                                        if (t.status === 'Completed') statusColor = '#10b981';
+                                        else if (t.status === 'In Progress') statusColor = '#f39c12';
+                                        else if (isOverdue) statusColor = '#ef4444';
+                                        
+                                        return `
+                                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; background: var(--card-bg); border-radius: 4px; margin-bottom: 6px; border-left: 3px solid ${statusColor};" onclick="event.stopPropagation(); editTask(${t.id})">
+                                                <div style="flex: 1; min-width: 0;">
+                                                    <div style="font-size: 12px; font-weight: 500; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${t.name}</div>
+                                                    <div style="font-size: 10px; color: var(--text-secondary);">
+                                                        ${t.assignee || 'Unassigned'} • ${t.dueDate}
+                                                        ${isOverdue ? ' • <span style="color: #ef4444;">OVERDUE</span>' : daysUntil >= 0 ? ` • ${daysUntil}d left` : ''}
+                                                    </div>
+                                                </div>
+                                                <span style="font-size: 10px; padding: 3px 8px; background: ${statusColor}; color: white; border-radius: 10px; white-space: nowrap; margin-left: 8px;">${t.status || 'Not Started'}</span>
+                                            </div>
+                                        `;
+                                    }).join('') +
+                                    (tasks.length > 5 ? `<div style="font-size: 11px; color: var(--text-secondary); text-align: center; padding: 5px;">+ ${tasks.length - 5} more tasks</div>` : '')
+                                }
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
             `;
             
@@ -1376,6 +1616,28 @@
             document.getElementById('projectClient').value = '';
             document.getElementById('projectStart').value = new Date().toISOString().split('T')[0];
             document.getElementById('projectModal').classList.add('show');
+        }
+        
+        function editProject(projectId) {
+            editingId = projectId;
+            const project = data.projects.find(p => p.id === projectId);
+            
+            document.getElementById('projectModalTitle').textContent = 'Edit Project';
+            document.getElementById('projectName').value = project.name;
+            document.getElementById('projectClient').value = project.client;
+            document.getElementById('projectStart').value = project.startDate;
+            document.getElementById('projectModal').classList.add('show');
+        }
+        
+        function deleteProject(projectId) {
+            if (confirm('Delete this project and all its transactions and tasks?')) {
+                data.projects = data.projects.filter(p => p.id !== projectId);
+                data.transactions = data.transactions.filter(t => t.projectId !== projectId);
+                data.tasks = data.tasks.filter(t => t.projectId !== projectId);
+                saveData();
+                renderView();
+                showStatus('🗑️ Project deleted');
+            }
         }
         
         function showTransactionModal() {
@@ -1432,19 +1694,29 @@
                 return;
             }
             
-            const project = {
-                id: Date.now(),
-                name,
-                client,
-                startDate: document.getElementById('projectStart').value,
-                createdAt: new Date().toISOString()
-            };
+            if (editingId) {
+                // Edit existing project
+                const project = data.projects.find(p => p.id === editingId);
+                project.name = name;
+                project.client = client;
+                project.startDate = document.getElementById('projectStart').value;
+                showStatus('✅ Project updated!');
+            } else {
+                // Create new project
+                const project = {
+                    id: Date.now(),
+                    name,
+                    client,
+                    startDate: document.getElementById('projectStart').value,
+                    createdAt: new Date().toISOString()
+                };
+                data.projects.push(project);
+                showStatus('✅ Project created!');
+            }
             
-            data.projects.push(project);
             saveData();
             closeModal('projectModal');
             renderView();
-            showStatus('✅ Project created!');
         }
         
         function saveTransaction() {
