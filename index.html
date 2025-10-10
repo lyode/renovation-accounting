@@ -34,9 +34,14 @@
         body.high-contrast { --contrast: 1.25; --brightness: 0.95; }
         body.extra-high-contrast { --contrast: 1.5; --brightness: 0.9; --text-primary: #000; --text-secondary: #2a2a2a; }
         body { filter: contrast(var(--contrast)) brightness(var(--brightness)); }
-        body.font-small { --font-scale: 0.85; }
-        body.font-large { --font-scale: 1.15; }
-        body.font-xlarge { --font-scale: 1.3; }
+        
+        /* Font Size Classes */
+        body.font-xs { --font-scale: 0.75; }
+        body.font-s { --font-scale: 0.85; }
+        body.font-m { --font-scale: 1; }
+        body.font-l { --font-scale: 1.15; }
+        body.font-xl { --font-scale: 1.3; }
+        body.font-xxl { --font-scale: 1.5; }
 
         .night-mode { 
             --bg-color: #1a1a20; 
@@ -66,7 +71,7 @@
         .sync-indicator.syncing { background: #f39c12; animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         
-        .sync-status-bar { background: var(--primary-light); color: var(--text-primary); padding: 4px 10px; font-size: 11px; text-align: center; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .sync-status-bar { background: var(--primary-light); color: var(--text-primary); padding: 4px 10px; font-size: calc(11px * var(--font-scale)); text-align: center; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
         .sync-status-bar.syncing { background: #fbbf24; animation: pulse 1s infinite; }
         .sync-status-bar.success { background: #10b981; color: white; }
         .sync-status-bar.error { background: #ef4444; color: white; }
@@ -87,6 +92,10 @@
         .timeline-filters { display: flex; gap: 8px; margin-bottom: 12px; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color); }
         .filter-btn { flex: 1; padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; cursor: pointer; font-size: calc(12px * var(--font-scale)); transition: all 0.2s; }
         .filter-btn.active { background: var(--primary-gradient); color: white; border-color: var(--primary-color); }
+        
+        .schedule-view-filters { display: flex; gap: 8px; margin-bottom: 12px; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color); }
+        .view-btn { flex: 1; padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; cursor: pointer; font-size: calc(12px * var(--font-scale)); transition: all 0.2s; }
+        .view-btn.active { background: var(--primary-gradient); color: white; border-color: var(--primary-color); }
         
         .project-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 2px 10px var(--shadow-color); overflow: hidden; margin-bottom: 12px; }
         .project-header { background: var(--primary-gradient); color: white; padding: 12px; cursor: pointer; }
@@ -125,8 +134,11 @@
         .kanban-task { background: var(--bg-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: move; font-size: calc(12px * var(--font-scale)); border: 2px solid transparent; }
         .kanban-task.dragging { opacity: 0.5; }
         
-        .gantt-container { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); overflow-x: auto; }
+        .gantt-container { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); overflow-x: auto; margin-bottom: 15px; }
         .gantt-header { font-size: calc(14px * var(--font-scale)); font-weight: 600; margin-bottom: 15px; color: var(--text-primary); }
+        .gantt-timeline-header { display: flex; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); }
+        .gantt-timeline-label { width: 150px; font-size: calc(10px * var(--font-scale)); font-weight: 600; color: var(--text-secondary); }
+        .gantt-timeline-dates { flex: 1; display: flex; justify-content: space-between; font-size: calc(9px * var(--font-scale)); color: var(--text-secondary); padding: 0 5px; }
         .gantt-row { display: flex; align-items: center; margin-bottom: 10px; min-height: 30px; }
         .gantt-label { width: 150px; font-size: calc(11px * var(--font-scale)); font-weight: 500; color: var(--text-primary); }
         .gantt-timeline { flex: 1; position: relative; height: 30px; background: var(--bg-color); border-radius: 4px; }
@@ -195,6 +207,10 @@
         .contrast-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
         .contrast-btn { padding: 0.5rem; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary); border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
         .contrast-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
+        
+        .font-size-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
+        .font-size-btn { padding: 0.5rem; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary); border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; text-align: center; }
+        .font-size-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
         
         .color-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 10px; }
         .color-option { width: 40px; height: 40px; border-radius: 8px; cursor: pointer; border: 3px solid transparent; transition: all 0.2s; }
@@ -275,7 +291,7 @@
         <div class="container" id="mainContent"></div>
     </div>
 
-    <!-- Settings Panel - EXACT COPY FROM RENOVATION APP -->
+    <!-- Settings Panel -->
     <div class="settings-panel" id="settings-panel">
         <div class="settings-header">
             <span class="settings-title">Settings</span>
@@ -296,7 +312,7 @@
             </div>
         </div>
         
-        <!-- 1. API Key Setup - FORCED VISIBLE -->
+        <!-- 1. API Key Setup -->
         <div class="settings-section api-section-highlight">
             <label class="settings-label" style="font-size: 1rem; margin-bottom: 0.75rem;">🔑 API Key Setup</label>
             <div class="api-status" id="apiStatus">Not Connected</div>
@@ -340,6 +356,18 @@
             </div>
             <button class="btn btn-primary" onclick="syncData()" style="margin-bottom: 0.5rem;">Manual Sync Now</button>
             <button class="btn btn-secondary" onclick="forceCloudPull()">Force Pull from Cloud</button>
+        </div>
+        
+        <!-- Font Size -->
+        <div class="settings-section">
+            <label class="settings-label">🔤 Font Size</label>
+            <div class="font-size-buttons">
+                <button class="font-size-btn" onclick="setFontSize('s')" id="font-s">S</button>
+                <button class="font-size-btn" onclick="setFontSize('m')" id="font-m">M</button>
+                <button class="font-size-btn" onclick="setFontSize('l')" id="font-l">L</button>
+                <button class="font-size-btn" onclick="setFontSize('xl')" id="font-xl">XL</button>
+                <button class="font-size-btn" onclick="setFontSize('xxl')" id="font-xxl">XXL</button>
+            </div>
         </div>
         
         <!-- Page Contrast -->
@@ -594,7 +622,7 @@
         const deviceType = isMobile ? 'Mobile' : 'Laptop';
         
         let autoSyncInterval = null;
-        const AUTO_SYNC_INTERVAL = 5 * 60 * 1000; // 5 minutes
+        const AUTO_SYNC_INTERVAL = 5 * 60 * 1000;
         
         class MobileFirstCloudSync {
             constructor() {
@@ -659,6 +687,7 @@
                         userPosition: data.userPosition,
                         themeColor: data.themeColor,
                         nightMode: data.nightMode,
+                        fontSize: data.fontSize,
                         contrast: localStorage.getItem('contrast'),
                         lastUpdated: new Date().toISOString(),
                         lastUpdateDevice: deviceType,
@@ -776,9 +805,11 @@
                 data.userPosition = cloudData.userPosition || 'Project Manager';
                 data.themeColor = cloudData.themeColor || 0;
                 data.nightMode = cloudData.nightMode || false;
+                data.fontSize = cloudData.fontSize || 'm';
                 
                 saveData();
                 applyThemeColor(data.themeColor);
+                setFontSize(data.fontSize);
                 updateHeader();
                 if (data.nightMode) {
                     document.body.classList.add('night-mode');
@@ -808,6 +839,8 @@
             transactions: [],
             nightMode: false,
             themeColor: 0,
+            fontSize: 'm',
+            scheduleView: 'week',
             lastUpdated: null,
             syncVersion: 0,
             timelineFilter: 'all'
@@ -1065,11 +1098,30 @@
             }
         }
         
+        // FONT SIZE CONTROL
+        function setFontSize(size) {
+            document.body.classList.remove('font-xs', 'font-s', 'font-m', 'font-l', 'font-xl', 'font-xxl');
+            document.querySelectorAll('.font-size-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.body.classList.add('font-' + size);
+            document.getElementById('font-' + size).classList.add('active');
+            
+            data.fontSize = size;
+            localStorage.setItem('fontSize', size);
+            saveData();
+        }
+        
+        function loadFontSize() {
+            const savedSize = localStorage.getItem('fontSize') || data.fontSize || 'm';
+            setFontSize(savedSize);
+        }
+        
         // INITIALIZATION
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
             initColorPicker();
             initializeSettings();
+            loadFontSize();
             renderView();
             updateStats();
         });
@@ -1086,6 +1138,7 @@
             }
             
             applyThemeColor(data.themeColor || 0);
+            setFontSize(data.fontSize || 'm');
             updateHeader();
             renderView();
             
@@ -1517,51 +1570,169 @@
         }
 
         function renderSchedule(container) {
-            const allSortedTasks = [...data.tasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-            const sortedTasks = filterTasksByTimeline(allSortedTasks);
+            let html = '';
             
-            let html = renderTimelineFilters();
+            // View selector: Day, Week, Month
+            html += `
+                <div class="schedule-view-filters">
+                    <button class="view-btn ${data.scheduleView === 'day' ? 'active' : ''}" onclick="setScheduleView('day')">Day</button>
+                    <button class="view-btn ${data.scheduleView === 'week' ? 'active' : ''}" onclick="setScheduleView('week')">Week</button>
+                    <button class="view-btn ${data.scheduleView === 'month' ? 'active' : ''}" onclick="setScheduleView('month')">Month</button>
+                </div>
+            `;
             
-            if (sortedTasks.length === 0) {
+            // Gantt Chart for Tasks
+            html += renderTaskGanttChart();
+            
+            // Task List
+            const sortedTasks = [...data.tasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
+            const filteredTasks = filterTasksByScheduleView(sortedTasks);
+            
+            if (filteredTasks.length === 0) {
                 html += '<div class="empty-state">No tasks scheduled for this period</div>';
-                container.innerHTML = html;
-                return;
+            } else {
+                html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
+                html += '<h3 style="font-size: 14px; font-weight: 600; margin-bottom: 15px;">📋 Task List</h3>';
+                
+                filteredTasks.forEach(task => {
+                    const project = data.projects.find(p => p.id === task.projectId);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const dueDate = new Date(task.dueDate);
+                    dueDate.setHours(0, 0, 0, 0);
+                    const isOverdue = dueDate < today && task.status !== 'Completed';
+                    const duration = calculateTaskDuration(task.startDate, task.dueDate);
+                    
+                    html += `
+                        <div class="task-item ${task.status === 'Completed' ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
+                            <div class="task-info">
+                                <div class="task-title">${task.name}</div>
+                                <div class="task-meta">
+                                    ${project ? project.name : 'No Project'} • 
+                                    ${task.startDate ? `${task.startDate} to ` : ''}${task.dueDate} • 
+                                    ${task.status || 'Get Ready'} • 
+                                    ${task.priority} Priority
+                                </div>
+                                ${duration ? `<div class="task-duration">📅 Duration: ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
+                            </div>
+                            <div class="task-actions">
+                                <button class="icon-btn" onclick="editTask(${task.id})" title="Edit">✏️</button>
+                                <button class="icon-btn danger" onclick="deleteTask(${task.id})" title="Delete">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
             }
             
-            html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
-            html += '<h3 style="font-size: 14px; font-weight: 600; margin-bottom: 15px;">📅 Task Schedule</h3>';
+            container.innerHTML = html;
+        }
+
+        function setScheduleView(view) {
+            data.scheduleView = view;
+            saveData();
+            renderView();
+        }
+
+        function filterTasksByScheduleView(tasks) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
             
-            sortedTasks.forEach(task => {
-                const project = data.projects.find(p => p.id === task.projectId);
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
+            return tasks.filter(task => {
+                const startDate = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
                 const dueDate = new Date(task.dueDate);
+                startDate.setHours(0, 0, 0, 0);
                 dueDate.setHours(0, 0, 0, 0);
-                const isOverdue = dueDate < today && task.status !== 'Completed';
-                const duration = calculateTaskDuration(task.startDate, task.dueDate);
+                
+                if (data.scheduleView === 'day') {
+                    return (startDate.getTime() === today.getTime() || dueDate.getTime() === today.getTime() ||
+                           (startDate <= today && dueDate >= today));
+                } else if (data.scheduleView === 'week') {
+                    const weekEnd = new Date(today);
+                    weekEnd.setDate(today.getDate() + 7);
+                    return (startDate <= weekEnd && dueDate >= today);
+                } else if (data.scheduleView === 'month') {
+                    const monthEnd = new Date(today);
+                    monthEnd.setMonth(today.getMonth() + 1);
+                    return (startDate <= monthEnd && dueDate >= today);
+                }
+                return true;
+            });
+        }
+
+        function renderTaskGanttChart() {
+            const filteredTasks = filterTasksByScheduleView([...data.tasks]);
+            
+            if (filteredTasks.length === 0) {
+                return '<div class="empty-state">No tasks to display in Gantt chart</div>';
+            }
+            
+            let html = '<div class="gantt-container"><div class="gantt-header">📊 Task Schedule Gantt Chart</div>';
+            
+            // Calculate date range
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let minDate = today;
+            let maxDate = today;
+            
+            if (data.scheduleView === 'day') {
+                maxDate = new Date(today);
+            } else if (data.scheduleView === 'week') {
+                maxDate = new Date(today);
+                maxDate.setDate(today.getDate() + 7);
+            } else if (data.scheduleView === 'month') {
+                maxDate = new Date(today);
+                maxDate.setMonth(today.getMonth() + 1);
+            }
+            
+            // Find actual min/max from tasks
+            filteredTasks.forEach(task => {
+                if (task.startDate) {
+                    const start = new Date(task.startDate);
+                    start.setHours(0, 0, 0, 0);
+                    if (start < minDate) minDate = start;
+                }
+                const due = new Date(task.dueDate);
+                due.setHours(0, 0, 0, 0);
+                if (due > maxDate) maxDate = due;
+            });
+            
+            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
+            
+            // Header with dates
+            html += '<div class="gantt-timeline-header">';
+            html += '<div class="gantt-timeline-label">Task Name</div>';
+            html += '<div class="gantt-timeline-dates">';
+            html += `<span>${minDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>`;
+            html += `<span>${maxDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>`;
+            html += '</div>';
+            html += '</div>';
+            
+            // Render each task
+            filteredTasks.forEach(task => {
+                const startDate = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
+                const dueDate = new Date(task.dueDate);
+                startDate.setHours(0, 0, 0, 0);
+                dueDate.setHours(0, 0, 0, 0);
+                
+                const startOffset = Math.max(0, Math.ceil((startDate - minDate) / (1000 * 60 * 60 * 24)));
+                const duration = Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                const width = (duration / totalDays) * 100;
+                const left = (startOffset / totalDays) * 100;
                 
                 html += `
-                    <div class="task-item ${task.status === 'Completed' ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
-                        <div class="task-info">
-                            <div class="task-title">${task.name}</div>
-                            <div class="task-meta">
-                                ${project ? project.name : 'No Project'} • 
-                                ${task.startDate ? `${task.startDate} to ` : ''}${task.dueDate} • 
-                                ${task.status || 'Get Ready'} • 
-                                ${task.priority} Priority
-                            </div>
-                            ${duration ? `<div class="task-duration">📅 Duration: ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
-                        </div>
-                        <div class="task-actions">
-                            <button class="icon-btn" onclick="editTask(${task.id})" title="Edit">✏️</button>
-                            <button class="icon-btn danger" onclick="deleteTask(${task.id})" title="Delete">🗑️</button>
+                    <div class="gantt-row">
+                        <div class="gantt-label">${task.name}</div>
+                        <div class="gantt-timeline">
+                            <div class="gantt-bar" style="left: ${left}%; width: ${width}%;">${duration}d</div>
                         </div>
                     </div>
                 `;
             });
             
             html += '</div>';
-            container.innerHTML = html;
+            return html;
         }
 
         function showProjectDetail(projectId) {
