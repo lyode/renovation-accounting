@@ -75,7 +75,17 @@
         .sync-status-bar.success { background: #10b981; color: white; }
         .sync-status-bar.error { background: #ef4444; color: white; }
         
-        .tabs { background: var(--card-bg); display: flex; border-bottom: 2px solid var(--border-color); position: sticky; top: 52px; z-index: 90; overflow-x: auto; }
+        /* FIX 1: Enhanced sticky tabs with higher z-index and background */
+        .tabs { 
+            background: var(--card-bg); 
+            display: flex; 
+            border-bottom: 2px solid var(--border-color); 
+            position: sticky; 
+            top: 52px; 
+            z-index: 95; 
+            overflow-x: auto; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
         .tab { flex: 1; min-width: 80px; padding: 10px 8px; text-align: center; cursor: pointer; font-weight: 500; color: var(--text-secondary); border-bottom: 3px solid transparent; font-size: calc(12px * var(--font-scale)); }
         .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
         
@@ -96,17 +106,47 @@
         .view-btn { flex: 1; padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; cursor: pointer; font-size: calc(12px * var(--font-scale)); transition: all 0.2s; }
         .view-btn.active { background: var(--primary-gradient); color: white; border-color: var(--primary-color); }
         
-        .project-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 2px 10px var(--shadow-color); overflow: hidden; margin-bottom: 12px; position: relative; }
-        .project-card.locked::after { content: '🔒'; position: absolute; top: 8px; right: 8px; font-size: 18px; opacity: 0.7; }
-        .project-header { background: var(--primary-gradient); color: white; padding: 12px; cursor: pointer; }
+        /* FIX 2: Fixed project card click issues */
+        .project-card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            box-shadow: 0 2px 10px var(--shadow-color); 
+            overflow: hidden; 
+            margin-bottom: 12px; 
+            position: relative;
+        }
+        .project-card.locked::after { content: '🔒'; position: absolute; top: 8px; right: 8px; font-size: 18px; opacity: 0.7; pointer-events: none; z-index: 1; }
+        .project-header { 
+            background: var(--primary-gradient); 
+            color: white; 
+            padding: 12px; 
+            cursor: pointer; 
+            position: relative;
+            z-index: 1;
+        }
         .project-header h3 { font-size: calc(15px * var(--font-scale)); margin-bottom: 3px; }
         .project-meta { font-size: calc(10px * var(--font-scale)); opacity: 0.9; }
         .project-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; background: rgba(0,0,0,0.1); }
         .project-stat { text-align: center; }
         .project-stat-label { font-size: calc(9px * var(--font-scale)); opacity: 0.8; }
         .project-stat-value { font-size: calc(13px * var(--font-scale)); font-weight: bold; }
-        .project-actions { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
-        .action-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: calc(10px * var(--font-scale)); }
+        .project-actions { 
+            display: flex; 
+            gap: 5px; 
+            margin-top: 8px; 
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+        }
+        .action-btn { 
+            background: rgba(255,255,255,0.2); 
+            border: none; 
+            color: white; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: calc(10px * var(--font-scale)); 
+        }
         .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .task-item { padding: 10px; margin-bottom: 8px; background: var(--bg-color); border-radius: 8px; border-left: 3px solid var(--primary-color); display: flex; justify-content: space-between; align-items: start; }
@@ -119,6 +159,7 @@
         .task-actions { display: flex; gap: 4px; }
         .icon-btn { background: var(--primary-color); border: none; color: white; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: calc(12px * var(--font-scale)); display: flex; align-items: center; justify-content: center; }
         .icon-btn.danger { background: var(--danger); }
+        .icon-btn.success { background: var(--success); }
         
         .transaction-item { display: flex; justify-content: space-between; padding: 10px; background: var(--bg-color); border-radius: 8px; margin-bottom: 8px; align-items: center; }
         .transaction-info { flex: 1; }
@@ -134,6 +175,22 @@
         .kanban-header { font-weight: 600; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); font-size: calc(13px * var(--font-scale)); }
         .kanban-task { background: var(--bg-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: move; font-size: calc(12px * var(--font-scale)); border: 2px solid transparent; }
         .kanban-task.dragging { opacity: 0.5; }
+        /* FIX 3: Kanban task actions styling */
+        .kanban-task-actions { 
+            display: flex; 
+            gap: 5px; 
+            margin-top: 8px; 
+            justify-content: flex-end;
+        }
+        .kanban-done-btn {
+            background: var(--success); 
+            border: none; 
+            color: white; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: calc(11px * var(--font-scale));
+        }
         
         .gantt-container { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); overflow-x: auto; margin-bottom: 15px; }
         .gantt-header { font-size: calc(14px * var(--font-scale)); font-weight: 600; margin-bottom: 15px; color: var(--text-primary); }
@@ -931,6 +988,18 @@
             console.log('Item marked for permanent deletion:', { id: itemId, type: itemType });
         }
 
+        // FIX 3: Mark task as done function
+        function markTaskDone(taskId) {
+            const task = data.tasks.find(t => t.id === taskId);
+            if (task) {
+                task.status = 'Completed';
+                task.completedAt = new Date().toISOString();
+                saveData();
+                renderKanban(document.getElementById('mainContent'));
+                showToast('✅ Task marked as completed');
+            }
+        }
+
         // API KEY MANAGEMENT
         function saveApiKey() {
             const apiKey = document.getElementById('apiKeyInput').value.trim();
@@ -1540,10 +1609,12 @@
             return html;
         }
 
+        // FIX 3: Updated renderKanban to exclude completed tasks and add done buttons
         function renderKanban(container) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
+            // Filter out completed tasks from all columns
             const dueTasks = data.tasks.filter(t => {
                 const dueDate = new Date(t.dueDate);
                 dueDate.setHours(0, 0, 0, 0);
@@ -1551,7 +1622,7 @@
             });
             
             const inProgressTasks = data.tasks.filter(t => t.status === 'In Progress');
-            const getReadyTasks = data.tasks.filter(t => t.status === 'Get Ready' || !t.status || t.status === 'Not Started');
+            const getReadyTasks = data.tasks.filter(t => (t.status === 'Get Ready' || !t.status || t.status === 'Not Started') && t.status !== 'Completed');
             
             const columns = [
                 { title: 'Due Now', tasks: dueTasks, status: 'Due' },
@@ -1577,6 +1648,9 @@
                             <div style="margin-top: 5px; font-size: 10px;">📅 ${task.dueDate}</div>
                             ${duration ? `<div style="margin-top: 3px; font-size: 10px; color: var(--primary-color); font-weight: 600;">⏱️ ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
                             <div style="margin-top: 5px; font-size: 10px;">${task.priority} Priority</div>
+                            <div class="kanban-task-actions">
+                                <button class="kanban-done-btn" onclick="event.stopPropagation(); markTaskDone(${task.id})">✓ Done</button>
+                            </div>
                         </div>
                     `;
                 });
@@ -1593,6 +1667,7 @@
             });
         }
 
+        // FIX 2: Updated renderProjects with better click handling
         function renderProjects(container) {
             if (data.projects.length === 0) {
                 container.innerHTML = '<div class="empty-state">No projects yet. Click + to create one!</div>';
@@ -1612,8 +1687,8 @@
                 
                 html += `
                     <div class="project-card ${isLocked ? 'locked' : ''}">
-                        <div class="project-header" onclick="showProjectDetail(${project.id})">
-                            <div>
+                        <div class="project-header">
+                            <div onclick="showProjectDetail(${project.id})" style="cursor: pointer;">
                                 <h3>${project.name} ${isLocked ? '🔒' : ''}</h3>
                                 <div class="project-meta">Client: ${project.client}</div>
                                 ${project.startDate ? `<div class="project-meta">${project.startDate} to ${project.endDate || 'Ongoing'}</div>` : ''}
@@ -1632,10 +1707,10 @@
                                     <div class="project-stat-value" style="color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${profit.toFixed(0)}</div>
                                 </div>
                             </div>
-                            <div class="project-actions">
-                                <button class="action-btn" onclick="event.stopPropagation(); editProject(${project.id})" ${isLocked ? 'disabled' : ''}>Edit</button>
-                                <button class="action-btn" onclick="event.stopPropagation(); permanentDelete(${project.id}, 'project')">Delete</button>
-                                <button class="action-btn" onclick="event.stopPropagation(); toggleProjectLock(${project.id})">${isLocked ? 'Unlock' : 'Lock'}</button>
+                            <div class="project-actions" onclick="event.stopPropagation();">
+                                <button class="action-btn" onclick="editProject(${project.id})" ${isLocked ? 'disabled' : ''}>Edit</button>
+                                <button class="action-btn" onclick="permanentDelete(${project.id}, 'project')">Delete</button>
+                                <button class="action-btn" onclick="toggleProjectLock(${project.id})">${isLocked ? 'Unlock' : 'Lock'}</button>
                             </div>
                         </div>
                     </div>
