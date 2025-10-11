@@ -35,7 +35,6 @@
         body.extra-high-contrast { --contrast: 1.5; --brightness: 0.9; --text-primary: #000; --text-secondary: #2a2a2a; }
         body { filter: contrast(var(--contrast)) brightness(var(--brightness)); }
         
-        /* Font Size Classes */
         body.font-xs { --font-scale: 0.75; }
         body.font-s { --font-scale: 0.85; }
         body.font-m { --font-scale: 1; }
@@ -97,7 +96,8 @@
         .view-btn { flex: 1; padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; cursor: pointer; font-size: calc(12px * var(--font-scale)); transition: all 0.2s; }
         .view-btn.active { background: var(--primary-gradient); color: white; border-color: var(--primary-color); }
         
-        .project-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 2px 10px var(--shadow-color); overflow: hidden; margin-bottom: 12px; }
+        .project-card { background: var(--card-bg); border-radius: 12px; box-shadow: 0 2px 10px var(--shadow-color); overflow: hidden; margin-bottom: 12px; position: relative; }
+        .project-card.locked::after { content: '🔒'; position: absolute; top: 8px; right: 8px; font-size: 18px; opacity: 0.7; }
         .project-header { background: var(--primary-gradient); color: white; padding: 12px; cursor: pointer; }
         .project-header h3 { font-size: calc(15px * var(--font-scale)); margin-bottom: 3px; }
         .project-meta { font-size: calc(10px * var(--font-scale)); opacity: 0.9; }
@@ -105,8 +105,9 @@
         .project-stat { text-align: center; }
         .project-stat-label { font-size: calc(9px * var(--font-scale)); opacity: 0.8; }
         .project-stat-value { font-size: calc(13px * var(--font-scale)); font-weight: bold; }
-        .project-actions { display: flex; gap: 5px; margin-top: 8px; }
+        .project-actions { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
         .action-btn { background: rgba(255,255,255,0.2); border: none; color: white; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: calc(10px * var(--font-scale)); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
         .task-item { padding: 10px; margin-bottom: 8px; background: var(--bg-color); border-radius: 8px; border-left: 3px solid var(--primary-color); display: flex; justify-content: space-between; align-items: start; }
         .task-item.completed { opacity: 0.7; border-left-color: var(--success); }
@@ -136,13 +137,16 @@
         
         .gantt-container { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); overflow-x: auto; margin-bottom: 15px; }
         .gantt-header { font-size: calc(14px * var(--font-scale)); font-weight: 600; margin-bottom: 15px; color: var(--text-primary); }
-        .gantt-timeline-header { display: flex; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); }
+        .gantt-months { display: flex; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); }
+        .gantt-month-label { font-size: calc(10px * var(--font-scale)); font-weight: 600; color: var(--text-secondary); padding: 4px 8px; background: var(--bg-color); border-radius: 4px; margin-right: 8px; }
+        .gantt-timeline-header { display: flex; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
         .gantt-timeline-label { width: 150px; font-size: calc(10px * var(--font-scale)); font-weight: 600; color: var(--text-secondary); }
         .gantt-timeline-dates { flex: 1; display: flex; justify-content: space-between; font-size: calc(9px * var(--font-scale)); color: var(--text-secondary); padding: 0 5px; }
-        .gantt-row { display: flex; align-items: center; margin-bottom: 10px; min-height: 30px; }
-        .gantt-label { width: 150px; font-size: calc(11px * var(--font-scale)); font-weight: 500; color: var(--text-primary); }
-        .gantt-timeline { flex: 1; position: relative; height: 30px; background: var(--bg-color); border-radius: 4px; }
-        .gantt-bar { position: absolute; height: 100%; background: var(--primary-gradient); border-radius: 4px; display: flex; align-items: center; padding: 0 8px; font-size: calc(9px * var(--font-scale)); color: white; font-weight: 500; }
+        .gantt-row { display: flex; align-items: center; margin-bottom: 10px; min-height: 35px; }
+        .gantt-label { width: 150px; font-size: calc(11px * var(--font-scale)); font-weight: 500; color: var(--text-primary); padding-right: 10px; }
+        .gantt-timeline { flex: 1; position: relative; height: 35px; background: var(--bg-color); border-radius: 4px; }
+        .gantt-bar { position: absolute; height: 100%; background: var(--primary-gradient); border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 8px; font-size: calc(8px * var(--font-scale)); color: white; font-weight: 500; line-height: 1.2; }
+        .gantt-bar-dates { font-size: calc(7px * var(--font-scale)); opacity: 0.9; margin-top: 2px; }
         
         .focus-section { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); margin-bottom: 15px; }
         .focus-header { font-size: calc(14px * var(--font-scale)); font-weight: 600; margin-bottom: 12px; color: var(--danger); }
@@ -291,20 +295,19 @@
         <div class="container" id="mainContent"></div>
     </div>
 
-    <!-- Settings Panel -->
     <div class="settings-panel" id="settings-panel">
         <div class="settings-header">
             <span class="settings-title">Settings</span>
             <button class="close-settings" onclick="toggleSettings()">✕</button>
         </div>
         
-        <!-- DEBUG INFO -->
         <div style="background: #dbeafe; border: 2px solid #3b82f6; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1rem; font-size: 0.75rem;">
             <strong>📊 System Status:</strong><br>
             API Key: <span id="debug-api-key">Not set</span><br>
             Device: <span id="debug-device">Unknown</span><br>
             Local Data: <span id="debug-local-count">0 projects, 0 tasks</span><br>
             <strong style="color: #16a34a;">✨ Smart Merge: Data never lost!</strong><br>
+            <strong style="color: #ef4444;">🗑️ Permanent Delete: Syncs deletion to cloud</strong><br>
             <strong style="color: #3b82f6;" id="debug-auto-sync-info">Auto-sync: Disabled</strong><br>
             <br>
             <div style="background: #fef3c7; padding: 0.5rem; border-radius: 0.25rem; margin-top: 0.5rem; font-size: 0.6875rem; color: #92400e;">
@@ -312,7 +315,6 @@
             </div>
         </div>
         
-        <!-- 1. API Key Setup -->
         <div class="settings-section api-section-highlight">
             <label class="settings-label" style="font-size: 1rem; margin-bottom: 0.75rem;">🔑 API Key Setup</label>
             <div class="api-status" id="apiStatus">Not Connected</div>
@@ -329,7 +331,6 @@
             <button class="btn btn-secondary" onclick="removeApiKey()" style="font-size: 0.8125rem;">Remove API Key</button>
         </div>
         
-        <!-- 2. Auto-Sync Toggle -->
         <div class="settings-section">
             <label class="settings-label">⚡ Auto Sync</label>
             <div class="toggle-switch">
@@ -342,11 +343,10 @@
                 • Syncs automatically when you open the app<br>
                 • Syncs every 5 minutes in background<br>
                 • Always have latest data from all users<br>
-                • No manual checking needed!
+                • Permanent deletes sync across all devices
             </div>
         </div>
         
-        <!-- Sync Status -->
         <div class="settings-section">
             <label class="settings-label">📊 Sync Status</label>
             <div class="settings-info">
@@ -358,7 +358,6 @@
             <button class="btn btn-secondary" onclick="forceCloudPull()">Force Pull from Cloud</button>
         </div>
         
-        <!-- Font Size -->
         <div class="settings-section">
             <label class="settings-label">🔤 Font Size</label>
             <div class="font-size-buttons">
@@ -370,7 +369,6 @@
             </div>
         </div>
         
-        <!-- Page Contrast -->
         <div class="settings-section">
             <label class="settings-label">🎨 Page Contrast</label>
             <div class="contrast-buttons">
@@ -381,7 +379,6 @@
             </div>
         </div>
         
-        <!-- Night Mode -->
         <div class="settings-section">
             <div class="toggle-switch">
                 <span class="settings-label" style="margin: 0;">🌙 Night Mode</span>
@@ -389,13 +386,11 @@
             </div>
         </div>
         
-        <!-- Color Theme -->
         <div class="settings-section">
             <label class="settings-label">🎨 Color Theme</label>
             <div class="color-grid" id="colorGrid"></div>
         </div>
         
-        <!-- Export/Import -->
         <div class="settings-section">
             <button class="btn btn-primary" onclick="exportData()">📤 Export Data</button>
             <label class="btn btn-success" style="display: block; text-align: center; margin-top: 10px;">
@@ -407,7 +402,6 @@
 
     <div id="cloudStatus"></div>
     
-    <!-- Startup Sync Loading Overlay -->
     <div id="startup-sync-overlay">
         <div class="sync-overlay-content">
             <div class="sync-spinner">🔄</div>
@@ -438,7 +432,6 @@
         <button class="fab" onclick="toggleFabMenu()">+</button>
     </div>
 
-    <!-- Modals -->
     <div class="modal" id="profileModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -490,6 +483,12 @@
                 <div class="form-group">
                     <label>Description</label>
                     <textarea id="projectDescription" rows="3"></textarea>
+                </div>
+                <div class="form-group">
+                    <div class="toggle-switch">
+                        <span style="font-size: 0.875rem;">🔒 Lock Project (prevent editing)</span>
+                        <input type="checkbox" id="projectLocked">
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -617,7 +616,6 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // EXACT CLOUD SYNC FROM RENOVATION APP
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
         const deviceType = isMobile ? 'Mobile' : 'Laptop';
         
@@ -648,7 +646,6 @@
                 
                 if (!await this.setup()) {
                     this.showStatus('⚠️ No API key set');
-                    alert('Please set up your API key first in Settings');
                     return false;
                 }
                 
@@ -656,33 +653,55 @@
                 updateSyncStatus('Syncing...', true);
                 
                 try {
-                    console.log('Step 1: Pulling latest cloud data before push...');
+                    console.log('Step 1: Pulling latest cloud data...');
                     const pullResponse = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
                         headers: { 'X-Master-Key': this.apiKey }
                     });
                     
-                    let cloudData = { projects: [], tasks: [], transactions: [] };
+                    let cloudData = { projects: [], tasks: [], transactions: [], deletedItems: [] };
                     if (pullResponse.ok) {
                         const result = await pullResponse.json();
                         cloudData = result.record;
                         console.log('Cloud data retrieved:', cloudData);
                     }
                     
-                    console.log('Step 2: Merging local and cloud data...');
+                    console.log('Step 2: Merging with permanent delete support...');
+                    
+                    // Apply deletions first
+                    if (cloudData.deletedItems && cloudData.deletedItems.length > 0) {
+                        const deletedIds = new Set(cloudData.deletedItems.map(d => d.id));
+                        data.projects = data.projects.filter(p => !deletedIds.has(p.id));
+                        data.tasks = data.tasks.filter(t => !deletedIds.has(t.id));
+                        data.transactions = data.transactions.filter(t => !deletedIds.has(t.id));
+                    }
+                    
+                    // Merge projects, tasks, transactions
                     const mergedProjects = this.mergeData(cloudData.projects || [], data.projects, 'id');
                     const mergedTasks = this.mergeData(cloudData.tasks || [], data.tasks, 'id');
                     const mergedTransactions = this.mergeData(cloudData.transactions || [], data.transactions, 'id');
                     
+                    // Merge deleted items
+                    const localDeleted = data.deletedItems || [];
+                    const cloudDeleted = cloudData.deletedItems || [];
+                    const mergedDeleted = [...cloudDeleted];
+                    localDeleted.forEach(d => {
+                        if (!mergedDeleted.find(cd => cd.id === d.id)) {
+                            mergedDeleted.push(d);
+                        }
+                    });
+                    
                     console.log('Merge complete:', {
                         projects: mergedProjects.length,
                         tasks: mergedTasks.length,
-                        transactions: mergedTransactions.length
+                        transactions: mergedTransactions.length,
+                        deleted: mergedDeleted.length
                     });
                     
                     const pushData = {
                         projects: mergedProjects,
                         tasks: mergedTasks,
                         transactions: mergedTransactions,
+                        deletedItems: mergedDeleted,
                         currentUser: data.currentUser,
                         userPosition: data.userPosition,
                         themeColor: data.themeColor,
@@ -691,7 +710,7 @@
                         contrast: localStorage.getItem('contrast'),
                         lastUpdated: new Date().toISOString(),
                         lastUpdateDevice: deviceType,
-                        version: '1.0'
+                        version: '2.0'
                     };
                     
                     console.log('Step 3: Pushing merged data to cloud...');
@@ -708,11 +727,12 @@
                         data.projects = mergedProjects;
                         data.tasks = mergedTasks;
                         data.transactions = mergedTransactions;
+                        data.deletedItems = mergedDeleted;
                         
                         saveData();
                         renderView();
                         
-                        console.log('✅ Sync complete!');
+                        console.log('✅ Sync complete with permanent delete support!');
                         
                         this.lastSyncTime = Date.now();
                         localStorage.setItem('lastSyncTime', this.lastSyncTime.toString());
@@ -801,6 +821,7 @@
                 data.projects = cloudData.projects || [];
                 data.tasks = cloudData.tasks || [];
                 data.transactions = cloudData.transactions || [];
+                data.deletedItems = cloudData.deletedItems || [];
                 data.currentUser = cloudData.currentUser || 'Builder Pro';
                 data.userPosition = cloudData.userPosition || 'Project Manager';
                 data.themeColor = cloudData.themeColor || 0;
@@ -837,6 +858,7 @@
             projects: [],
             tasks: [],
             transactions: [],
+            deletedItems: [],
             nightMode: false,
             themeColor: 0,
             fontSize: 'm',
@@ -874,6 +896,40 @@
         let editingTaskId = null;
         let editingTransactionId = null;
         let draggedElement = null;
+
+        // PERMANENT DELETE FUNCTION
+        function permanentDelete(itemId, itemType) {
+            const confirmMsg = `⚠️ PERMANENT DELETE\n\nThis will permanently remove this ${itemType} from ALL devices when you sync.\n\nThis action cannot be undone. Continue?`;
+            
+            if (!confirm(confirmMsg)) return;
+            
+            // Add to deleted items list
+            if (!data.deletedItems) data.deletedItems = [];
+            data.deletedItems.push({
+                id: itemId,
+                type: itemType,
+                deletedAt: new Date().toISOString(),
+                deletedBy: deviceType
+            });
+            
+            // Remove from local data
+            if (itemType === 'project') {
+                data.projects = data.projects.filter(p => p.id !== itemId);
+                data.tasks = data.tasks.filter(t => t.projectId !== itemId);
+                data.transactions = data.transactions.filter(t => t.projectId !== itemId);
+            } else if (itemType === 'task') {
+                data.tasks = data.tasks.filter(t => t.id !== itemId);
+            } else if (itemType === 'transaction') {
+                data.transactions = data.transactions.filter(t => t.id !== itemId);
+            }
+            
+            saveData();
+            renderView();
+            updateStats();
+            showToast('🗑️ Permanently deleted - will sync to cloud');
+            
+            console.log('Item marked for permanent deletion:', { id: itemId, type: itemType });
+        }
 
         // API KEY MANAGEMENT
         function saveApiKey() {
@@ -924,7 +980,6 @@
             statusEl.className = hasKey ? 'api-status connected' : 'api-status disconnected';
         }
         
-        // AUTO-SYNC FUNCTIONS
         function toggleAutoSync() {
             const enabled = document.getElementById('auto-sync-toggle').checked;
             if (enabled && !cloudSync.apiKey) {
@@ -1027,7 +1082,7 @@
                 progressText.textContent = 'Pulling latest data from cloud...';
                 await new Promise(resolve => setTimeout(resolve, 300));
                 
-                progressText.textContent = 'Merging data from all users...';
+                progressText.textContent = 'Merging data with permanent delete support...';
                 const success = await cloudSync.push();
                 
                 if (success) {
@@ -1098,7 +1153,6 @@
             }
         }
         
-        // FONT SIZE CONTROL
         function setFontSize(size) {
             document.body.classList.remove('font-xs', 'font-s', 'font-m', 'font-l', 'font-xl', 'font-xxl');
             document.querySelectorAll('.font-size-btn').forEach(btn => btn.classList.remove('active'));
@@ -1116,7 +1170,6 @@
             setFontSize(savedSize);
         }
         
-        // INITIALIZATION
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
             initColorPicker();
@@ -1409,7 +1462,7 @@
                             </div>
                             <div class="task-actions">
                                 <button class="icon-btn" onclick="editTask(${task.id})" title="Edit">✏️</button>
-                                <button class="icon-btn danger" onclick="deleteTask(${task.id})" title="Delete">🗑️</button>
+                                <button class="icon-btn danger" onclick="permanentDelete(${task.id}, 'task')" title="Permanent Delete">🗑️</button>
                             </div>
                         </div>
                     `;
@@ -1441,6 +1494,20 @@
                 }
             });
             
+            // Get unique months
+            const months = [];
+            let current = new Date(minDate);
+            while (current <= maxDate) {
+                months.push(current.toLocaleDateString('en', { month: 'short', year: 'numeric' }));
+                current.setMonth(current.getMonth() + 1);
+            }
+            
+            html += '<div class="gantt-months">';
+            months.forEach(month => {
+                html += `<div class="gantt-month-label">${month}</div>`;
+            });
+            html += '</div>';
+            
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
             data.projects.forEach(project => {
@@ -1452,11 +1519,17 @@
                     const width = (duration / totalDays) * 100;
                     const left = (startOffset / totalDays) * 100;
                     
+                    const startStr = start.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                    const endStr = end.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                    
                     html += `
                         <div class="gantt-row">
                             <div class="gantt-label">${project.name}</div>
                             <div class="gantt-timeline">
-                                <div class="gantt-bar" style="left: ${left}%; width: ${width}%;">${duration}d</div>
+                                <div class="gantt-bar" style="left: ${left}%; width: ${width}%;">
+                                    <div>${duration}d</div>
+                                    <div class="gantt-bar-dates">${startStr} - ${endStr}</div>
+                                </div>
                             </div>
                         </div>
                     `;
@@ -1535,11 +1608,13 @@
                 const expenses = projectTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
                 const profit = income - expenses;
                 
+                const isLocked = project.locked || false;
+                
                 html += `
-                    <div class="project-card">
+                    <div class="project-card ${isLocked ? 'locked' : ''}">
                         <div class="project-header" onclick="showProjectDetail(${project.id})">
                             <div>
-                                <h3>${project.name}</h3>
+                                <h3>${project.name} ${isLocked ? '🔒' : ''}</h3>
                                 <div class="project-meta">Client: ${project.client}</div>
                                 ${project.startDate ? `<div class="project-meta">${project.startDate} to ${project.endDate || 'Ongoing'}</div>` : ''}
                             </div>
@@ -1558,8 +1633,9 @@
                                 </div>
                             </div>
                             <div class="project-actions">
-                                <button class="action-btn" onclick="event.stopPropagation(); editProject(${project.id})">Edit</button>
-                                <button class="action-btn" onclick="event.stopPropagation(); deleteProject(${project.id})">Delete</button>
+                                <button class="action-btn" onclick="event.stopPropagation(); editProject(${project.id})" ${isLocked ? 'disabled' : ''}>Edit</button>
+                                <button class="action-btn" onclick="event.stopPropagation(); permanentDelete(${project.id}, 'project')">Delete</button>
+                                <button class="action-btn" onclick="event.stopPropagation(); toggleProjectLock(${project.id})">${isLocked ? 'Unlock' : 'Lock'}</button>
                             </div>
                         </div>
                     </div>
@@ -1569,10 +1645,19 @@
             container.innerHTML = html;
         }
 
+        function toggleProjectLock(projectId) {
+            const project = data.projects.find(p => p.id === projectId);
+            if (project) {
+                project.locked = !project.locked;
+                saveData();
+                renderView();
+                showToast(project.locked ? '🔒 Project locked' : '🔓 Project unlocked');
+            }
+        }
+
         function renderSchedule(container) {
             let html = '';
             
-            // View selector: Day, Week, Month
             html += `
                 <div class="schedule-view-filters">
                     <button class="view-btn ${data.scheduleView === 'day' ? 'active' : ''}" onclick="setScheduleView('day')">Day</button>
@@ -1581,10 +1666,8 @@
                 </div>
             `;
             
-            // Gantt Chart for Tasks
             html += renderTaskGanttChart();
             
-            // Task List
             const sortedTasks = [...data.tasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
             const filteredTasks = filterTasksByScheduleView(sortedTasks);
             
@@ -1617,7 +1700,7 @@
                             </div>
                             <div class="task-actions">
                                 <button class="icon-btn" onclick="editTask(${task.id})" title="Edit">✏️</button>
-                                <button class="icon-btn danger" onclick="deleteTask(${task.id})" title="Delete">🗑️</button>
+                                <button class="icon-btn danger" onclick="permanentDelete(${task.id}, 'task')" title="Permanent Delete">🗑️</button>
                             </div>
                         </div>
                     `;
@@ -1670,7 +1753,6 @@
             
             let html = '<div class="gantt-container"><div class="gantt-header">📊 Task Schedule Gantt Chart</div>';
             
-            // Calculate date range
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             let minDate = today;
@@ -1686,7 +1768,6 @@
                 maxDate.setMonth(today.getMonth() + 1);
             }
             
-            // Find actual min/max from tasks
             filteredTasks.forEach(task => {
                 if (task.startDate) {
                     const start = new Date(task.startDate);
@@ -1698,18 +1779,22 @@
                 if (due > maxDate) maxDate = due;
             });
             
+            // Get unique months
+            const months = [];
+            let current = new Date(minDate);
+            while (current <= maxDate) {
+                months.push(current.toLocaleDateString('en', { month: 'short', year: 'numeric' }));
+                current.setMonth(current.getMonth() + 1);
+            }
+            
+            html += '<div class="gantt-months">';
+            months.forEach(month => {
+                html += `<div class="gantt-month-label">${month}</div>`;
+            });
+            html += '</div>';
+            
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
-            // Header with dates
-            html += '<div class="gantt-timeline-header">';
-            html += '<div class="gantt-timeline-label">Task Name</div>';
-            html += '<div class="gantt-timeline-dates">';
-            html += `<span>${minDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>`;
-            html += `<span>${maxDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })}</span>`;
-            html += '</div>';
-            html += '</div>';
-            
-            // Render each task
             filteredTasks.forEach(task => {
                 const startDate = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
                 const dueDate = new Date(task.dueDate);
@@ -1721,11 +1806,17 @@
                 const width = (duration / totalDays) * 100;
                 const left = (startOffset / totalDays) * 100;
                 
+                const startStr = startDate.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                const endStr = dueDate.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                
                 html += `
                     <div class="gantt-row">
                         <div class="gantt-label">${task.name}</div>
                         <div class="gantt-timeline">
-                            <div class="gantt-bar" style="left: ${left}%; width: ${width}%;">${duration}d</div>
+                            <div class="gantt-bar" style="left: ${left}%; width: ${width}%;">
+                                <div>${duration}d</div>
+                                <div class="gantt-bar-dates">${startStr} - ${endStr}</div>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -1746,7 +1837,7 @@
             const expenses = projectTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
             const profit = income - expenses;
             
-            document.getElementById('projectDetailTitle').textContent = project.name;
+            document.getElementById('projectDetailTitle').textContent = project.name + (project.locked ? ' 🔒' : '');
             
             let html = '<div style="max-height: 60vh; overflow-y: auto;">';
             
@@ -1793,7 +1884,7 @@
                             </div>
                             <div class="task-actions">
                                 <button class="icon-btn" onclick="editTask(${task.id}); closeModal('projectDetailModal');" title="Edit">✏️</button>
-                                <button class="icon-btn danger" onclick="deleteTask(${task.id}); closeModal('projectDetailModal');" title="Delete">🗑️</button>
+                                <button class="icon-btn danger" onclick="permanentDelete(${task.id}, 'task'); closeModal('projectDetailModal');" title="Permanent Delete">🗑️</button>
                             </div>
                         </div>
                     `;
@@ -1814,7 +1905,7 @@
                             <div class="transaction-amount ${trans.type}">${trans.type === 'income' ? '+' : '-'}$${trans.amount.toFixed(2)}</div>
                             <div class="transaction-actions">
                                 <button class="icon-btn" onclick="editTransaction(${trans.id}); closeModal('projectDetailModal');" title="Edit">✏️</button>
-                                <button class="icon-btn danger" onclick="deleteTransaction(${trans.id}); closeModal('projectDetailModal');" title="Delete">🗑️</button>
+                                <button class="icon-btn danger" onclick="permanentDelete(${trans.id}, 'transaction'); closeModal('projectDetailModal');" title="Permanent Delete">🗑️</button>
                             </div>
                         </div>
                     `;
@@ -1850,19 +1941,28 @@
             document.getElementById('projectStart').value = new Date().toISOString().split('T')[0];
             document.getElementById('projectEnd').value = '';
             document.getElementById('projectDescription').value = '';
+            document.getElementById('projectLocked').checked = false;
             document.getElementById('projectModal').classList.add('show');
             toggleFabMenu();
         }
 
         function editProject(projectId) {
-            editingProjectId = projectId;
             const project = data.projects.find(p => p.id === projectId);
+            if (!project) return;
+            
+            if (project.locked) {
+                showToast('🔒 This project is locked and cannot be edited');
+                return;
+            }
+            
+            editingProjectId = projectId;
             document.getElementById('projectModalTitle').textContent = 'Edit Project';
             document.getElementById('projectName').value = project.name;
             document.getElementById('projectClient').value = project.client || '';
             document.getElementById('projectStart').value = project.startDate || '';
             document.getElementById('projectEnd').value = project.endDate || '';
             document.getElementById('projectDescription').value = project.description || '';
+            document.getElementById('projectLocked').checked = project.locked || false;
             document.getElementById('projectModal').classList.add('show');
         }
 
@@ -1873,6 +1973,7 @@
                 startDate: document.getElementById('projectStart').value,
                 endDate: document.getElementById('projectEnd').value,
                 description: document.getElementById('projectDescription').value,
+                locked: document.getElementById('projectLocked').checked,
                 status: 'active',
                 lastModified: new Date().toISOString(),
                 timestamp: new Date().toISOString()
@@ -1897,18 +1998,6 @@
             renderView();
             updateStats();
             closeModal('projectModal');
-        }
-
-        function deleteProject(projectId) {
-            if (confirm('Delete project and all its tasks & transactions?')) {
-                data.projects = data.projects.filter(p => p.id !== projectId);
-                data.tasks = data.tasks.filter(t => t.projectId !== projectId);
-                data.transactions = data.transactions.filter(t => t.projectId !== projectId);
-                saveData();
-                renderView();
-                updateStats();
-                showToast('🗑️ Project deleted');
-            }
         }
 
         function showTaskModal(projectId = null) {
@@ -1990,16 +2079,6 @@
             renderView();
             updateStats();
             closeModal('taskModal');
-        }
-
-        function deleteTask(taskId) {
-            if (confirm('Delete this task?')) {
-                data.tasks = data.tasks.filter(t => t.id !== taskId);
-                saveData();
-                renderView();
-                updateStats();
-                showToast('🗑️ Task deleted');
-            }
         }
 
         function showTransactionModal(type, projectId = null) {
@@ -2087,16 +2166,6 @@
             renderView();
             updateStats();
             closeModal('transactionModal');
-        }
-
-        function deleteTransaction(transId) {
-            if (confirm('Delete this transaction?')) {
-                data.transactions = data.transactions.filter(t => t.id !== transId);
-                saveData();
-                renderView();
-                updateStats();
-                showToast('🗑️ Transaction deleted');
-            }
         }
 
         function closeModal(modalId) {
