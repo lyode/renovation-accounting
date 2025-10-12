@@ -6,20 +6,20 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#6b5d56">
-    <title>Builder Pro - Complete Project Manager</title>
+    <title>REFIT Interior - Project Manager</title>
     
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #d4a5a5 0%, #e6b8b8 100%);
-            --primary-color: #d4a5a5;
-            --primary-dark: #b08989;
-            --primary-light: #f0d0d0;
-            --bg-color: #fefefe;
+            --primary-gradient: linear-gradient(135deg, #e4838a 0%, #f0a0a6 100%);
+            --primary-color: #e4838a;
+            --primary-dark: #d67379;
+            --primary-light: #f0a0a6;
+            --bg-color: #f8f6f4;
             --card-bg: #ffffff;
             --text-primary: #2a2a2a;
             --text-secondary: #5a5a5a;
             --border-color: #e8e8e8;
-            --shadow-color: rgba(0, 0, 0, 0.08);
+            --shadow-color: rgba(228, 131, 138, 0.15);
             --success: #10b981;
             --warning: #f39c12;
             --danger: #ef4444;
@@ -852,8 +852,10 @@
 
         // 36 Pastel Theme Colors (18 Light + 18 Dark)
         const themeColors = [
+            // REFIT Brand Color - First position for default
+            { name: 'REFIT Rose', primary: '#e4838a', gradient: 'linear-gradient(135deg, #e4838a 0%, #f0a0a6 100%)' },
+            
             // Light Pastel Colors
-            { name: 'Rose', primary: '#ffb3ba', gradient: 'linear-gradient(135deg, #ffb3ba 0%, #ffc8cc 100%)' },
             { name: 'Peach', primary: '#ffdfba', gradient: 'linear-gradient(135deg, #ffdfba 0%, #ffe9cc 100%)' },
             { name: 'Cream', primary: '#ffffba', gradient: 'linear-gradient(135deg, #ffffba 0%, #ffffcc 100%)' },
             { name: 'Mint', primary: '#baffc9', gradient: 'linear-gradient(135deg, #baffc9 0%, #ccffd8 100%)' },
@@ -872,8 +874,8 @@
             { name: 'Cloud', primary: '#e6e6fa', gradient: 'linear-gradient(135deg, #e6e6fa 0%, #f0f0ff 100%)' },
             { name: 'Vanilla', primary: '#fff8e6', gradient: 'linear-gradient(135deg, #fff8e6 0%, #fffbf0 100%)' },
             
-            // Dark Pastel Colors
-            { name: 'Dusty Rose', primary: '#d4a5a5', gradient: 'linear-gradient(135deg, #d4a5a5 0%, #e6b8b8 100%)' },
+            // Dark Pastel Colors - Including REFIT Brown
+            { name: 'REFIT Brown', primary: '#5c3a21', gradient: 'linear-gradient(135deg, #5c3a21 0%, #7a5033 100%)' },
             { name: 'Terracotta', primary: '#d4a574', gradient: 'linear-gradient(135deg, #d4a574 0%, #e6b888 100%)' },
             { name: 'Olive', primary: '#a8b88a', gradient: 'linear-gradient(135deg, #a8b88a 0%, #bcc9a0 100%)' },
             { name: 'Sage Green', primary: '#8ab8a8', gradient: 'linear-gradient(135deg, #8ab8a8 0%, #a0c9bc 100%)' },
@@ -895,15 +897,15 @@
 
         // App State
         let data = {
-            currentUser: 'Builder Pro',
-            userPosition: 'Project Manager',
+            currentUser: 'REFIT Interior',
+            userPosition: 'Professional Services',
             currentView: 'home',
             projects: [],
             tasks: [],
             transactions: [],
             deletedItems: [],
             nightMode: false,
-            themeColor: 18, // Default to first dark pastel
+            themeColor: 0, // Default to REFIT Rose
             fontSize: 'm',
             contrast: 'normal',
             timelineFilter: 'all',
@@ -1070,7 +1072,7 @@
         }
 
         function updateHeader() {
-            document.getElementById('headerName').textContent = data.currentUser;
+            document.getElementById('headerName').textContent = '🏠 ' + data.currentUser;
             document.getElementById('headerPosition').textContent = data.userPosition;
         }
 
