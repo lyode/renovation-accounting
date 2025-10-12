@@ -486,6 +486,10 @@
                     <option value="pop">Pop 🎈</option>
                     <option value="click">Click 🖱️</option>
                 </select>
+                <div class="form-group">
+                    <label style="font-size: 0.75rem;">Volume: <span id="soundVolumeValue">30%</span></label>
+                    <input type="range" id="soundVolumeSlider" min="10" max="100" value="30" onchange="adjustSoundVolume()" style="width: 100%;">
+                </div>
                 <button class="btn btn-secondary" onclick="testSound()" style="width: 100%; font-size: 0.75rem;">🔊 Test Sound</button>
             </div>
         </div>
@@ -764,42 +768,71 @@
                         console.log('Cloud data retrieved:', cloudData);
                     }
                     
-                    console.log('Step 2: Merging with permanent delete support...');
+                    console.log('Step 2: Merging deleted items first...');
                     
-                    // Apply deletions first
-                    if (cloudData.deletedItems && cloudData.deletedItems.length > 0) {
-                        const deletedIds = new Set(cloudData.deletedItems.map(d => d.id));
-                        data.projects = data.projects.filter(p => !deletedIds.has(p.id));
-                        data.tasks = data.tasks.filter(t => !deletedIds.has(t.id));
-                        data.transactions = data.transactions.filter(t => !deletedIds.has(t.id));
-                    }
-                    
-                    // Merge projects, tasks, transactions
-                    const mergedProjects = this.mergeData(cloudData.projects || [], data.projects, 'id');
-                    const mergedTasks = this.mergeData(cloudData.tasks || [], data.tasks, 'id');
-                    const mergedTransactions = this.mergeData(cloudData.transactions || [], data.transactions, 'id');
-                    
-                    // Merge deleted items
+                    // Merge deleted items lists first
                     const localDeleted = data.deletedItems || [];
                     const cloudDeleted = cloudData.deletedItems || [];
                     const mergedDeleted = [...cloudDeleted];
+                    
                     localDeleted.forEach(d => {
                         if (!mergedDeleted.find(cd => cd.id === d.id)) {
                             mergedDeleted.push(d);
                         }
                     });
                     
+                    // Create a set of all deleted IDs for quick lookup
+                    const deletedIds = new Set(mergedDeleted.map(d => d.id));
+                    
+                    console.log('Deleted items to exclude:', deletedIds);
+                    
+                    // Apply deletions to local data first
+                    data.projects = data.projects.filter(p => !deletedIds.has(p.id));
+                    data.tasks = data.tasks.filter(t => !deletedIds.has(t.id));
+                    data.transactions = data.transactions.filter(t => !deletedIds.has(t.id));
+                    
+                    // Apply deletions to cloud data
+                    cloudData.projects = (cloudData.projects || []).filter(p => !deletedIds.has(p.id));
+                    cloudData.tasks = (cloudData.tasks || []).filter(t => !deletedIds.has(t.id));
+                    cloudData.transactions = (cloudData.transactions || []).filter(t => !deletedIds.has(t.id));
+                    
+                    console.log('Step 3: Merging non-deleted data...');
+                    
+                    // Now merge the cleaned data
+                    const mergedProjects = this.mergeData(cloudData.projects || [], data.projects, 'id');
+                    const mergedTasks = this.mergeData(cloudData.tasks || [], data.tasks, 'id');
+                    const mergedTransactions = this.mergeData(cloudData.transactions || [], data.transactions, 'id');
+                    
+                    // Clean up deleted tasks from projects
+                    mergedTasks.forEach(task => {
+                        if (deletedIds.has(task.projectId)) {
+                            deletedIds.add(task.id);
+                            mergedDeleted.push({
+                                id: task.id,
+                                type: 'task',
+                                deletedAt: new Date().toISOString(),
+                                deletedBy: deviceType,
+                                reason: 'project_deleted'
+                            });
+                        }
+                    });
+                    
+                    // Final filter to ensure no deleted items remain
+                    const finalProjects = mergedProjects.filter(p => !deletedIds.has(p.id));
+                    const finalTasks = mergedTasks.filter(t => !deletedIds.has(t.id) && !deletedIds.has(t.projectId));
+                    const finalTransactions = mergedTransactions.filter(t => !deletedIds.has(t.id) && !deletedIds.has(t.projectId));
+                    
                     console.log('Merge complete:', {
-                        projects: mergedProjects.length,
-                        tasks: mergedTasks.length,
-                        transactions: mergedTransactions.length,
+                        projects: finalProjects.length,
+                        tasks: finalTasks.length,
+                        transactions: finalTransactions.length,
                         deleted: mergedDeleted.length
                     });
                     
                     const pushData = {
-                        projects: mergedProjects,
-                        tasks: mergedTasks,
-                        transactions: mergedTransactions,
+                        projects: finalProjects,
+                        tasks: finalTasks,
+                        transactions: finalTransactions,
                         deletedItems: mergedDeleted,
                         currentUser: data.currentUser,
                         userPosition: data.userPosition,
@@ -809,10 +842,10 @@
                         contrast: localStorage.getItem('contrast'),
                         lastUpdated: new Date().toISOString(),
                         lastUpdateDevice: deviceType,
-                        version: '2.0'
+                        version: '2.1'
                     };
                     
-                    console.log('Step 3: Pushing merged data to cloud...');
+                    console.log('Step 4: Pushing merged data to cloud...');
                     const response = await fetch(`${this.baseUrl}/b/${this.binId}`, {
                         method: 'PUT',
                         headers: {
@@ -823,9 +856,9 @@
                     });
                     
                     if (response.ok) {
-                        data.projects = mergedProjects;
-                        data.tasks = mergedTasks;
-                        data.transactions = mergedTransactions;
+                        data.projects = finalProjects;
+                        data.tasks = finalTasks;
+                        data.transactions = finalTransactions;
                         data.deletedItems = mergedDeleted;
                         
                         saveData();
@@ -864,21 +897,36 @@
             }
             
             mergeData(cloudArray, localArray, uniqueKey) {
-                const merged = [...cloudArray];
+                // First, get all deleted item IDs
+                const allDeletedIds = new Set();
+                if (data.deletedItems) {
+                    data.deletedItems.forEach(item => allDeletedIds.add(item.id));
+                }
+                
+                // Start with cloud data, but exclude deleted items
+                const merged = cloudArray.filter(item => !allDeletedIds.has(item[uniqueKey]));
                 const cloudIds = new Set(cloudArray.map(item => item[uniqueKey]));
                 
+                // Add local items that aren't in cloud and aren't deleted
                 localArray.forEach(localItem => {
-                    if (!cloudIds.has(localItem[uniqueKey])) {
-                        merged.push(localItem);
-                    } else {
-                        const cloudItem = merged.find(item => item[uniqueKey] === localItem[uniqueKey]);
-                        if (cloudItem && localItem.timestamp && (!cloudItem.timestamp || new Date(localItem.timestamp) > new Date(cloudItem.timestamp))) {
-                            Object.assign(cloudItem, localItem);
+                    if (!allDeletedIds.has(localItem[uniqueKey])) {
+                        if (!cloudIds.has(localItem[uniqueKey])) {
+                            merged.push(localItem);
+                        } else {
+                            // Update existing item if local is newer
+                            const cloudItemIndex = merged.findIndex(item => item[uniqueKey] === localItem[uniqueKey]);
+                            if (cloudItemIndex !== -1) {
+                                const cloudItem = merged[cloudItemIndex];
+                                if (localItem.timestamp && (!cloudItem.timestamp || new Date(localItem.timestamp) > new Date(cloudItem.timestamp))) {
+                                    merged[cloudItemIndex] = localItem;
+                                }
+                            }
                         }
                     }
                 });
                 
-                return merged;
+                // Final filter to ensure no deleted items
+                return merged.filter(item => !allDeletedIds.has(item[uniqueKey]));
             }
             
             async pull(force = false) {
@@ -1019,6 +1067,7 @@
         // Sound settings
         let syncSoundEnabled = false;
         let selectedSound = 'bell';
+        let soundVolume = 30; // Default to 30% volume for softer sounds
         
         // Color toning settings
         let colorBrightness = 100;
@@ -1045,50 +1094,50 @@
             oscillator.connect(gainNode);
             gainNode.connect(audioContext.destination);
             
+            // Apply volume control (0.01 to 0.3 for softer sounds)
+            const volumeLevel = (soundVolume / 100) * 0.3;
+            
             switch(soundType) {
                 case 'bell':
-                    oscillator.frequency.value = 800;
+                    oscillator.frequency.value = 600;
                     oscillator.type = 'sine';
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-                    break;
-                case 'chime':
-                    oscillator.frequency.value = 1000;
-                    oscillator.type = 'triangle';
-                    gainNode.gain.setValueAtTime(0.2, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.8);
-                    break;
-                case 'ding':
-                    oscillator.frequency.value = 1200;
-                    oscillator.type = 'sine';
-                    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+                    gainNode.gain.setValueAtTime(volumeLevel, audioContext.currentTime);
                     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
                     break;
-                case 'whoosh':
-                    oscillator.frequency.value = 400;
-                    oscillator.type = 'sawtooth';
-                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                case 'chime':
+                    oscillator.frequency.value = 800;
+                    oscillator.type = 'triangle';
+                    gainNode.gain.setValueAtTime(volumeLevel * 0.7, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+                    break;
+                case 'ding':
+                    oscillator.frequency.value = 1000;
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(volumeLevel, audioContext.currentTime);
                     gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
                     break;
+                case 'whoosh':
+                    oscillator.frequency.value = 300;
+                    oscillator.type = 'sawtooth';
+                    gainNode.gain.setValueAtTime(volumeLevel * 0.5, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
+                    break;
                 case 'pop':
-                    oscillator.frequency.value = 600;
+                    oscillator.frequency.value = 500;
                     oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(volumeLevel * 0.5, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
                     break;
                 case 'click':
-                    oscillator.frequency.value = 1500;
+                    oscillator.frequency.value = 1200;
                     oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.05);
+                    gainNode.gain.setValueAtTime(volumeLevel * 0.3, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.03);
                     break;
             }
             
             oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 1);
-            
-            // Visual feedback
-            showToast(soundMap[soundType] + ' Sound played');
+            oscillator.stop(audioContext.currentTime + 0.6);
         }
         
         function toggleSyncSound() {
@@ -1097,12 +1146,19 @@
             localStorage.setItem('syncSoundEnabled', syncSoundEnabled);
             if (syncSoundEnabled) {
                 localStorage.setItem('selectedSound', selectedSound);
+                localStorage.setItem('soundVolume', soundVolume);
             }
         }
         
         function previewSound() {
             selectedSound = document.getElementById('soundSelect').value;
             localStorage.setItem('selectedSound', selectedSound);
+        }
+        
+        function adjustSoundVolume() {
+            soundVolume = document.getElementById('soundVolumeSlider').value;
+            document.getElementById('soundVolumeValue').textContent = soundVolume + '%';
+            localStorage.setItem('soundVolume', soundVolume);
         }
         
         function testSound() {
@@ -1158,11 +1214,14 @@
         function loadSoundSettings() {
             syncSoundEnabled = localStorage.getItem('syncSoundEnabled') === 'true';
             selectedSound = localStorage.getItem('selectedSound') || 'bell';
+            soundVolume = parseInt(localStorage.getItem('soundVolume') || '30');
             
             if (document.getElementById('sound-toggle')) {
                 document.getElementById('sound-toggle').checked = syncSoundEnabled;
                 document.getElementById('soundOptions').style.display = syncSoundEnabled ? 'block' : 'none';
                 document.getElementById('soundSelect').value = selectedSound;
+                document.getElementById('soundVolumeSlider').value = soundVolume;
+                document.getElementById('soundVolumeValue').textContent = soundVolume + '%';
             }
         }
 
