@@ -30,12 +30,12 @@
             --font-scale: 1;
         }
         
+        /* Contrast and font size modifiers */
         body.low-contrast { --contrast: 0.85; --brightness: 1.05; }
         body.high-contrast { --contrast: 1.25; --brightness: 0.95; }
         body.extra-high-contrast { --contrast: 1.5; --brightness: 0.9; --text-primary: #000; --text-secondary: #2a2a2a; }
         body { filter: contrast(var(--contrast)) brightness(var(--brightness)); }
         
-        body.font-xs { --font-scale: 0.75; }
         body.font-s { --font-scale: 0.85; }
         body.font-m { --font-scale: 1; }
         body.font-l { --font-scale: 1.15; }
@@ -51,42 +51,110 @@
             --shadow-color: rgba(0,0,0,0.5);
             --primary-gradient: linear-gradient(135deg, #8a7a72 0%, #9d8d85 100%);
             --primary-color: #8a7a72;
-            --primary-light: #524840;
         }
         
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; -webkit-user-select: none; user-select: none; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-color); min-height: 100vh; overflow-x: hidden; transition: background 0.3s; font-size: calc(14px * var(--font-scale)); }
-        .app-container { max-width: 100vw; min-height: 100vh; display: flex; flex-direction: column; }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: var(--bg-color); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+            transition: background 0.3s; 
+            font-size: calc(14px * var(--font-scale));
+        }
         
-        .header { background: var(--primary-gradient); color: white; padding: 10px 12px; box-shadow: 0 2px 10px var(--shadow-color); position: sticky; top: 0; z-index: 100; }
+        .app-container { 
+            max-width: 100vw; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Fixed header section */
+        .fixed-header-section {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: var(--bg-color);
+        }
+        
+        .header { 
+            background: var(--primary-gradient); 
+            color: white; 
+            padding: 10px 12px; 
+            box-shadow: 0 2px 10px var(--shadow-color); 
+        }
+        
         .header-content { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
         .header-left { display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; }
         .header h1 { font-size: calc(16px * var(--font-scale)); font-weight: 600; }
         .header-subtitle { font-size: calc(11px * var(--font-scale)); opacity: 0.9; margin-top: 2px; }
         .header-controls { display: flex; gap: 8px; align-items: center; }
-        .header-btn { background: rgba(255,255,255,0.2); border: none; color: white; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: calc(14px * var(--font-scale)); display: flex; align-items: center; justify-content: center; position: relative; }
+        
+        .header-btn { 
+            background: rgba(255,255,255,0.2); 
+            border: none; 
+            color: white; 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            font-size: calc(14px * var(--font-scale)); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+        }
         .header-btn:active { transform: scale(0.9); }
-        .sync-indicator { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: #10b981; border: 2px solid white; }
+        
+        .sync-indicator { 
+            position: absolute; 
+            top: -2px; 
+            right: -2px; 
+            width: 10px; 
+            height: 10px; 
+            border-radius: 50%; 
+            background: #10b981; 
+            border: 2px solid white; 
+        }
         .sync-indicator.syncing { background: #f39c12; animation: pulse 1s infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         
-        .sync-status-bar { background: var(--primary-light); color: var(--text-primary); padding: 4px 10px; font-size: calc(11px * var(--font-scale)); text-align: center; display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .sync-status-bar { 
+            background: var(--primary-light); 
+            color: white; 
+            padding: 4px 10px; 
+            font-size: calc(11px * var(--font-scale)); 
+            text-align: center; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            gap: 10px; 
+        }
         .sync-status-bar.syncing { background: #fbbf24; animation: pulse 1s infinite; }
-        .sync-status-bar.success { background: #10b981; color: white; }
-        .sync-status-bar.error { background: #ef4444; color: white; }
+        .sync-status-bar.success { background: #10b981; }
         
-        /* FIX 1: Enhanced sticky tabs with higher z-index and background */
         .tabs { 
             background: var(--card-bg); 
             display: flex; 
             border-bottom: 2px solid var(--border-color); 
-            position: sticky; 
-            top: 0; 
-            z-index: 98; 
             overflow-x: auto; 
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .tab { flex: 1; min-width: 80px; padding: 10px 8px; text-align: center; cursor: pointer; font-weight: 500; color: var(--text-secondary); border-bottom: 3px solid transparent; font-size: calc(12px * var(--font-scale)); }
+        
+        .tab { 
+            flex: 1; 
+            min-width: 80px; 
+            padding: 10px 8px; 
+            text-align: center; 
+            cursor: pointer; 
+            font-weight: 500; 
+            color: var(--text-secondary); 
+            border-bottom: 3px solid transparent; 
+            font-size: calc(12px * var(--font-scale)); 
+        }
         .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
         
         .stats-bar { 
@@ -95,76 +163,93 @@
             gap: 8px; 
             padding: 10px; 
             background: var(--bg-color); 
-            position: sticky;
-            top: 44px;
-            z-index: 92;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+        
+        /* Content area with proper spacing for fixed header */
+        .main-content-wrapper {
+            margin-top: 160px; /* Adjust based on actual header height */
+            flex: 1;
+        }
+        
         .stat-card { 
             background: var(--card-bg); 
             padding: 10px; 
             border-radius: 8px; 
             box-shadow: 0 2px 5px var(--shadow-color); 
             text-align: center; 
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 10px var(--shadow-color);
         }
         .stat-card h3 { font-size: calc(16px * var(--font-scale)); color: var(--primary-color); margin-bottom: 2px; font-weight: 700; }
         .stat-card p { font-size: calc(10px * var(--font-scale)); color: var(--text-secondary); }
         .stat-card.income h3 { color: var(--income-color); }
         .stat-card.expense h3 { color: var(--expense-color); }
         
-        .container { flex: 1; padding: 10px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
+        .container { 
+            padding: 10px; 
+            overflow-y: auto; 
+            -webkit-overflow-scrolling: touch; 
+            padding-bottom: 80px; 
+        }
         
-        .timeline-filters { display: flex; gap: 8px; margin-bottom: 12px; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color); }
-        .filter-btn { flex: 1; padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; cursor: pointer; font-size: calc(12px * var(--font-scale)); transition: all 0.2s; }
-        .filter-btn.active { background: var(--primary-gradient); color: white; border-color: var(--primary-color); }
+        /* UI Components */
+        .filter-btn, .view-btn { 
+            flex: 1; 
+            padding: 8px; 
+            border: 1px solid var(--border-color); 
+            background: var(--bg-color); 
+            color: var(--text-primary); 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: calc(12px * var(--font-scale)); 
+            transition: all 0.2s; 
+        }
+        .filter-btn.active, .view-btn.active { 
+            background: var(--primary-gradient); 
+            color: white; 
+            border-color: var(--primary-color); 
+        }
         
-        .schedule-view-filters { display: flex; gap: 8px; margin-bottom: 12px; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color); }
-        .view-btn { flex: 1; padding: 8px; border: 1px solid var(--border-color); background: var(--bg-color); color: var(--text-primary); border-radius: 6px; cursor: pointer; font-size: calc(12px * var(--font-scale)); transition: all 0.2s; }
-        .view-btn.active { background: var(--primary-gradient); color: white; border-color: var(--primary-color); }
-        
-        /* FIX 2: Fixed project card click issues */
         .project-card { 
             background: var(--card-bg); 
             border-radius: 12px; 
             box-shadow: 0 2px 10px var(--shadow-color); 
             overflow: hidden; 
             margin-bottom: 12px; 
-            position: relative;
-            cursor: pointer;
+            position: relative; 
         }
-        .project-card.locked::after { content: '🔒'; position: absolute; top: 8px; right: 8px; font-size: 18px; opacity: 0.7; pointer-events: none; z-index: 1; }
+        
         .project-header { 
             background: var(--primary-gradient); 
             color: white; 
             padding: 12px; 
+            cursor: pointer; 
             position: relative;
             z-index: 1;
-            pointer-events: none; /* Make header non-blocking */
         }
-        .project-header > * {
-            pointer-events: auto; /* Re-enable pointer events for children */
+        
+        .project-header h3 { font-size: calc(15px * var(--font-scale)); margin-bottom: 3px; }
+        .project-meta { font-size: calc(10px * var(--font-scale)); opacity: 0.9; }
+        
+        .project-stats { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 8px; 
+            padding: 10px; 
+            background: rgba(0,0,0,0.1); 
         }
-        .project-header h3 { font-size: calc(15px * var(--font-scale)); margin-bottom: 3px; pointer-events: none; }
-        .project-meta { font-size: calc(10px * var(--font-scale)); opacity: 0.9; pointer-events: none; }
-        .project-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 10px; background: rgba(0,0,0,0.1); pointer-events: none; }
-        .project-stat { text-align: center; pointer-events: none; }
+        
+        .project-stat { text-align: center; }
         .project-stat-label { font-size: calc(9px * var(--font-scale)); opacity: 0.8; }
         .project-stat-value { font-size: calc(13px * var(--font-scale)); font-weight: bold; }
+        
         .project-actions { 
             display: flex; 
             gap: 5px; 
             margin-top: 8px; 
-            flex-wrap: wrap;
+            flex-wrap: wrap; 
             position: relative;
-            z-index: 10;
-            pointer-events: auto;
+            z-index: 2;
         }
+        
         .action-btn { 
             background: rgba(255,255,255,0.2); 
             border: none; 
@@ -172,66 +257,295 @@
             padding: 4px 8px; 
             border-radius: 4px; 
             cursor: pointer; 
-            font-size: calc(10px * var(--font-scale));
-            position: relative;
-            z-index: 11;
+            font-size: calc(10px * var(--font-scale)); 
         }
-        .action-btn:hover { background: rgba(255,255,255,0.3); }
         .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        .task-item { padding: 10px; margin-bottom: 8px; background: var(--bg-color); border-radius: 8px; border-left: 3px solid var(--primary-color); display: flex; justify-content: space-between; align-items: start; }
+        .task-item { 
+            padding: 10px; 
+            margin-bottom: 8px; 
+            background: var(--bg-color); 
+            border-radius: 8px; 
+            border-left: 3px solid var(--primary-color); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: start; 
+        }
         .task-item.completed { opacity: 0.7; border-left-color: var(--success); }
         .task-item.overdue { border-left-color: var(--danger); }
+        
         .task-info { flex: 1; }
         .task-title { font-weight: 500; margin-bottom: 5px; font-size: calc(13px * var(--font-scale)); }
         .task-meta { font-size: calc(10px * var(--font-scale)); color: var(--text-secondary); }
         .task-duration { font-size: calc(9px * var(--font-scale)); color: var(--primary-color); margin-top: 3px; font-weight: 600; }
-        .task-actions { display: flex; gap: 4px; }
-        .icon-btn { background: var(--primary-color); border: none; color: white; width: 28px; height: 28px; border-radius: 4px; cursor: pointer; font-size: calc(12px * var(--font-scale)); display: flex; align-items: center; justify-content: center; }
-        .icon-btn.danger { background: var(--danger); }
-        .icon-btn.success { background: var(--success); }
         
-        .transaction-item { display: flex; justify-content: space-between; padding: 10px; background: var(--bg-color); border-radius: 8px; margin-bottom: 8px; align-items: center; }
-        .transaction-info { flex: 1; }
-        .transaction-category { font-weight: 500; margin-bottom: 3px; font-size: calc(12px * var(--font-scale)); }
-        .transaction-date { font-size: calc(10px * var(--font-scale)); color: var(--text-secondary); }
+        .icon-btn { 
+            background: var(--primary-color); 
+            border: none; 
+            color: white; 
+            width: 28px; 
+            height: 28px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: calc(12px * var(--font-scale)); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+        }
+        .icon-btn.danger { background: var(--danger); }
+        
+        .transaction-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 10px; 
+            background: var(--bg-color); 
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            align-items: center; 
+        }
+        
         .transaction-amount { font-weight: bold; font-size: calc(14px * var(--font-scale)); margin-right: 8px; }
         .transaction-amount.income { color: var(--income-color); }
         .transaction-amount.expense { color: var(--expense-color); }
-        .transaction-actions { display: flex; gap: 4px; }
         
-        .kanban-view { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; }
-        .kanban-column { min-width: 280px; background: var(--card-bg); border-radius: 10px; padding: 10px; box-shadow: 0 2px 10px var(--shadow-color); }
-        .kanban-header { font-weight: 600; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); font-size: calc(13px * var(--font-scale)); }
-        .kanban-task { background: var(--bg-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: move; font-size: calc(12px * var(--font-scale)); border: 2px solid transparent; }
-        .kanban-task.dragging { opacity: 0.5; }
-        /* FIX 3: Kanban task actions styling */
-        .kanban-task-actions { 
-            display: flex; 
-            gap: 5px; 
-            margin-top: 8px; 
-            justify-content: flex-end;
-        }
-        .kanban-done-btn {
-            background: var(--success); 
-            border: none; 
+        /* Modals */
+        .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
+        
+        .fab { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            background: var(--primary-gradient); 
             color: white; 
-            padding: 4px 8px; 
-            border-radius: 4px; 
+            border: none; 
+            font-size: 24px; 
             cursor: pointer; 
-            font-size: calc(11px * var(--font-scale));
+            box-shadow: 0 4px 12px var(--shadow-color); 
+        }
+        .fab:active { transform: scale(0.95); }
+        
+        .fab-menu { 
+            position: absolute; 
+            bottom: 60px; 
+            right: 0; 
+            display: none; 
+            flex-direction: column; 
+            gap: 8px; 
+        }
+        .fab-menu.show { display: flex; }
+        
+        .fab-option { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            padding: 8px 12px; 
+            background: var(--card-bg); 
+            border-radius: 8px; 
+            box-shadow: 0 2px 10px var(--shadow-color); 
+            cursor: pointer; 
+            white-space: nowrap; 
+            font-size: calc(12px * var(--font-scale)); 
         }
         
-        .gantt-container { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); overflow-x: auto; margin-bottom: 15px; }
-        .gantt-header { font-size: calc(14px * var(--font-scale)); font-weight: 600; margin-bottom: 15px; color: var(--text-primary); }
-        .gantt-months { display: flex; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--border-color); }
-        .gantt-month-label { font-size: calc(10px * var(--font-scale)); font-weight: 600; color: var(--text-secondary); padding: 4px 8px; background: var(--bg-color); border-radius: 4px; margin-right: 8px; }
-        .gantt-timeline-header { display: flex; align-items: center; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border-color); }
-        .gantt-timeline-label { width: 150px; font-size: calc(10px * var(--font-scale)); font-weight: 600; color: var(--text-secondary); }
-        .gantt-timeline-dates { flex: 1; display: flex; justify-content: space-between; font-size: calc(9px * var(--font-scale)); color: var(--text-secondary); padding: 0 5px; }
-        .gantt-row { display: flex; align-items: center; margin-bottom: 10px; min-height: 35px; }
-        .gantt-label { width: 150px; font-size: calc(11px * var(--font-scale)); font-weight: 500; color: var(--text-primary); padding-right: 10px; }
-        .gantt-timeline { flex: 1; position: relative; height: 35px; background: var(--bg-color); border-radius: 4px; }
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.5); 
+            justify-content: center; 
+            align-items: center; 
+            z-index: 2000; 
+            padding: 20px; 
+        }
+        .modal.show { display: flex; }
+        
+        .modal-content { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            width: 100%; 
+            max-width: 400px; 
+            max-height: 80vh; 
+            overflow-y: auto; 
+        }
+        
+        .modal-header { 
+            padding: 15px; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+        }
+        
+        .modal-close { font-size: 24px; color: var(--text-secondary); cursor: pointer; }
+        .modal-body { padding: 15px; }
+        .modal-footer { 
+            padding: 12px 15px; 
+            border-top: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: flex-end; 
+            gap: 8px; 
+        }
+        
+        .form-group { margin-bottom: 12px; }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 4px; 
+            font-size: calc(12px * var(--font-scale)); 
+            color: var(--text-secondary); 
+            font-weight: 500; 
+        }
+        
+        .form-group input, .form-group select, .form-group textarea { 
+            width: 100%; 
+            padding: 8px 10px; 
+            border: 1px solid var(--border-color); 
+            border-radius: 6px; 
+            font-size: calc(13px * var(--font-scale)); 
+            background: var(--bg-color); 
+            color: var(--text-primary); 
+        }
+        
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: calc(13px * var(--font-scale)); cursor: pointer; }
+        .btn-primary { background: var(--primary-gradient); color: white; }
+        .btn-secondary { background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
+        
+        /* Settings Panel */
+        .settings-panel { 
+            position: fixed; 
+            top: 0; 
+            right: -100%; 
+            width: 90%; 
+            max-width: 360px; 
+            height: 100vh; 
+            background: var(--card-bg); 
+            box-shadow: -2px 0 10px rgba(0,0,0,0.2); 
+            transition: right 0.3s; 
+            z-index: 3000; 
+            overflow-y: auto; 
+            padding: 20px; 
+        }
+        .settings-panel.show { right: 0; }
+        
+        .settings-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 20px; 
+            padding-bottom: 10px; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        
+        .settings-section { 
+            margin-bottom: 20px; 
+            padding-bottom: 20px; 
+            border-bottom: 1px solid var(--border-color); 
+        }
+        .settings-section:last-child { border-bottom: none; }
+        
+        .toggle-switch { 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            margin-bottom: 10px; 
+        }
+        
+        .toggle-switch input[type="checkbox"] { 
+            width: 44px; 
+            height: 24px; 
+            -webkit-appearance: none; 
+            background: #cbd5e0; 
+            border-radius: 12px; 
+            position: relative; 
+            cursor: pointer; 
+        }
+        .toggle-switch input[type="checkbox"]:checked { background: var(--primary-color); }
+        .toggle-switch input[type="checkbox"]::after { 
+            content: ''; 
+            position: absolute; 
+            top: 2px; 
+            left: 2px; 
+            width: 20px; 
+            height: 20px; 
+            background: white; 
+            border-radius: 50%; 
+            transition: left 0.3s; 
+        }
+        .toggle-switch input[type="checkbox"]:checked::after { left: 22px; }
+        
+        .color-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-top: 10px; }
+        .color-option { 
+            width: 40px; 
+            height: 40px; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            border: 3px solid transparent; 
+            transition: all 0.2s; 
+        }
+        .color-option.active { border-color: var(--text-primary); transform: scale(1.1); }
+        
+        .toast { 
+            position: fixed; 
+            bottom: 80px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: var(--card-bg); 
+            color: var(--text-primary); 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+            z-index: 9999; 
+            opacity: 0; 
+            transition: opacity 0.3s; 
+            font-size: calc(13px * var(--font-scale)); 
+        }
+        .toast.show { opacity: 1; }
+        
+        .empty-state { 
+            text-align: center; 
+            padding: 40px 20px; 
+            color: var(--text-secondary); 
+        }
+        
+        /* Optimized Gantt Chart */
+        .gantt-container { 
+            background: var(--card-bg); 
+            border-radius: 10px; 
+            padding: 15px; 
+            box-shadow: 0 2px 10px var(--shadow-color); 
+            overflow-x: auto; 
+            margin-bottom: 15px; 
+        }
+        
+        .gantt-row { 
+            display: flex; 
+            align-items: center; 
+            margin-bottom: 10px; 
+            min-height: 35px; 
+        }
+        
+        .gantt-label { 
+            width: 150px; 
+            font-size: calc(11px * var(--font-scale)); 
+            font-weight: 500; 
+            color: var(--text-primary); 
+            padding-right: 10px; 
+        }
+        
+        .gantt-timeline { 
+            flex: 1; 
+            position: relative; 
+            height: 35px; 
+            background: var(--bg-color); 
+            border-radius: 4px; 
+        }
+        
         .gantt-bar { 
             position: absolute; 
             height: 100%; 
@@ -245,103 +559,34 @@
             font-size: calc(8px * var(--font-scale)); 
             color: white; 
             font-weight: 500; 
-            line-height: 1.2; 
-            cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
         }
-        .gantt-bar:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-            z-index: 10;
+        
+        /* Kanban View */
+        .kanban-view { 
+            display: flex; 
+            gap: 10px; 
+            overflow-x: auto; 
+            padding-bottom: 10px; 
         }
-        .gantt-bar-dates { font-size: calc(7px * var(--font-scale)); opacity: 0.9; margin-top: 2px; }
         
-        .focus-section { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); margin-bottom: 15px; }
-        .focus-header { font-size: calc(14px * var(--font-scale)); font-weight: 600; margin-bottom: 12px; color: var(--danger); }
+        .kanban-column { 
+            min-width: 280px; 
+            background: var(--card-bg); 
+            border-radius: 10px; 
+            padding: 10px; 
+            box-shadow: 0 2px 10px var(--shadow-color); 
+        }
         
-        .finance-summary { background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color); margin-bottom: 15px; }
-        .finance-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-color); }
-        .finance-row:last-child { border-bottom: none; font-weight: 600; }
-        .finance-label { font-size: calc(12px * var(--font-scale)); color: var(--text-secondary); }
-        .finance-value { font-size: calc(14px * var(--font-scale)); font-weight: 600; }
-        
-        .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 999; }
-        .fab { width: 50px; height: 50px; border-radius: 50%; background: var(--primary-gradient); color: white; border: none; font-size: 24px; cursor: pointer; box-shadow: 0 4px 12px var(--shadow-color); }
-        .fab:active { transform: scale(0.95); }
-        .fab-menu { position: absolute; bottom: 60px; right: 0; display: none; flex-direction: column; gap: 8px; }
-        .fab-menu.show { display: flex; }
-        .fab-option { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 10px var(--shadow-color); cursor: pointer; white-space: nowrap; font-size: calc(12px * var(--font-scale)); }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 2000; padding: 20px; }
-        .modal.show { display: flex; }
-        .modal-content { background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
-        .modal-header { padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
-        .modal-header h2 { font-size: calc(16px * var(--font-scale)); color: var(--text-primary); }
-        .modal-close { font-size: 24px; color: var(--text-secondary); cursor: pointer; }
-        .modal-body { padding: 15px; }
-        .modal-footer { padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 8px; }
-        
-        .form-group { margin-bottom: 12px; }
-        .form-group label { display: block; margin-bottom: 4px; font-size: calc(12px * var(--font-scale)); color: var(--text-secondary); font-weight: 500; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 8px 10px; border: 1px solid var(--border-color); border-radius: 6px; font-size: calc(13px * var(--font-scale)); background: var(--bg-color); color: var(--text-primary); }
-        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: calc(13px * var(--font-scale)); cursor: pointer; }
-        .btn-primary { background: var(--primary-gradient); color: white; }
-        .btn-secondary { background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
-        
-        .settings-panel { position: fixed; top: 0; right: -100%; width: 90%; max-width: 360px; height: 100vh; background: var(--card-bg); box-shadow: -2px 0 10px rgba(0,0,0,0.2); transition: right 0.3s; z-index: 3000; overflow-y: auto; padding: 20px; }
-        .settings-panel.show { right: 0; }
-        .settings-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
-        .settings-title { font-size: 1.25rem; font-weight: bold; color: var(--text-primary); }
-        .close-settings { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-primary); padding: 0.25rem; }
-        .settings-section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color); }
-        .settings-section:last-child { border-bottom: none; }
-        .settings-label { font-size: calc(13px * var(--font-scale)); font-weight: 600; color: var(--text-secondary); margin-bottom: 10px; display: block; }
-        .settings-info { font-size: 0.8125rem; color: var(--text-secondary); margin-bottom: 0.5rem; line-height: 1.5; }
-        .toggle-switch { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-        .toggle-switch input[type="checkbox"] { width: 44px; height: 24px; -webkit-appearance: none; background: #cbd5e0; border-radius: 12px; position: relative; cursor: pointer; }
-        .toggle-switch input[type="checkbox"]:checked { background: var(--primary-color); }
-        .toggle-switch input[type="checkbox"]::after { content: ''; position: absolute; top: 2px; left: 2px; width: 20px; height: 20px; background: white; border-radius: 50%; transition: left 0.3s; }
-        .toggle-switch input[type="checkbox"]:checked::after { left: 22px; }
-        
-        .api-section-highlight { background: linear-gradient(135deg, #e0f2fe 0%, #dbeafe 100%); border: 3px solid var(--primary-color); padding: 1.25rem; border-radius: 0.5rem; margin-bottom: 1.5rem; }
-        body.night-mode .api-section-highlight { background: linear-gradient(135deg, rgba(120, 153, 179, 0.3) 0%, rgba(88, 121, 163, 0.3) 100%); }
-        
-        .api-input-group { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; }
-        .api-input-group input { flex: 1; padding: 0.625rem; border: 2px solid var(--border-color); border-radius: 0.375rem; font-size: 0.875rem; background: var(--card-bg); color: var(--text-primary); }
-        .api-status { padding: 0.625rem; border-radius: 0.375rem; font-size: 0.8125rem; margin-bottom: 0.75rem; text-align: center; font-weight: 600; }
-        .api-status.connected { background: #d1fae5; color: #065f46; }
-        .api-status.disconnected { background: #fee2e2; color: #991b1b; }
-        
-        .contrast-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; margin-bottom: 1rem; }
-        .contrast-btn { padding: 0.5rem; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary); border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; }
-        .contrast-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-        
-        .font-size-buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem; margin-top: 0.5rem; }
-        .font-size-btn { padding: 0.5rem; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-primary); border-radius: 0.375rem; font-size: 0.75rem; cursor: pointer; transition: all 0.2s; text-align: center; }
-        .font-size-btn.active { background: var(--primary-color); color: white; border-color: var(--primary-color); }
-        
-        .color-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 10px; max-height: 250px; overflow-y: auto; padding: 5px; border: 1px solid var(--border-color); border-radius: 6px; }
-        .color-option { width: 35px; height: 35px; border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s; }
-        .color-option:hover { transform: scale(1.1); border-color: var(--text-secondary); }
-        .color-option.active { border-color: var(--text-primary); transform: scale(1.1); box-shadow: 0 0 0 3px rgba(255,255,255,0.3); }
-        
-        .toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: var(--card-bg); color: var(--text-primary); padding: 12px 20px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 9999; opacity: 0; transition: opacity 0.3s; font-size: calc(13px * var(--font-scale)); }
-        .toast.show { opacity: 1; }
-        
-        #cloudStatus { position: fixed; top: 120px; left: 50%; transform: translateX(-50%); background: var(--primary-color); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.8125rem; z-index: 1000; transition: all 0.3s; opacity: 0; pointer-events: none; max-width: 90%; text-align: center; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        #cloudStatus.show { opacity: 1; }
-        
-        #startup-sync-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 9999; align-items: center; justify-content: center; backdrop-filter: blur(4px); }
-        .sync-overlay-content { background: var(--card-bg); padding: 2rem; border-radius: 1rem; text-align: center; max-width: 340px; box-shadow: 0 20px 50px rgba(0,0,0,0.3); }
-        .sync-spinner { font-size: 3rem; margin-bottom: 1rem; animation: spin 2s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        @keyframes progress { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-        
-        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
+        .kanban-task { 
+            background: var(--bg-color); 
+            padding: 10px; 
+            border-radius: 8px; 
+            margin-bottom: 8px; 
+            cursor: move; 
+            font-size: calc(12px * var(--font-scale)); 
+            border: 2px solid transparent; 
+        }
+        .kanban-task.dragging { opacity: 0.5; }
         
         @media (min-width: 768px) {
             .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
@@ -352,214 +597,121 @@
 </head>
 <body>
     <div class="app-container">
-        <div class="header">
-            <div class="header-content">
-                <div class="header-left" onclick="showProfileModal()">
-                    <div>
-                        <h1 id="headerName">🏗️ Builder Pro</h1>
-                        <div class="header-subtitle" id="headerPosition">Project Manager</div>
+        <!-- Fixed Header Section -->
+        <div class="fixed-header-section">
+            <div class="header">
+                <div class="header-content">
+                    <div class="header-left" onclick="showProfileModal()">
+                        <div>
+                            <h1 id="headerName">🏗️ Builder Pro</h1>
+                            <div class="header-subtitle" id="headerPosition">Project Manager</div>
+                        </div>
+                    </div>
+                    <div class="header-controls">
+                        <button class="header-btn" onclick="manualSync()" title="Sync">
+                            🔄
+                            <span class="sync-indicator" id="syncIndicator"></span>
+                        </button>
+                        <button class="header-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
                     </div>
                 </div>
-                <div class="header-controls">
-                    <button class="header-btn" onclick="manualStartupSync()" title="Smart Sync - Pull, Merge & Push">
-                        🔄
-                        <span class="sync-indicator" id="syncIndicator"></span>
-                    </button>
-                    <button class="header-btn" onclick="toggleSettings()" title="Settings">⚙️</button>
+                <div class="sync-status-bar" id="syncStatusBar">
+                    <span id="deviceType"></span> • 
+                    <span id="lastSyncTime">Never synced</span> • 
+                    <span id="syncMode">Offline</span>
                 </div>
             </div>
-            <div class="sync-status-bar" id="syncStatusBar">
-                <span id="deviceType"></span> • 
-                <span id="lastSyncTime">Never synced</span> • 
-                <span id="syncMode">Offline</span>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="switchView('home')">Home</div>
+                <div class="tab" onclick="switchView('kanban')">Kanban</div>
+                <div class="tab" onclick="switchView('projects')">Projects</div>
+                <div class="tab" onclick="switchView('schedule')">Schedule</div>
             </div>
-        </div>
-        
-        <div class="tabs">
-            <div class="tab active" onclick="switchView('home')">Home</div>
-            <div class="tab" onclick="switchView('kanban')">Kanban</div>
-            <div class="tab" onclick="switchView('projects')">Projects</div>
-            <div class="tab" onclick="switchView('schedule')">Schedule</div>
-        </div>
 
-        <div class="stats-bar">
-            <div class="stat-card">
-                <h3 id="totalProjects">0</h3>
-                <p>Projects</p>
-            </div>
-            <div class="stat-card">
-                <h3 id="totalTasks">0</h3>
-                <p>Tasks</p>
-            </div>
-            <div class="stat-card income">
-                <h3 id="totalIncome">$0</h3>
-                <p>Income</p>
-            </div>
-            <div class="stat-card expense">
-                <h3 id="totalExpenses">$0</h3>
-                <p>Expenses</p>
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <h3 id="totalProjects">0</h3>
+                    <p>Projects</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="totalTasks">0</h3>
+                    <p>Tasks</p>
+                </div>
+                <div class="stat-card income">
+                    <h3 id="totalIncome">$0</h3>
+                    <p>Income</p>
+                </div>
+                <div class="stat-card expense">
+                    <h3 id="totalExpenses">$0</h3>
+                    <p>Expenses</p>
+                </div>
             </div>
         </div>
 
-        <div class="container" id="mainContent"></div>
+        <!-- Main Content Area -->
+        <div class="main-content-wrapper">
+            <div class="container" id="mainContent"></div>
+        </div>
     </div>
 
-    <div class="settings-panel" id="settings-panel">
+    <!-- Settings Panel -->
+    <div class="settings-panel" id="settingsPanel">
         <div class="settings-header">
-            <span class="settings-title">Settings</span>
-            <button class="close-settings" onclick="toggleSettings()">✕</button>
-        </div>
-        
-        <div style="background: #dbeafe; border: 2px solid #3b82f6; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1rem; font-size: 0.75rem;">
-            <strong>📊 System Status:</strong><br>
-            API Key: <span id="debug-api-key">Not set</span><br>
-            Device: <span id="debug-device">Unknown</span><br>
-            Local Data: <span id="debug-local-count">0 projects, 0 tasks</span><br>
-            <strong style="color: #16a34a;">✨ Smart Merge: Data never lost!</strong><br>
-            <strong style="color: #ef4444;">🗑️ Permanent Delete: Syncs deletion to cloud</strong><br>
-            <strong style="color: #3b82f6;" id="debug-auto-sync-info">Auto-sync: Disabled</strong><br>
-            <br>
-            <div style="background: #fef3c7; padding: 0.5rem; border-radius: 0.25rem; margin-top: 0.5rem; font-size: 0.6875rem; color: #92400e;">
-                <strong>💡 Tip:</strong> Check browser console (F12) for detailed sync logs
-            </div>
-        </div>
-        
-        <div class="settings-section api-section-highlight">
-            <label class="settings-label" style="font-size: 1rem; margin-bottom: 0.75rem;">🔑 API Key Setup</label>
-            <div class="api-status" id="apiStatus">Not Connected</div>
-            
-            <div class="api-input-group">
-                <input type="password" id="apiKeyInput" placeholder="Enter JSONBin API Key" class="form-input">
-                <button class="btn btn-primary" onclick="saveApiKey()" style="width: auto;">Save</button>
-            </div>
-            
-            <div class="settings-info">
-                Get your free API key from <a href="https://jsonbin.io" target="_blank" style="color: var(--primary-color); text-decoration: underline;">jsonbin.io</a>
-            </div>
-            
-            <button class="btn btn-secondary" onclick="removeApiKey()" style="font-size: 0.8125rem;">Remove API Key</button>
+            <span style="font-size: 1.25rem; font-weight: bold;">Settings</span>
+            <button onclick="toggleSettings()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
         </div>
         
         <div class="settings-section">
-            <label class="settings-label">⚡ Auto Sync</label>
+            <label style="display: block; font-weight: 600; margin-bottom: 10px;">🔑 API Key</label>
+            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                <input type="password" id="apiKeyInput" placeholder="Enter JSONBin API Key" style="flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
+                <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
+            </div>
+            <button class="btn btn-secondary" onclick="removeApiKey()">Remove API Key</button>
+        </div>
+        
+        <div class="settings-section">
             <div class="toggle-switch">
-                <span class="settings-info" style="margin: 0; flex: 1;">Sync on app open + every 5 minutes</span>
-                <input type="checkbox" id="auto-sync-toggle" onchange="toggleAutoSync()">
+                <span>⚡ Auto Sync</span>
+                <input type="checkbox" id="autoSyncToggle" onchange="toggleAutoSync()">
             </div>
-            <div class="settings-info" id="autoSyncStatus">Auto-sync is disabled</div>
-            <div class="settings-info" style="background: #dbeafe; padding: 0.5rem; border-radius: 0.375rem; margin-top: 0.5rem;">
-                <strong>💡 When enabled:</strong><br>
-                • Syncs automatically when you open the app<br>
-                • Syncs every 5 minutes in background<br>
-                • Always have latest data from all users<br>
-                • Permanent deletes sync across all devices
-            </div>
+            <button class="btn btn-primary" onclick="syncData()" style="width: 100%;">Manual Sync Now</button>
         </div>
         
         <div class="settings-section">
-            <label class="settings-label">📊 Sync Status</label>
-            <div class="settings-info">
-                Device: <strong id="settingsDevice">Mobile</strong><br>
-                Mode: <strong id="settingsMode">Manual Sync Only</strong><br>
-                Last Sync: <strong id="settingsLastSync">Never</strong>
-            </div>
-            <button class="btn btn-primary" onclick="syncData()" style="margin-bottom: 0.5rem;">Manual Sync Now</button>
-            <button class="btn btn-secondary" onclick="forceCloudPull()">Force Pull from Cloud</button>
-        </div>
-        
-        <div class="settings-section">
-            <label class="settings-label">🔤 Font Size</label>
-            <div class="font-size-buttons">
-                <button class="font-size-btn" onclick="setFontSize('s')" id="font-s">S</button>
-                <button class="font-size-btn" onclick="setFontSize('m')" id="font-m">M</button>
-                <button class="font-size-btn" onclick="setFontSize('l')" id="font-l">L</button>
-                <button class="font-size-btn" onclick="setFontSize('xl')" id="font-xl">XL</button>
-                <button class="font-size-btn" onclick="setFontSize('xxl')" id="font-xxl">XXL</button>
-            </div>
-        </div>
-        
-        <div class="settings-section">
-            <label class="settings-label">🎨 Page Contrast</label>
-            <div class="contrast-buttons">
-                <button class="contrast-btn" onclick="setContrast('normal')" id="contrast-normal">Normal</button>
-                <button class="contrast-btn" onclick="setContrast('low')" id="contrast-low">Low</button>
-                <button class="contrast-btn" onclick="setContrast('high')" id="contrast-high">High</button>
-                <button class="contrast-btn" onclick="setContrast('extra')" id="contrast-extra">Extra High</button>
+            <label style="display: block; font-weight: 600; margin-bottom: 10px;">🔤 Font Size</label>
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
+                <button class="btn btn-secondary" onclick="setFontSize('s')">S</button>
+                <button class="btn btn-secondary" onclick="setFontSize('m')">M</button>
+                <button class="btn btn-secondary" onclick="setFontSize('l')">L</button>
+                <button class="btn btn-secondary" onclick="setFontSize('xl')">XL</button>
+                <button class="btn btn-secondary" onclick="setFontSize('xxl')">XXL</button>
             </div>
         </div>
         
         <div class="settings-section">
             <div class="toggle-switch">
-                <span class="settings-label" style="margin: 0;">🌙 Night Mode</span>
-                <input type="checkbox" id="night-toggle" onchange="toggleNightMode()">
+                <span>🌙 Night Mode</span>
+                <input type="checkbox" id="nightToggle" onchange="toggleNightMode()">
             </div>
         </div>
         
-        .settings-section {
-            <label class="settings-label">🎨 Color Theme</label>
+        <div class="settings-section">
+            <label style="display: block; font-weight: 600; margin-bottom: 10px;">🎨 Theme Color</label>
             <div class="color-grid" id="colorGrid"></div>
         </div>
         
         <div class="settings-section">
-            <label class="settings-label">🎨 Color Toning</label>
-            <div class="form-group">
-                <label style="font-size: 0.75rem;">Brightness: <span id="brightnessValue">100%</span></label>
-                <input type="range" id="brightnessSlider" min="50" max="150" value="100" onchange="adjustColorToning()" style="width: 100%;">
-            </div>
-            <div class="form-group">
-                <label style="font-size: 0.75rem;">Saturation: <span id="saturationValue">100%</span></label>
-                <input type="range" id="saturationSlider" min="0" max="200" value="100" onchange="adjustColorToning()" style="width: 100%;">
-            </div>
-            <button class="btn btn-secondary" onclick="resetColorToning()" style="width: 100%; font-size: 0.75rem;">Reset to Default</button>
-        </div>
-        
-        <div class="settings-section">
-            <label class="settings-label">🔊 Sync Sound Settings</label>
-            <div class="toggle-switch" style="margin-bottom: 10px;">
-                <span class="settings-info" style="margin: 0; flex: 1;">Enable Sync Sounds</span>
-                <input type="checkbox" id="sound-toggle" onchange="toggleSyncSound()">
-            </div>
-            <div id="soundOptions" style="display: none;">
-                <label style="font-size: 0.75rem; margin-bottom: 5px; display: block;">Choose Sound:</label>
-                <select id="soundSelect" onchange="previewSound()" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; margin-bottom: 10px;">
-                    <option value="bell">Bell 🔔</option>
-                    <option value="chime">Chime 🎵</option>
-                    <option value="ding">Ding 🛎️</option>
-                    <option value="whoosh">Whoosh 💨</option>
-                    <option value="pop">Pop 🎈</option>
-                    <option value="click">Click 🖱️</option>
-                </select>
-                <div class="form-group">
-                    <label style="font-size: 0.75rem;">Volume: <span id="soundVolumeValue">30%</span></label>
-                    <input type="range" id="soundVolumeSlider" min="10" max="100" value="30" onchange="adjustSoundVolume()" style="width: 100%;">
-                </div>
-                <button class="btn btn-secondary" onclick="testSound()" style="width: 100%; font-size: 0.75rem;">🔊 Test Sound</button>
-            </div>
-        </div>
-        
-        <div class="settings-section">
-            <button class="btn btn-primary" onclick="exportData()">📤 Export Data</button>
-            <label class="btn btn-success" style="display: block; text-align: center; margin-top: 10px;">
+            <button class="btn btn-primary" onclick="exportData()" style="width: 100%;">📤 Export Data</button>
+            <label class="btn btn-success" style="display: block; text-align: center; margin-top: 10px; width: 100%;">
                 📥 Import Data
                 <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
             </label>
         </div>
     </div>
 
-    <div id="cloudStatus"></div>
-    
-    <div id="startup-sync-overlay">
-        <div class="sync-overlay-content">
-            <div class="sync-spinner">🔄</div>
-            <div style="font-size: 1.25rem; font-weight: bold; color: var(--text-primary); margin-bottom: 0.5rem;">Smart Sync in Progress</div>
-            <div style="font-size: 0.875rem; color: var(--text-secondary); margin-bottom: 1rem;" id="sync-progress-text">Pulling latest data from cloud...</div>
-            <div style="width: 100%; height: 4px; background: var(--border-color); border-radius: 2px; overflow: hidden; margin-bottom: 0.75rem;">
-                <div style="width: 100%; height: 100%; background: var(--primary-color); animation: progress 2s ease-in-out infinite;"></div>
-            </div>
-            <div style="font-size: 0.75rem; color: var(--text-secondary);">Merging data from all users...</div>
-        </div>
-    </div>
-
+    <!-- FAB Menu -->
     <div class="fab-container">
         <div class="fab-menu" id="fabMenu">
             <div class="fab-option" onclick="showProjectModal()">
@@ -578,6 +730,7 @@
         <button class="fab" onclick="toggleFabMenu()">+</button>
     </div>
 
+    <!-- Modals -->
     <div class="modal" id="profileModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -629,12 +782,6 @@
                 <div class="form-group">
                     <label>Description</label>
                     <textarea id="projectDescription" rows="3"></textarea>
-                </div>
-                <div class="form-group">
-                    <div class="toggle-switch">
-                        <span style="font-size: 0.875rem;">🔒 Lock Project (prevent editing)</span>
-                        <input type="checkbox" id="projectLocked">
-                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -688,14 +835,6 @@
                         <input type="date" id="taskDue">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label>Assignee</label>
-                    <input type="text" id="taskAssignee" placeholder="Worker name">
-                </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="taskDescription" rows="3"></textarea>
-                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('taskModal')">Cancel</button>
@@ -734,10 +873,6 @@
                     <label>Date *</label>
                     <input type="date" id="transDate">
                 </div>
-                <div class="form-group">
-                    <label>Description</label>
-                    <textarea id="transDescription" rows="3"></textarea>
-                </div>
             </div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" onclick="closeModal('transactionModal')">Cancel</button>
@@ -746,301 +881,16 @@
         </div>
     </div>
 
-    <div class="modal" id="projectDetailModal">
-        <div class="modal-content" style="max-width: 600px;">
-            <div class="modal-header">
-                <h2 id="projectDetailTitle"></h2>
-                <span class="modal-close" onclick="closeModal('projectDetailModal')">×</span>
-            </div>
-            <div class="modal-body" id="projectDetailBody"></div>
-            <div class="modal-footer">
-                <button class="btn btn-secondary" onclick="closeModal('projectDetailModal')">Close</button>
-            </div>
-        </div>
-    </div>
-
     <div class="toast" id="toast"></div>
 
     <script>
-        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        const deviceType = isMobile ? 'Mobile' : 'Laptop';
-        
-        let autoSyncInterval = null;
-        const AUTO_SYNC_INTERVAL = 5 * 60 * 1000;
-        
-        class MobileFirstCloudSync {
-            constructor() {
-                this.binId = '68e121b8ae596e708f05df17';
-                this.apiKey = localStorage.getItem('builderProSyncApiKey') || '';
-                this.baseUrl = 'https://api.jsonbin.io/v3';
-                this.lastSyncTime = parseInt(localStorage.getItem('lastSyncTime')) || 0;
-                this.isMobile = isMobile;
-                this.isSyncing = false;
-                this.syncQueue = false;
-            }
-            
-            async setup() {
-                if (!this.apiKey) return false;
-                return true;
-            }
-            
-            async push(forceUpdate = false) {
-                if (this.isSyncing) {
-                    this.syncQueue = true;
-                    return false;
-                }
-                
-                if (!await this.setup()) {
-                    this.showStatus('⚠️ No API key set');
-                    return false;
-                }
-                
-                this.isSyncing = true;
-                updateSyncStatus('Syncing...', true);
-                
-                try {
-                    console.log('Step 1: Pulling latest cloud data...');
-                    const pullResponse = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
-                        headers: { 'X-Master-Key': this.apiKey }
-                    });
-                    
-                    let cloudData = { projects: [], tasks: [], transactions: [], deletedItems: [] };
-                    if (pullResponse.ok) {
-                        const result = await pullResponse.json();
-                        cloudData = result.record;
-                        console.log('Cloud data retrieved:', cloudData);
-                    }
-                    
-                    console.log('Step 2: Merging deleted items first...');
-                    
-                    // Merge deleted items lists first
-                    const localDeleted = data.deletedItems || [];
-                    const cloudDeleted = cloudData.deletedItems || [];
-                    const mergedDeleted = [...cloudDeleted];
-                    
-                    localDeleted.forEach(d => {
-                        if (!mergedDeleted.find(cd => cd.id === d.id)) {
-                            mergedDeleted.push(d);
-                        }
-                    });
-                    
-                    // Create a set of all deleted IDs for quick lookup
-                    const deletedIds = new Set(mergedDeleted.map(d => d.id));
-                    
-                    console.log('Deleted items to exclude:', deletedIds);
-                    
-                    // Apply deletions to local data first
-                    data.projects = data.projects.filter(p => !deletedIds.has(p.id));
-                    data.tasks = data.tasks.filter(t => !deletedIds.has(t.id));
-                    data.transactions = data.transactions.filter(t => !deletedIds.has(t.id));
-                    
-                    // Apply deletions to cloud data
-                    cloudData.projects = (cloudData.projects || []).filter(p => !deletedIds.has(p.id));
-                    cloudData.tasks = (cloudData.tasks || []).filter(t => !deletedIds.has(t.id));
-                    cloudData.transactions = (cloudData.transactions || []).filter(t => !deletedIds.has(t.id));
-                    
-                    console.log('Step 3: Merging non-deleted data...');
-                    
-                    // Now merge the cleaned data
-                    const mergedProjects = this.mergeData(cloudData.projects || [], data.projects, 'id');
-                    const mergedTasks = this.mergeData(cloudData.tasks || [], data.tasks, 'id');
-                    const mergedTransactions = this.mergeData(cloudData.transactions || [], data.transactions, 'id');
-                    
-                    // Clean up deleted tasks from projects
-                    mergedTasks.forEach(task => {
-                        if (deletedIds.has(task.projectId)) {
-                            deletedIds.add(task.id);
-                            mergedDeleted.push({
-                                id: task.id,
-                                type: 'task',
-                                deletedAt: new Date().toISOString(),
-                                deletedBy: deviceType,
-                                reason: 'project_deleted'
-                            });
-                        }
-                    });
-                    
-                    // Final filter to ensure no deleted items remain
-                    const finalProjects = mergedProjects.filter(p => !deletedIds.has(p.id));
-                    const finalTasks = mergedTasks.filter(t => !deletedIds.has(t.id) && !deletedIds.has(t.projectId));
-                    const finalTransactions = mergedTransactions.filter(t => !deletedIds.has(t.id) && !deletedIds.has(t.projectId));
-                    
-                    console.log('Merge complete:', {
-                        projects: finalProjects.length,
-                        tasks: finalTasks.length,
-                        transactions: finalTransactions.length,
-                        deleted: mergedDeleted.length
-                    });
-                    
-                    const pushData = {
-                        projects: finalProjects,
-                        tasks: finalTasks,
-                        transactions: finalTransactions,
-                        deletedItems: mergedDeleted,
-                        currentUser: data.currentUser,
-                        userPosition: data.userPosition,
-                        themeColor: data.themeColor,
-                        nightMode: data.nightMode,
-                        fontSize: data.fontSize,
-                        contrast: localStorage.getItem('contrast'),
-                        lastUpdated: new Date().toISOString(),
-                        lastUpdateDevice: deviceType,
-                        version: '2.1'
-                    };
-                    
-                    console.log('Step 4: Pushing merged data to cloud...');
-                    const response = await fetch(`${this.baseUrl}/b/${this.binId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': this.apiKey
-                        },
-                        body: JSON.stringify(pushData)
-                    });
-                    
-                    if (response.ok) {
-                        data.projects = finalProjects;
-                        data.tasks = finalTasks;
-                        data.transactions = finalTransactions;
-                        data.deletedItems = mergedDeleted;
-                        
-                        saveData();
-                        renderView();
-                        
-                        console.log('✅ Sync complete with permanent delete support!');
-                        
-                        this.lastSyncTime = Date.now();
-                        localStorage.setItem('lastSyncTime', this.lastSyncTime.toString());
-                        this.showStatus('☁️ Synced & Merged');
-                        updateSyncStatus('Synced', false);
-                        updateLastSyncDisplay();
-                        playSound(selectedSound); // Play sync sound
-                        this.isSyncing = false;
-                        
-                        if (this.syncQueue) {
-                            this.syncQueue = false;
-                            setTimeout(() => this.push(), 2000);
-                        }
-                        
-                        return true;
-                    } else {
-                        console.error('Push failed:', response.status);
-                        this.showStatus(`⚠️ Sync failed (${response.status})`);
-                        updateSyncStatus('Sync Failed', false);
-                        this.isSyncing = false;
-                        return false;
-                    }
-                } catch (error) {
-                    console.error('Push error:', error);
-                    this.showStatus('🔵 Offline - Data saved locally');
-                    updateSyncStatus('Offline', false);
-                    this.isSyncing = false;
-                    return false;
-                }
-            }
-            
-            mergeData(cloudArray, localArray, uniqueKey) {
-                // First, get all deleted item IDs
-                const allDeletedIds = new Set();
-                if (data.deletedItems) {
-                    data.deletedItems.forEach(item => allDeletedIds.add(item.id));
-                }
-                
-                // Start with cloud data, but exclude deleted items
-                const merged = cloudArray.filter(item => !allDeletedIds.has(item[uniqueKey]));
-                const cloudIds = new Set(cloudArray.map(item => item[uniqueKey]));
-                
-                // Add local items that aren't in cloud and aren't deleted
-                localArray.forEach(localItem => {
-                    if (!allDeletedIds.has(localItem[uniqueKey])) {
-                        if (!cloudIds.has(localItem[uniqueKey])) {
-                            merged.push(localItem);
-                        } else {
-                            // Update existing item if local is newer
-                            const cloudItemIndex = merged.findIndex(item => item[uniqueKey] === localItem[uniqueKey]);
-                            if (cloudItemIndex !== -1) {
-                                const cloudItem = merged[cloudItemIndex];
-                                if (localItem.timestamp && (!cloudItem.timestamp || new Date(localItem.timestamp) > new Date(cloudItem.timestamp))) {
-                                    merged[cloudItemIndex] = localItem;
-                                }
-                            }
-                        }
-                    }
-                });
-                
-                // Final filter to ensure no deleted items
-                return merged.filter(item => !allDeletedIds.has(item[uniqueKey]));
-            }
-            
-            async pull(force = false) {
-                if (!await this.setup()) {
-                    this.showStatus('⚠️ No API key set');
-                    return false;
-                }
-                
-                updateSyncStatus('Loading...', true);
-                
-                try {
-                    const response = await fetch(`${this.baseUrl}/b/${this.binId}/latest`, {
-                        headers: { 'X-Master-Key': this.apiKey }
-                    });
-                    
-                    if (response.ok) {
-                        const result = await response.json();
-                        const cloudData = result.record;
-                        
-                        if (force || confirm(`Replace local data with cloud data from ${cloudData.lastUpdateDevice || 'unknown'}?`)) {
-                            this.applyCloudData(cloudData);
-                            this.lastSyncTime = Date.now();
-                            localStorage.setItem('lastSyncTime', this.lastSyncTime.toString());
-                            this.showStatus('☁️ Loaded from cloud');
-                            updateSyncStatus('Synced', false);
-                            updateLastSyncDisplay();
-                            return true;
-                        }
-                    }
-                    return false;
-                } catch (error) {
-                    console.error('Pull error:', error);
-                    this.showStatus('🔵 Offline');
-                    updateSyncStatus('Offline', false);
-                    return false;
-                }
-            }
-            
-            applyCloudData(cloudData) {
-                data.projects = cloudData.projects || [];
-                data.tasks = cloudData.tasks || [];
-                data.transactions = cloudData.transactions || [];
-                data.deletedItems = cloudData.deletedItems || [];
-                data.currentUser = cloudData.currentUser || 'Builder Pro';
-                data.userPosition = cloudData.userPosition || 'Project Manager';
-                data.themeColor = cloudData.themeColor || 0;
-                data.nightMode = cloudData.nightMode || false;
-                data.fontSize = cloudData.fontSize || 'm';
-                
-                saveData();
-                applyThemeColor(data.themeColor);
-                setFontSize(data.fontSize);
-                updateHeader();
-                if (data.nightMode) {
-                    document.body.classList.add('night-mode');
-                    document.getElementById('night-toggle').checked = true;
-                }
-                renderView();
-            }
-            
-            showStatus(message) {
-                const status = document.getElementById('cloudStatus');
-                if (status) {
-                    status.textContent = message;
-                    status.classList.add('show');
-                    setTimeout(() => status.classList.remove('show'), 3000);
-                }
-            }
-        }
-
-        const cloudSync = new MobileFirstCloudSync();
+        // Core App State
+        const APP_CONFIG = {
+            binId: '68e121b8ae596e708f05df17',
+            baseUrl: 'https://api.jsonbin.io/v3',
+            autoSyncInterval: 5 * 60 * 1000,
+            deviceType: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Laptop'
+        };
 
         let data = {
             currentUser: 'Builder Pro',
@@ -1052,600 +902,70 @@
             deletedItems: [],
             nightMode: false,
             themeColor: 0,
-            fontSize: 'm',
-            scheduleView: 'week',
-            lastUpdated: null,
-            syncVersion: 0,
-            timelineFilter: 'all',
-            assigneeTemplates: ['John Smith', 'Jane Doe', 'Mike Johnson', 'Sarah Wilson', 'Tom Brown']
+            fontSize: 'm'
         };
 
         const themeColors = [
-            // Darker, muted pestle/stone colors (36 choices)
-            { name: 'Charcoal Black', primary: '#1a1a1a', gradient: 'linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%)' },
-            { name: 'Obsidian', primary: '#0d0d0d', gradient: 'linear-gradient(135deg, #0d0d0d 0%, #262626 100%)' },
-            { name: 'Graphite', primary: '#2b2b2b', gradient: 'linear-gradient(135deg, #2b2b2b 0%, #3d3d3d 100%)' },
-            { name: 'Dark Slate', primary: '#2f3542', gradient: 'linear-gradient(135deg, #2f3542 0%, #47525d 100%)' },
-            { name: 'Midnight Blue', primary: '#1e3a5f', gradient: 'linear-gradient(135deg, #1e3a5f 0%, #2d4a7b 100%)' },
-            { name: 'Deep Navy', primary: '#1a2332', gradient: 'linear-gradient(135deg, #1a2332 0%, #2c3e50 100%)' },
-            { name: 'Dark Teal', primary: '#1a3d3d', gradient: 'linear-gradient(135deg, #1a3d3d 0%, #2d5555 100%)' },
-            { name: 'Forest Shadow', primary: '#1a2e1a', gradient: 'linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%)' },
-            { name: 'Burnt Umber', primary: '#3d2817', gradient: 'linear-gradient(135deg, #3d2817 0%, #5c3d26 100%)' },
-            { name: 'Dark Chocolate', primary: '#2e1a0e', gradient: 'linear-gradient(135deg, #2e1a0e 0%, #4a2c1a 100%)' },
-            { name: 'Espresso', primary: '#3c2415', gradient: 'linear-gradient(135deg, #3c2415 0%, #533226 100%)' },
-            { name: 'Dark Walnut', primary: '#33261a', gradient: 'linear-gradient(135deg, #33261a 0%, #4d3d2d 100%)' },
-            { name: 'Mahogany', primary: '#420c0c', gradient: 'linear-gradient(135deg, #420c0c 0%, #5c1a1a 100%)' },
-            { name: 'Oxblood', primary: '#4a0e0e', gradient: 'linear-gradient(135deg, #4a0e0e 0%, #661a1a 100%)' },
-            { name: 'Burgundy Wine', primary: '#3d0814', gradient: 'linear-gradient(135deg, #3d0814 0%, #5c1426 100%)' },
-            { name: 'Dark Maroon', primary: '#2d0a0a', gradient: 'linear-gradient(135deg, #2d0a0a 0%, #4a1a1a 100%)' },
-            { name: 'Eggplant', primary: '#311432', gradient: 'linear-gradient(135deg, #311432 0%, #4a2650 100%)' },
-            { name: 'Deep Purple', primary: '#2d1b4e', gradient: 'linear-gradient(135deg, #2d1b4e 0%, #3d2d6b 100%)' },
-            { name: 'Midnight Purple', primary: '#1f1033', gradient: 'linear-gradient(135deg, #1f1033 0%, #332650 100%)' },
-            { name: 'Dark Plum', primary: '#3d1e3d', gradient: 'linear-gradient(135deg, #3d1e3d 0%, #5c2d5c 100%)' },
-            { name: 'Iron Grey', primary: '#3a3a3c', gradient: 'linear-gradient(135deg, #3a3a3c 0%, #4d4d50 100%)' },
-            { name: 'Pewter', primary: '#4a4a4d', gradient: 'linear-gradient(135deg, #4a4a4d 0%, #5c5c60 100%)' },
-            { name: 'Lead', primary: '#2d2d30', gradient: 'linear-gradient(135deg, #2d2d30 0%, #404045 100%)' },
-            { name: 'Basalt', primary: '#3d3d40', gradient: 'linear-gradient(135deg, #3d3d40 0%, #505055 100%)' },
-            { name: 'Dark Olive', primary: '#2d331a', gradient: 'linear-gradient(135deg, #2d331a 0%, #404626 100%)' },
-            { name: 'Moss Stone', primary: '#33402d', gradient: 'linear-gradient(135deg, #33402d 0%, #4a5940 100%)' },
-            { name: 'Sage Shadow', primary: '#3d4a40', gradient: 'linear-gradient(135deg, #3d4a40 0%, #4d5c50 100%)' },
-            { name: 'Dark Jade', primary: '#1a332d', gradient: 'linear-gradient(135deg, #1a332d 0%, #2d4a40 100%)' },
-            { name: 'Hunter Green', primary: '#1a261a', gradient: 'linear-gradient(135deg, #1a261a 0%, #2d3d2d 100%)' },
-            { name: 'Pine Bark', primary: '#261a14', gradient: 'linear-gradient(135deg, #261a14 0%, #3d2d26 100%)' },
-            { name: 'Dark Sienna', primary: '#331a0d', gradient: 'linear-gradient(135deg, #331a0d 0%, #4a2d1a 100%)' },
-            { name: 'Rusty Brown', primary: '#402618', gradient: 'linear-gradient(135deg, #402618 0%, #5c3d2d 100%)' },
-            { name: 'Dark Taupe', primary: '#3d332d', gradient: 'linear-gradient(135deg, #3d332d 0%, #504540 100%)' },
-            { name: 'Shadow Grey', primary: '#333333', gradient: 'linear-gradient(135deg, #333333 0%, #454545 100%)' },
-            { name: 'Storm Cloud', primary: '#3a3d45', gradient: 'linear-gradient(135deg, #3a3d45 0%, #4d5260 100%)' },
-            { name: 'Volcanic Ash', primary: '#3d3a3a', gradient: 'linear-gradient(135deg, #3d3a3a 0%, #504d4d 100%)' }
+            { name: 'Pebble Brown', primary: '#6b5d56', gradient: 'linear-gradient(135deg, #6b5d56 0%, #8a7a72 100%)' },
+            { name: 'Ocean Blue', primary: '#0f4c81', gradient: 'linear-gradient(135deg, #0f4c81 0%, #1e6fa8 100%)' },
+            { name: 'Forest', primary: '#2d5016', gradient: 'linear-gradient(135deg, #2d5016 0%, #4a7c2d 100%)' },
+            { name: 'Purple', primary: '#6b46c1', gradient: 'linear-gradient(135deg, #6b46c1 0%, #9333ea 100%)' },
+            { name: 'Sunset', primary: '#d97706', gradient: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' },
+            { name: 'Rose', primary: '#be185d', gradient: 'linear-gradient(135deg, #be185d 0%, #db2777 100%)' }
         ];
 
-        const expenseCategories = ['Materials', 'Labor', 'Tools & Equipment', 'Transportation', 'Permits', 'Subcontractors', 'Other'];
-        const incomeCategories = ['Project Payment', 'Deposit', 'Final Payment', 'Other Income'];
+        const categories = {
+            expense: ['Materials', 'Labor', 'Equipment', 'Transport', 'Permits', 'Other'],
+            income: ['Payment', 'Deposit', 'Final Payment', 'Other']
+        };
 
-        let editingProjectId = null;
-        let editingTaskId = null;
-        let editingTransactionId = null;
-        let draggedElement = null;
-        
-        // Sound settings
-        let syncSoundEnabled = false;
-        let selectedSound = 'bell';
-        let soundVolume = 30; // Default to 30% volume for softer sounds
-        
-        // Color toning settings
-        let colorBrightness = 100;
-        let colorSaturation = 100;
-        
-        // Sound functions
-        function playSound(soundType) {
-            if (!syncSoundEnabled) return;
-            
-            const soundMap = {
-                bell: '🔔',
-                chime: '🎵',
-                ding: '🛎️',
-                whoosh: '💨',
-                pop: '🎈',
-                click: '🖱️'
-            };
-            
-            // Create audio context for web audio API sounds
-            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const oscillator = audioContext.createOscillator();
-            const gainNode = audioContext.createGain();
-            
-            oscillator.connect(gainNode);
-            gainNode.connect(audioContext.destination);
-            
-            // Apply volume control (0.01 to 0.3 for softer sounds)
-            const volumeLevel = (soundVolume / 100) * 0.3;
-            
-            switch(soundType) {
-                case 'bell':
-                    oscillator.frequency.value = 600;
-                    oscillator.type = 'sine';
-                    gainNode.gain.setValueAtTime(volumeLevel, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
-                    break;
-                case 'chime':
-                    oscillator.frequency.value = 800;
-                    oscillator.type = 'triangle';
-                    gainNode.gain.setValueAtTime(volumeLevel * 0.7, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
-                    break;
-                case 'ding':
-                    oscillator.frequency.value = 1000;
-                    oscillator.type = 'sine';
-                    gainNode.gain.setValueAtTime(volumeLevel, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.2);
-                    break;
-                case 'whoosh':
-                    oscillator.frequency.value = 300;
-                    oscillator.type = 'sawtooth';
-                    gainNode.gain.setValueAtTime(volumeLevel * 0.5, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.15);
-                    break;
-                case 'pop':
-                    oscillator.frequency.value = 500;
-                    oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(volumeLevel * 0.5, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.08);
-                    break;
-                case 'click':
-                    oscillator.frequency.value = 1200;
-                    oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(volumeLevel * 0.3, audioContext.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.03);
-                    break;
-            }
-            
-            oscillator.start(audioContext.currentTime);
-            oscillator.stop(audioContext.currentTime + 0.6);
-        }
-        
-        function toggleSyncSound() {
-            syncSoundEnabled = document.getElementById('sound-toggle').checked;
-            document.getElementById('soundOptions').style.display = syncSoundEnabled ? 'block' : 'none';
-            localStorage.setItem('syncSoundEnabled', syncSoundEnabled);
-            if (syncSoundEnabled) {
-                localStorage.setItem('selectedSound', selectedSound);
-                localStorage.setItem('soundVolume', soundVolume);
-            }
-        }
-        
-        function previewSound() {
-            selectedSound = document.getElementById('soundSelect').value;
-            localStorage.setItem('selectedSound', selectedSound);
-        }
-        
-        function adjustSoundVolume() {
-            soundVolume = document.getElementById('soundVolumeSlider').value;
-            document.getElementById('soundVolumeValue').textContent = soundVolume + '%';
-            localStorage.setItem('soundVolume', soundVolume);
-        }
-        
-        function testSound() {
-            const tempEnabled = syncSoundEnabled;
-            syncSoundEnabled = true;
-            playSound(selectedSound);
-            syncSoundEnabled = tempEnabled;
-        }
-        
-        // Color toning functions
-        function adjustColorToning() {
-            colorBrightness = document.getElementById('brightnessSlider').value;
-            colorSaturation = document.getElementById('saturationSlider').value;
-            
-            document.getElementById('brightnessValue').textContent = colorBrightness + '%';
-            document.getElementById('saturationValue').textContent = colorSaturation + '%';
-            
-            document.documentElement.style.filter = `brightness(${colorBrightness}%) saturate(${colorSaturation}%)`;
-            
-            localStorage.setItem('colorBrightness', colorBrightness);
-            localStorage.setItem('colorSaturation', colorSaturation);
-        }
-        
-        function resetColorToning() {
-            colorBrightness = 100;
-            colorSaturation = 100;
-            
-            document.getElementById('brightnessSlider').value = 100;
-            document.getElementById('saturationSlider').value = 100;
-            document.getElementById('brightnessValue').textContent = '100%';
-            document.getElementById('saturationValue').textContent = '100%';
-            
-            document.documentElement.style.filter = 'brightness(100%) saturate(100%)';
-            
-            localStorage.setItem('colorBrightness', 100);
-            localStorage.setItem('colorSaturation', 100);
-            showToast('✅ Color toning reset');
-        }
-        
-        function loadColorToningSettings() {
-            colorBrightness = localStorage.getItem('colorBrightness') || 100;
-            colorSaturation = localStorage.getItem('colorSaturation') || 100;
-            
-            if (document.getElementById('brightnessSlider')) {
-                document.getElementById('brightnessSlider').value = colorBrightness;
-                document.getElementById('saturationSlider').value = colorSaturation;
-                document.getElementById('brightnessValue').textContent = colorBrightness + '%';
-                document.getElementById('saturationValue').textContent = colorSaturation + '%';
-                document.documentElement.style.filter = `brightness(${colorBrightness}%) saturate(${colorSaturation}%)`;
-            }
-        }
-        
-        function loadSoundSettings() {
-            syncSoundEnabled = localStorage.getItem('syncSoundEnabled') === 'true';
-            selectedSound = localStorage.getItem('selectedSound') || 'bell';
-            soundVolume = parseInt(localStorage.getItem('soundVolume') || '30');
-            
-            if (document.getElementById('sound-toggle')) {
-                document.getElementById('sound-toggle').checked = syncSoundEnabled;
-                document.getElementById('soundOptions').style.display = syncSoundEnabled ? 'block' : 'none';
-                document.getElementById('soundSelect').value = selectedSound;
-                document.getElementById('soundVolumeSlider').value = soundVolume;
-                document.getElementById('soundVolumeValue').textContent = soundVolume + '%';
-            }
-        }
+        let editingId = null;
+        let editingType = null;
+        let autoSyncInterval = null;
+        let syncApiKey = '';
 
-        // PERMANENT DELETE FUNCTION - Fixed for proper sync
-        function permanentDelete(itemId, itemType) {
-            const confirmMsg = `⚠️ PERMANENT DELETE\n\nThis will permanently remove this ${itemType} from ALL devices when you sync.\n\nThis action cannot be undone. Continue?`;
-            
-            if (!confirm(confirmMsg)) return;
-            
-            // Add to deleted items list
-            if (!data.deletedItems) data.deletedItems = [];
-            
-            // Add with timestamp to ensure proper sync
-            const deleteRecord = {
-                id: itemId,
-                type: itemType,
-                deletedAt: new Date().toISOString(),
-                deletedBy: deviceType,
-                timestamp: Date.now() // Add numeric timestamp for better tracking
-            };
-            
-            data.deletedItems.push(deleteRecord);
-            
-            // Remove from local data immediately
-            if (itemType === 'project') {
-                // Also mark related tasks and transactions as deleted
-                const relatedTasks = data.tasks.filter(t => t.projectId === itemId);
-                const relatedTransactions = data.transactions.filter(t => t.projectId === itemId);
-                
-                relatedTasks.forEach(task => {
-                    data.deletedItems.push({
-                        id: task.id,
-                        type: 'task',
-                        deletedAt: new Date().toISOString(),
-                        deletedBy: deviceType,
-                        timestamp: Date.now(),
-                        reason: 'project_deleted'
-                    });
-                });
-                
-                relatedTransactions.forEach(trans => {
-                    data.deletedItems.push({
-                        id: trans.id,
-                        type: 'transaction',
-                        deletedAt: new Date().toISOString(),
-                        deletedBy: deviceType,
-                        timestamp: Date.now(),
-                        reason: 'project_deleted'
-                    });
-                });
-                
-                // Remove everything
-                data.projects = data.projects.filter(p => p.id !== itemId);
-                data.tasks = data.tasks.filter(t => t.projectId !== itemId);
-                data.transactions = data.transactions.filter(t => t.projectId !== itemId);
-            } else if (itemType === 'task') {
-                data.tasks = data.tasks.filter(t => t.id !== itemId);
-            } else if (itemType === 'transaction') {
-                data.transactions = data.transactions.filter(t => t.id !== itemId);
-            }
-            
-            // Save immediately
-            saveData();
-            
-            // Force immediate sync if API key is set
-            if (cloudSync.apiKey) {
-                cloudSync.push();
-            }
-            
-            renderView();
-            updateStats();
-            showToast('🗑️ Permanently deleted - syncing to cloud');
-            
-            console.log('Item marked for permanent deletion:', deleteRecord);
-        }
-
-        // FIX 3: Mark task as done function - permanently removes task
-        function markTaskDone(taskId) {
-            const confirmMsg = `⚠️ Mark as DONE\n\nThis will permanently remove this task from ALL devices when you sync.\n\nThis action cannot be undone. Continue?`;
-            
-            if (!confirm(confirmMsg)) return;
-            
-            // Add to deleted items list for sync
-            if (!data.deletedItems) data.deletedItems = [];
-            data.deletedItems.push({
-                id: taskId,
-                type: 'task',
-                deletedAt: new Date().toISOString(),
-                deletedBy: deviceType,
-                reason: 'marked_done'
-            });
-            
-            // Remove from local data
-            data.tasks = data.tasks.filter(t => t.id !== taskId);
-            
-            saveData();
-            renderKanban(document.getElementById('mainContent'));
-            updateStats();
-            showToast('✅ Task completed & removed permanently');
-            playSound(selectedSound);
-        }
-
-        // API KEY MANAGEMENT
-        function saveApiKey() {
-            const apiKey = document.getElementById('apiKeyInput').value.trim();
-            if (!apiKey) {
-                alert('Please enter an API key');
-                return;
-            }
-            
-            cloudSync.apiKey = apiKey;
-            fetch(`${cloudSync.baseUrl}/b/${cloudSync.binId}/latest`, {
-                headers: { 'X-Master-Key': apiKey }
-            })
-            .then(response => {
-                if (response.ok) {
-                    localStorage.setItem('builderProSyncApiKey', apiKey);
-                    document.getElementById('apiKeyInput').value = '';
-                    updateApiStatus();
-                    alert('✅ API Key saved successfully!');
-                } else {
-                    cloudSync.apiKey = '';
-                    alert('❌ Invalid API key');
-                }
-            })
-            .catch(() => {
-                cloudSync.apiKey = '';
-                alert('❌ Invalid API key');
-            });
-        }
-        
-        function removeApiKey() {
-            if (confirm('Remove API key? This will disable cloud sync.')) {
-                localStorage.removeItem('builderProSyncApiKey');
-                cloudSync.apiKey = '';
-                stopAutoSync();
-                document.getElementById('auto-sync-toggle').checked = false;
-                localStorage.setItem('autoSyncEnabled', 'false');
-                updateApiStatus();
-                updateAutoSyncStatus();
-                alert('API key removed');
-            }
-        }
-        
-        function updateApiStatus() {
-            const statusEl = document.getElementById('apiStatus');
-            const hasKey = !!cloudSync.apiKey;
-            statusEl.textContent = hasKey ? '✅ Connected' : '❌ Not Connected';
-            statusEl.className = hasKey ? 'api-status connected' : 'api-status disconnected';
-        }
-        
-        function toggleAutoSync() {
-            const enabled = document.getElementById('auto-sync-toggle').checked;
-            if (enabled && !cloudSync.apiKey) {
-                alert('Please set up your API key first');
-                document.getElementById('auto-sync-toggle').checked = false;
-                return;
-            }
-            
-            if (enabled) {
-                startAutoSync();
-                localStorage.setItem('autoSyncEnabled', 'true');
-            } else {
-                stopAutoSync();
-                localStorage.setItem('autoSyncEnabled', 'false');
-            }
-            updateAutoSyncStatus();
-            updateDebugInfo();
-        }
-        
-        function startAutoSync() {
-            if (autoSyncInterval) clearInterval(autoSyncInterval);
-            autoSyncInterval = setInterval(async () => {
-                console.log('🔄 Auto-syncing...');
-                const success = await cloudSync.push();
-                if (success) {
-                    renderView();
-                    showToast('🔄 Auto-synced');
-                }
-                updateDebugInfo();
-            }, AUTO_SYNC_INTERVAL);
-            console.log('✅ Auto-sync enabled');
-        }
-        
-        function stopAutoSync() {
-            if (autoSyncInterval) {
-                clearInterval(autoSyncInterval);
-                autoSyncInterval = null;
-            }
-        }
-        
-        function updateAutoSyncStatus() {
-            const enabled = document.getElementById('auto-sync-toggle').checked;
-            const statusEl = document.getElementById('autoSyncStatus');
-            const settingsModeEl = document.getElementById('settingsMode');
-            
-            if (enabled) {
-                statusEl.textContent = '✅ Auto-sync active (on open + every 5 minutes)';
-                statusEl.style.color = '#065f46';
-                settingsModeEl.textContent = 'Auto Sync (Smart Mode)';
-            } else {
-                statusEl.textContent = '⏸️ Auto-sync is disabled';
-                statusEl.style.color = 'var(--text-secondary)';
-                settingsModeEl.textContent = 'Manual Sync Only';
-            }
-        }
-        
-        function initializeSettings() {
-            updateApiStatus();
-            const autoSyncEnabled = localStorage.getItem('autoSyncEnabled') === 'true';
-            document.getElementById('auto-sync-toggle').checked = autoSyncEnabled;
-            if (autoSyncEnabled && cloudSync.apiKey) startAutoSync();
-            updateAutoSyncStatus();
-        }
-        
-        function updateSyncStatus(status, isLoading) {
-            const statusBar = document.getElementById('syncStatusBar');
-            const syncMode = document.getElementById('syncMode');
-            const settingsDevice = document.getElementById('settingsDevice');
-            
-            document.getElementById('deviceType').textContent = deviceType;
-            settingsDevice.textContent = deviceType;
-            syncMode.textContent = status;
-            
-            statusBar.classList.remove('syncing', 'success', 'error');
-            if (isLoading) {
-                statusBar.classList.add('syncing');
-            } else if (status === 'Synced') {
-                statusBar.classList.add('success');
-                setTimeout(() => statusBar.classList.remove('success'), 2000);
-            }
-        }
-        
-        function updateLastSyncDisplay() {
-            const lastSync = localStorage.getItem('lastSyncTime');
-            if (lastSync) {
-                const date = new Date(parseInt(lastSync));
-                const timeStr = date.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
-                const dateStr = date.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-                document.getElementById('lastSyncTime').textContent = `${dateStr} ${timeStr}`;
-                document.getElementById('settingsLastSync').textContent = `${dateStr} ${timeStr}`;
-            }
-        }
-        
-        async function performStartupSync() {
-            const overlay = document.getElementById('startup-sync-overlay');
-            const progressText = document.getElementById('sync-progress-text');
-            overlay.style.display = 'flex';
-            
-            try {
-                progressText.textContent = 'Pulling latest data from cloud...';
-                await new Promise(resolve => setTimeout(resolve, 300));
-                
-                progressText.textContent = 'Merging data with permanent delete support...';
-                const success = await cloudSync.push();
-                
-                if (success) {
-                    renderView();
-                    progressText.textContent = `✅ Loaded ${data.projects.length} projects, ${data.tasks.length} tasks`;
-                    await new Promise(resolve => setTimeout(resolve, 1500));
-                    showToast(`Synced: ${data.projects.length} projects, ${data.tasks.length} tasks`);
-                } else {
-                    progressText.textContent = '⚠️ Sync failed - using local data';
-                    await new Promise(resolve => setTimeout(resolve, 1500));
-                }
-            } catch (error) {
-                progressText.textContent = '⚠️ Sync failed - using local data';
-                await new Promise(resolve => setTimeout(resolve, 1500));
-            } finally {
-                overlay.style.display = 'none';
-                updateLastSyncDisplay();
-                updateDebugInfo();
-            }
-        }
-        
-        async function syncData() {
-            if (!cloudSync.apiKey) {
-                alert('Please set up your API key first');
-                toggleSettings();
-                return;
-            }
-            const success = await cloudSync.push();
-            if (success) {
-                renderView();
-                showToast('✅ Synced successfully');
-            }
-            updateDebugInfo();
-        }
-        
-        async function manualStartupSync() {
-            if (!cloudSync.apiKey) {
-                alert('Please set up your API key first');
-                return;
-            }
-            await performStartupSync();
-        }
-        
-        async function forceCloudPull() {
-            if (!cloudSync.apiKey) {
-                alert('Please set up your API key first');
-                return;
-            }
-            if (confirm('Replace ALL local data with cloud data?')) {
-                await cloudSync.pull(true);
-                toggleSettings();
-            }
-        }
-        
-        function updateDebugInfo() {
-            document.getElementById('debug-api-key').textContent = cloudSync.apiKey ? `Set (${cloudSync.apiKey.substring(0, 8)}...)` : 'Not set';
-            document.getElementById('debug-device').textContent = deviceType;
-            document.getElementById('debug-local-count').textContent = `${data.projects.length} projects, ${data.tasks.length} tasks, ${data.transactions.length} transactions`;
-            
-            const autoSyncEnabled = document.getElementById('auto-sync-toggle').checked;
-            const autoSyncInfo = document.getElementById('debug-auto-sync-info');
-            if (autoSyncEnabled) {
-                autoSyncInfo.textContent = 'Auto-sync: ✅ Active (on open + every 5 min)';
-                autoSyncInfo.style.color = '#16a34a';
-            } else {
-                autoSyncInfo.textContent = 'Auto-sync: ⏸️ Disabled';
-                autoSyncInfo.style.color = '#6b7280';
-            }
-        }
-        
-        function setFontSize(size) {
-            document.body.classList.remove('font-xs', 'font-s', 'font-m', 'font-l', 'font-xl', 'font-xxl');
-            document.querySelectorAll('.font-size-btn').forEach(btn => btn.classList.remove('active'));
-            
-            document.body.classList.add('font-' + size);
-            document.getElementById('font-' + size).classList.add('active');
-            
-            data.fontSize = size;
-            localStorage.setItem('fontSize', size);
-            saveData();
-        }
-        
-        function loadFontSize() {
-            const savedSize = localStorage.getItem('fontSize') || data.fontSize || 'm';
-            setFontSize(savedSize);
-        }
-        
+        // Initialize App
         document.addEventListener('DOMContentLoaded', function() {
             loadData();
-            initColorPicker();
-            initializeSettings();
-            loadFontSize();
-            loadColorToningSettings();
-            loadSoundSettings();
-            renderView();
+            initUI();
             updateStats();
+            renderView();
+            updateSyncDisplay();
         });
 
-        async function loadData() {
+        // Data Management
+        function loadData() {
             const saved = localStorage.getItem('builderProData');
             if (saved) {
                 data = { ...data, ...JSON.parse(saved) };
             }
-            
-            if (data.nightMode) {
-                document.body.classList.add('night-mode');
-                document.getElementById('night-toggle').checked = true;
-            }
-            
-            applyThemeColor(data.themeColor || 0);
-            setFontSize(data.fontSize || 'm');
-            updateHeader();
-            renderView();
-            
-            const autoSyncEnabled = localStorage.getItem('autoSyncEnabled') === 'true';
-            if (cloudSync.apiKey && autoSyncEnabled) {
-                await performStartupSync();
-            } else {
-                updateLastSyncDisplay();
-            }
+            syncApiKey = localStorage.getItem('builderProSyncApiKey') || '';
+            applySettings();
         }
 
         function saveData() {
             data.lastUpdated = new Date().toISOString();
-            data.syncVersion++;
             localStorage.setItem('builderProData', JSON.stringify(data));
+        }
+
+        function applySettings() {
+            if (data.nightMode) {
+                document.body.classList.add('night-mode');
+                document.getElementById('nightToggle').checked = true;
+            }
+            applyThemeColor(data.themeColor || 0);
+            setFontSize(data.fontSize || 'm');
+            updateHeader();
+        }
+
+        // UI Functions
+        function initUI() {
+            initColorPicker();
+            document.getElementById('deviceType').textContent = APP_CONFIG.deviceType;
+            
+            const autoSyncEnabled = localStorage.getItem('autoSyncEnabled') === 'true';
+            document.getElementById('autoSyncToggle').checked = autoSyncEnabled;
+            if (autoSyncEnabled && syncApiKey) startAutoSync();
         }
 
         function initColorPicker() {
@@ -1656,16 +976,18 @@
                 div.className = 'color-option' + (index === data.themeColor ? ' active' : '');
                 div.style.background = color.gradient;
                 div.title = color.name;
-                div.onclick = () => {
-                    data.themeColor = index;
-                    applyThemeColor(index);
-                    saveData();
-                    document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
-                    div.classList.add('active');
-                    showToast('✅ Theme updated');
-                };
+                div.onclick = () => selectThemeColor(index);
                 grid.appendChild(div);
             });
+        }
+
+        function selectThemeColor(index) {
+            data.themeColor = index;
+            applyThemeColor(index);
+            saveData();
+            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.color-option')[index].classList.add('active');
+            showToast('Theme updated');
         }
 
         function applyThemeColor(index) {
@@ -1679,27 +1001,11 @@
             document.getElementById('headerPosition').textContent = data.userPosition;
         }
 
-        function showProfileModal() {
-            document.getElementById('profileName').value = data.currentUser;
-            document.getElementById('profilePosition').value = data.userPosition;
-            document.getElementById('profileModal').classList.add('show');
-        }
-
-        function saveProfile() {
-            data.currentUser = document.getElementById('profileName').value || 'Builder Pro';
-            data.userPosition = document.getElementById('profilePosition').value || 'Project Manager';
-            updateHeader();
+        function setFontSize(size) {
+            document.body.classList.remove('font-s', 'font-m', 'font-l', 'font-xl', 'font-xxl');
+            document.body.classList.add('font-' + size);
+            data.fontSize = size;
             saveData();
-            closeModal('profileModal');
-            showToast('✅ Profile updated');
-        }
-
-        function toggleSettings() {
-            const panel = document.getElementById('settings-panel');
-            panel.classList.toggle('show');
-            if (panel.classList.contains('show')) {
-                updateDebugInfo();
-            }
         }
 
         function toggleNightMode() {
@@ -1708,63 +1014,12 @@
             saveData();
         }
 
-        function setContrast(level) {
-            document.body.classList.remove('low-contrast', 'high-contrast', 'extra-high-contrast');
-            document.querySelectorAll('.contrast-btn').forEach(btn => btn.classList.remove('active'));
-            
-            if (level === 'low') {
-                document.body.classList.add('low-contrast');
-                document.getElementById('contrast-low').classList.add('active');
-            } else if (level === 'high') {
-                document.body.classList.add('high-contrast');
-                document.getElementById('contrast-high').classList.add('active');
-            } else if (level === 'extra') {
-                document.body.classList.add('extra-high-contrast');
-                document.getElementById('contrast-extra').classList.add('active');
-            } else {
-                document.getElementById('contrast-normal').classList.add('active');
-            }
-            
-            localStorage.setItem('contrast', level);
+        function toggleSettings() {
+            document.getElementById('settingsPanel').classList.toggle('show');
         }
 
-        function exportData() {
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'builder-pro-' + new Date().toISOString().split('T')[0] + '.json';
-            a.click();
-            URL.revokeObjectURL(url);
-            showToast('✅ Data exported');
-            toggleSettings();
-        }
-
-        function importData(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const importedData = JSON.parse(e.target.result);
-                        if (confirm('Replace all data?')) {
-                            data = { ...data, ...importedData };
-                        } else {
-                            data.projects = [...data.projects, ...(importedData.projects || [])];
-                            data.tasks = [...data.tasks, ...(importedData.tasks || [])];
-                            data.transactions = [...data.transactions, ...(importedData.transactions || [])];
-                        }
-                        saveData();
-                        renderView();
-                        updateStats();
-                        showToast('✅ Data imported');
-                        toggleSettings();
-                    } catch (error) {
-                        showToast('❌ Error importing data');
-                    }
-                };
-                reader.readAsText(file);
-            }
+        function toggleFabMenu() {
+            document.getElementById('fabMenu').classList.toggle('show');
         }
 
         function showToast(message) {
@@ -1774,6 +1029,11 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
 
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // View Management
         function switchView(view) {
             data.currentView = view;
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -1791,183 +1051,77 @@
             }
         }
 
-        function filterTasksByTimeline(tasks) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            if (data.timelineFilter === 'all') return tasks;
-            
-            return tasks.filter(task => {
-                const dueDate = new Date(task.dueDate);
-                dueDate.setHours(0, 0, 0, 0);
-                
-                if (data.timelineFilter === 'day') {
-                    return dueDate.getTime() === today.getTime();
-                } else if (data.timelineFilter === 'week') {
-                    const weekEnd = new Date(today);
-                    weekEnd.setDate(today.getDate() + 7);
-                    return dueDate >= today && dueDate <= weekEnd;
-                } else if (data.timelineFilter === 'month') {
-                    const monthEnd = new Date(today);
-                    monthEnd.setMonth(today.getMonth() + 1);
-                    return dueDate >= today && dueDate <= monthEnd;
-                }
-                return true;
-            });
-        }
-
-        function renderTimelineFilters() {
-            return `
-                <div class="timeline-filters">
-                    <button class="filter-btn ${data.timelineFilter === 'all' ? 'active' : ''}" onclick="setTimelineFilter('all')">All</button>
-                    <button class="filter-btn ${data.timelineFilter === 'day' ? 'active' : ''}" onclick="setTimelineFilter('day')">Today</button>
-                    <button class="filter-btn ${data.timelineFilter === 'week' ? 'active' : ''}" onclick="setTimelineFilter('week')">This Week</button>
-                    <button class="filter-btn ${data.timelineFilter === 'month' ? 'active' : ''}" onclick="setTimelineFilter('month')">This Month</button>
-                </div>
-            `;
-        }
-
-        function setTimelineFilter(filter) {
-            data.timelineFilter = filter;
-            renderView();
-        }
-
-        function calculateTaskDuration(startDate, dueDate) {
-            if (!startDate || !dueDate) return null;
-            const start = new Date(startDate);
-            const due = new Date(dueDate);
-            const diffTime = Math.abs(due - start);
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-            return diffDays;
-        }
-
         function renderHome(container) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
+            const income = data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const profit = income - expenses;
             
-            const totalIncome = data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-            const totalExpenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-            const netProfit = totalIncome - totalExpenses;
-            
-            const allDueTasks = data.tasks.filter(t => {
-                const dueDate = new Date(t.dueDate);
-                dueDate.setHours(0, 0, 0, 0);
-                return dueDate <= today && t.status !== 'Completed';
-            });
-            
-            const dueTasks = filterTasksByTimeline(allDueTasks);
-            
-            let html = '';
-            
-            html += `
-                <div class="finance-summary">
-                    <h3 style="font-size: 14px; font-weight: 600; margin-bottom: 12px;">💰 Finance Summary</h3>
-                    <div class="finance-row">
-                        <span class="finance-label">Total Income</span>
-                        <span class="finance-value" style="color: var(--income-color);">$${totalIncome.toFixed(2)}</span>
-                    </div>
-                    <div class="finance-row">
-                        <span class="finance-label">Total Expenses</span>
-                        <span class="finance-value" style="color: var(--expense-color);">$${totalExpenses.toFixed(2)}</span>
-                    </div>
-                    <div class="finance-row">
-                        <span class="finance-label">Net Profit</span>
-                        <span class="finance-value" style="color: ${netProfit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${netProfit.toFixed(2)}</span>
+            let html = `
+                <div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
+                    <h3 style="font-size: 14px; margin-bottom: 12px;">💰 Finance Summary</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">Income</div>
+                            <div style="font-size: 18px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">Expenses</div>
+                            <div style="font-size: 18px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 11px; color: var(--text-secondary);">Profit</div>
+                            <div style="font-size: 18px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${profit.toFixed(2)}</div>
+                        </div>
                     </div>
                 </div>
             `;
             
-            html += renderTimelineFilters();
+            if (data.projects.length > 0) {
+                html += renderGanttChart();
+            }
             
-            html += `
-                <div class="focus-section">
-                    <div class="focus-header">🎯 Priority Tasks (${dueTasks.length} Due)</div>
-            `;
+            const dueTasks = data.tasks.filter(t => {
+                const due = new Date(t.dueDate);
+                const today = new Date();
+                return due <= today && t.status !== 'Completed';
+            });
             
-            if (dueTasks.length === 0) {
-                html += '<p class="empty-state" style="padding: 20px;">No tasks due in this period!</p>';
-            } else {
+            if (dueTasks.length > 0) {
+                html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
+                html += '<h3 style="font-size: 14px; margin-bottom: 12px; color: var(--danger);">🎯 Due Tasks</h3>';
                 dueTasks.forEach(task => {
                     const project = data.projects.find(p => p.id === task.projectId);
-                    const duration = calculateTaskDuration(task.startDate, task.dueDate);
                     html += `
                         <div class="task-item overdue">
                             <div class="task-info">
                                 <div class="task-title">${task.name}</div>
-                                <div class="task-meta">
-                                    ${project ? project.name : 'No Project'} • Due: ${task.dueDate} • ${task.priority} Priority
-                                </div>
-                                ${duration ? `<div class="task-duration">📅 Duration: ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
+                                <div class="task-meta">${project ? project.name : 'No Project'} • ${task.dueDate}</div>
                             </div>
-                            <div class="task-actions">
-                                <button class="icon-btn" onclick="editTask(${task.id})" title="Edit">✏️</button>
-                                <button class="icon-btn danger" onclick="permanentDelete(${task.id}, 'task')" title="Permanent Delete">🗑️</button>
-                            </div>
+                            <button class="icon-btn" onclick="editTask(${task.id})">✏️</button>
                         </div>
                     `;
                 });
+                html += '</div>';
             }
             
-            html += '</div>';
-            html += renderGanttChart();
-            
-            container.innerHTML = html;
+            container.innerHTML = html || '<div class="empty-state">No data yet. Click + to get started!</div>';
         }
 
         function renderGanttChart() {
-            if (data.projects.length === 0) return '<div class="empty-state">No projects to display</div>';
-            
-            let html = '<div class="gantt-container"><div class="gantt-header">📅 Project Timeline</div>';
-            
-            let minDate = new Date();
-            let maxDate = new Date();
-            
-            data.projects.forEach(p => {
-                if (p.startDate) {
-                    const start = new Date(p.startDate);
-                    if (start < minDate) minDate = start;
-                }
-                if (p.endDate) {
-                    const end = new Date(p.endDate);
-                    if (end > maxDate) maxDate = end;
-                }
-            });
-            
-            // Get unique months
-            const months = [];
-            let current = new Date(minDate);
-            while (current <= maxDate) {
-                months.push(current.toLocaleDateString('en', { month: 'short', year: 'numeric' }));
-                current.setMonth(current.getMonth() + 1);
-            }
-            
-            html += '<div class="gantt-months">';
-            months.forEach(month => {
-                html += `<div class="gantt-month-label">${month}</div>`;
-            });
-            html += '</div>';
-            
-            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
+            let html = '<div class="gantt-container"><h3 style="font-size: 14px; margin-bottom: 15px;">📅 Project Timeline</h3>';
             
             data.projects.forEach(project => {
                 if (project.startDate && project.endDate) {
                     const start = new Date(project.startDate);
                     const end = new Date(project.endDate);
-                    const startOffset = Math.ceil((start - minDate) / (1000 * 60 * 60 * 24));
                     const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-                    const width = (duration / totalDays) * 100;
-                    const left = (startOffset / totalDays) * 100;
-                    
-                    const startStr = start.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-                    const endStr = end.toLocaleDateString('en', { month: 'short', day: 'numeric' });
                     
                     html += `
                         <div class="gantt-row">
-                            <div class="gantt-label" onclick="showProjectDetail(${project.id})" style="cursor: pointer;">${project.name}</div>
+                            <div class="gantt-label">${project.name}</div>
                             <div class="gantt-timeline">
-                                <div class="gantt-bar" onclick="showProjectDetail(${project.id})" style="left: ${left}%; width: ${width}%;">
-                                    <div>${duration}d</div>
-                                    <div class="gantt-bar-dates">${startStr} - ${endStr}</div>
+                                <div class="gantt-bar" style="width: ${Math.min(100, duration * 2)}%;">
+                                    ${duration}d
                                 </div>
                             </div>
                         </div>
@@ -1979,48 +1133,35 @@
             return html;
         }
 
-        // FIX 3: Updated renderKanban to exclude completed tasks and add done buttons
         function renderKanban(container) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            // Filter out completed tasks from all columns
-            const dueTasks = data.tasks.filter(t => {
-                const dueDate = new Date(t.dueDate);
-                dueDate.setHours(0, 0, 0, 0);
-                return dueDate <= today && t.status !== 'Completed';
-            });
-            
-            const inProgressTasks = data.tasks.filter(t => t.status === 'In Progress');
-            const getReadyTasks = data.tasks.filter(t => (t.status === 'Get Ready' || !t.status || t.status === 'Not Started') && t.status !== 'Completed');
-            
             const columns = [
-                { title: 'Due Now', tasks: dueTasks, status: 'Due' },
-                { title: 'In Progress', tasks: inProgressTasks, status: 'In Progress' },
-                { title: 'Get Ready', tasks: getReadyTasks, status: 'Get Ready' }
+                { title: 'Get Ready', status: 'Get Ready', tasks: [] },
+                { title: 'In Progress', status: 'In Progress', tasks: [] },
+                { title: 'Completed', status: 'Completed', tasks: [] }
             ];
+            
+            data.tasks.forEach(task => {
+                const column = columns.find(c => c.status === task.status) || columns[0];
+                column.tasks.push(task);
+            });
             
             let html = '<div class="kanban-view">';
             columns.forEach(column => {
                 html += `
                     <div class="kanban-column">
-                        <div class="kanban-header">${column.title} (${column.tasks.length})</div>
-                        <div class="kanban-tasks" data-status="${column.status}">
+                        <h3 style="font-size: 14px; margin-bottom: 10px;">${column.title} (${column.tasks.length})</h3>
+                        <div ondrop="dropTask(event, '${column.status}')" ondragover="allowDrop(event)">
                 `;
                 
                 column.tasks.forEach(task => {
                     const project = data.projects.find(p => p.id === task.projectId);
-                    const duration = calculateTaskDuration(task.startDate, task.dueDate);
                     html += `
-                        <div class="kanban-task" draggable="true" data-task-id="${task.id}" ondragstart="dragStart(event)" ondragend="dragEnd(event)">
-                            <div style="font-weight: 500; margin-bottom: 5px;">${task.name}</div>
-                            <div style="font-size: 11px; color: var(--text-secondary);">${project ? project.name : 'No Project'}</div>
-                            <div style="margin-top: 5px; font-size: 10px;">📅 ${task.dueDate}</div>
-                            ${duration ? `<div style="margin-top: 3px; font-size: 10px; color: var(--primary-color); font-weight: 600;">⏱️ ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
-                            <div style="margin-top: 5px; font-size: 10px;">${task.priority} Priority</div>
-                            <div class="kanban-task-actions">
-                                <button class="kanban-done-btn" onclick="event.stopPropagation(); markTaskDone(${task.id})">✓ Done</button>
+                        <div class="kanban-task" draggable="true" ondragstart="dragTask(event, ${task.id})">
+                            <div style="font-weight: 500;">${task.name}</div>
+                            <div style="font-size: 11px; color: var(--text-secondary); margin-top: 5px;">
+                                ${project ? project.name : 'No Project'}
                             </div>
+                            <div style="font-size: 10px; margin-top: 5px;">📅 ${task.dueDate}</div>
                         </div>
                     `;
                 });
@@ -2030,14 +1171,8 @@
             html += '</div>';
             
             container.innerHTML = html;
-            
-            document.querySelectorAll('.kanban-tasks').forEach(column => {
-                column.addEventListener('dragover', dragOver);
-                column.addEventListener('drop', dragDrop);
-            });
         }
 
-        // FIX 2: Updated renderProjects with better click handling
         function renderProjects(container) {
             if (data.projects.length === 0) {
                 container.innerHTML = '<div class="empty-state">No projects yet. Click + to create one!</div>';
@@ -2046,41 +1181,35 @@
             
             let html = '';
             data.projects.forEach(project => {
-                const projectTasks = data.tasks.filter(t => t.projectId === project.id);
-                const projectTransactions = data.transactions.filter(t => t.projectId === project.id);
-                
-                const income = projectTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-                const expenses = projectTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-                const profit = income - expenses;
-                
-                const isLocked = project.locked || false;
+                const tasks = data.tasks.filter(t => t.projectId === project.id);
+                const transactions = data.transactions.filter(t => t.projectId === project.id);
+                const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+                const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
                 
                 html += `
-                    <div class="project-card ${isLocked ? 'locked' : ''}" onclick="showProjectDetail(${project.id})">
+                    <div class="project-card">
                         <div class="project-header">
-                            <div style="cursor: pointer;">
-                                <h3>${project.name} ${isLocked ? '🔒' : ''}</h3>
-                                <div class="project-meta">Client: ${project.client}</div>
-                                ${project.startDate ? `<div class="project-meta">${project.startDate} to ${project.endDate || 'Ongoing'}</div>` : ''}
-                            </div>
+                            <h3>${project.name}</h3>
+                            <div class="project-meta">Client: ${project.client}</div>
                             <div class="project-stats">
                                 <div class="project-stat">
                                     <div class="project-stat-label">Tasks</div>
-                                    <div class="project-stat-value">${projectTasks.length}</div>
+                                    <div class="project-stat-value">${tasks.length}</div>
                                 </div>
                                 <div class="project-stat">
                                     <div class="project-stat-label">Income</div>
-                                    <div class="project-stat-value" style="color: var(--income-color);">${income.toFixed(0)}</div>
+                                    <div class="project-stat-value" style="color: var(--income-color);">$${income.toFixed(0)}</div>
                                 </div>
                                 <div class="project-stat">
                                     <div class="project-stat-label">Profit</div>
-                                    <div class="project-stat-value" style="color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">${profit.toFixed(0)}</div>
+                                    <div class="project-stat-value" style="color: ${income - expenses >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">
+                                        $${(income - expenses).toFixed(0)}
+                                    </div>
                                 </div>
                             </div>
-                            <div class="project-actions" onclick="event.stopPropagation();">
-                                <button class="action-btn" onclick="event.stopPropagation(); editProject(${project.id})" ${isLocked ? 'disabled' : ''}>Edit</button>
-                                <button class="action-btn" onclick="event.stopPropagation(); permanentDelete(${project.id}, 'project')">Delete</button>
-                                <button class="action-btn" onclick="event.stopPropagation(); toggleProjectLock(${project.id})">${isLocked ? 'Unlock' : 'Lock'}</button>
+                            <div class="project-actions">
+                                <button class="action-btn" onclick="event.stopPropagation(); editProject(${project.id})">Edit</button>
+                                <button class="action-btn" onclick="event.stopPropagation(); deleteItem(${project.id}, 'project')">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -2090,353 +1219,121 @@
             container.innerHTML = html;
         }
 
-        function toggleProjectLock(projectId) {
-            const project = data.projects.find(p => p.id === projectId);
-            if (project) {
-                project.locked = !project.locked;
-                saveData();
-                renderView();
-                showToast(project.locked ? '🔒 Project locked' : '🔓 Project unlocked');
-            }
-        }
-
         function renderSchedule(container) {
-            let html = '';
-            
-            html += `
-                <div class="schedule-view-filters">
-                    <button class="view-btn ${data.scheduleView === 'day' ? 'active' : ''}" onclick="setScheduleView('day')">Day</button>
-                    <button class="view-btn ${data.scheduleView === 'week' ? 'active' : ''}" onclick="setScheduleView('week')">Week</button>
-                    <button class="view-btn ${data.scheduleView === 'month' ? 'active' : ''}" onclick="setScheduleView('month')">Month</button>
-                </div>
-            `;
-            
-            html += renderTaskGanttChart();
-            
             const sortedTasks = [...data.tasks].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate));
-            const filteredTasks = filterTasksByScheduleView(sortedTasks);
             
-            if (filteredTasks.length === 0) {
-                html += '<div class="empty-state">No tasks scheduled for this period</div>';
+            let html = '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
+            html += '<h3 style="font-size: 14px; margin-bottom: 15px;">📋 All Tasks</h3>';
+            
+            if (sortedTasks.length === 0) {
+                html += '<p class="empty-state">No tasks scheduled</p>';
             } else {
-                html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
-                html += '<h3 style="font-size: 14px; font-weight: 600; margin-bottom: 15px;">📋 Task List</h3>';
-                
-                filteredTasks.forEach(task => {
+                sortedTasks.forEach(task => {
                     const project = data.projects.find(p => p.id === task.projectId);
-                    const today = new Date();
-                    today.setHours(0, 0, 0, 0);
-                    const dueDate = new Date(task.dueDate);
-                    dueDate.setHours(0, 0, 0, 0);
-                    const isOverdue = dueDate < today && task.status !== 'Completed';
-                    const duration = calculateTaskDuration(task.startDate, task.dueDate);
+                    const isCompleted = task.status === 'Completed';
                     
                     html += `
-                        <div class="task-item ${task.status === 'Completed' ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
+                        <div class="task-item ${isCompleted ? 'completed' : ''}">
                             <div class="task-info">
                                 <div class="task-title">${task.name}</div>
                                 <div class="task-meta">
                                     ${project ? project.name : 'No Project'} • 
-                                    ${task.startDate ? `${task.startDate} to ` : ''}${task.dueDate} • 
-                                    ${task.status || 'Get Ready'} • 
-                                    ${task.priority} Priority
+                                    ${task.dueDate} • 
+                                    ${task.status} • 
+                                    ${task.priority}
                                 </div>
-                                ${duration ? `<div class="task-duration">📅 Duration: ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
                             </div>
-                            <div class="task-actions">
-                                <button class="icon-btn" onclick="editTask(${task.id})" title="Edit">✏️</button>
-                                <button class="icon-btn danger" onclick="permanentDelete(${task.id}, 'task')" title="Permanent Delete">🗑️</button>
+                            <div style="display: flex; gap: 4px;">
+                                <button class="icon-btn" onclick="editTask(${task.id})">✏️</button>
+                                <button class="icon-btn danger" onclick="deleteItem(${task.id}, 'task')">🗑️</button>
                             </div>
                         </div>
                     `;
                 });
-                
-                html += '</div>';
             }
             
+            html += '</div>';
             container.innerHTML = html;
         }
 
-        function setScheduleView(view) {
-            data.scheduleView = view;
-            saveData();
-            renderView();
-        }
-
-        function filterTasksByScheduleView(tasks) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            return tasks.filter(task => {
-                const startDate = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
-                const dueDate = new Date(task.dueDate);
-                startDate.setHours(0, 0, 0, 0);
-                dueDate.setHours(0, 0, 0, 0);
-                
-                if (data.scheduleView === 'day') {
-                    return (startDate.getTime() === today.getTime() || dueDate.getTime() === today.getTime() ||
-                           (startDate <= today && dueDate >= today));
-                } else if (data.scheduleView === 'week') {
-                    const weekEnd = new Date(today);
-                    weekEnd.setDate(today.getDate() + 7);
-                    return (startDate <= weekEnd && dueDate >= today);
-                } else if (data.scheduleView === 'month') {
-                    const monthEnd = new Date(today);
-                    monthEnd.setMonth(today.getMonth() + 1);
-                    return (startDate <= monthEnd && dueDate >= today);
-                }
-                return true;
-            });
-        }
-
-        function renderTaskGanttChart() {
-            const filteredTasks = filterTasksByScheduleView([...data.tasks]);
-            
-            if (filteredTasks.length === 0) {
-                return '<div class="empty-state">No tasks to display in Gantt chart</div>';
-            }
-            
-            let html = '<div class="gantt-container"><div class="gantt-header">📊 Task Schedule Gantt Chart</div>';
-            
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            let minDate = today;
-            let maxDate = today;
-            
-            if (data.scheduleView === 'day') {
-                maxDate = new Date(today);
-            } else if (data.scheduleView === 'week') {
-                maxDate = new Date(today);
-                maxDate.setDate(today.getDate() + 7);
-            } else if (data.scheduleView === 'month') {
-                maxDate = new Date(today);
-                maxDate.setMonth(today.getMonth() + 1);
-            }
-            
-            filteredTasks.forEach(task => {
-                if (task.startDate) {
-                    const start = new Date(task.startDate);
-                    start.setHours(0, 0, 0, 0);
-                    if (start < minDate) minDate = start;
-                }
-                const due = new Date(task.dueDate);
-                due.setHours(0, 0, 0, 0);
-                if (due > maxDate) maxDate = due;
-            });
-            
-            // Get unique months
-            const months = [];
-            let current = new Date(minDate);
-            while (current <= maxDate) {
-                months.push(current.toLocaleDateString('en', { month: 'short', year: 'numeric' }));
-                current.setMonth(current.getMonth() + 1);
-            }
-            
-            html += '<div class="gantt-months">';
-            months.forEach(month => {
-                html += `<div class="gantt-month-label">${month}</div>`;
-            });
-            html += '</div>';
-            
-            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
-            
-            filteredTasks.forEach(task => {
-                const startDate = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
-                const dueDate = new Date(task.dueDate);
-                startDate.setHours(0, 0, 0, 0);
-                dueDate.setHours(0, 0, 0, 0);
-                
-                const startOffset = Math.max(0, Math.ceil((startDate - minDate) / (1000 * 60 * 60 * 24)));
-                const duration = Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-                const width = (duration / totalDays) * 100;
-                const left = (startOffset / totalDays) * 100;
-                
-                const startStr = startDate.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-                const endStr = dueDate.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-                
-                html += `
-                    <div class="gantt-row">
-                        <div class="gantt-label">${task.name}</div>
-                        <div class="gantt-timeline">
-                            <div class="gantt-bar" style="left: ${left}%; width: ${width}%;">
-                                <div>${duration}d</div>
-                                <div class="gantt-bar-dates">${startStr} - ${endStr}</div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            return html;
-        }
-
-        function showProjectDetail(projectId) {
-            const project = data.projects.find(p => p.id === projectId);
-            if (!project) return;
-            
-            const projectTasks = data.tasks.filter(t => t.projectId === projectId);
-            const projectTransactions = data.transactions.filter(t => t.projectId === projectId);
-            
-            const income = projectTransactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-            const expenses = projectTransactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-            const profit = income - expenses;
-            
-            document.getElementById('projectDetailTitle').textContent = project.name + (project.locked ? ' 🔒' : '');
-            
-            let html = '<div style="max-height: 60vh; overflow-y: auto;">';
-            
-            html += `
-                <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="font-size: 13px; margin-bottom: 10px;">💰 Finances</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                        <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Income</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Expenses</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Profit</div>
-                            <div style="font-size: 16px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">$${profit.toFixed(2)}</div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            html += `
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
-                    <button class="btn btn-success" onclick="closeModal('projectDetailModal'); showTransactionModal('income', ${projectId})">+ Income</button>
-                    <button class="btn btn-danger" onclick="closeModal('projectDetailModal'); showTransactionModal('expense', ${projectId})">+ Expense</button>
-                </div>
-                <button class="btn btn-primary" style="width: 100%; margin-bottom: 15px;" onclick="closeModal('projectDetailModal'); showTaskModal(${projectId})">+ Add Task</button>
-            `;
-            
-            html += '<h4 style="font-size: 13px; margin-bottom: 10px;">📋 Tasks (' + projectTasks.length + ')</h4>';
-            if (projectTasks.length === 0) {
-                html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No tasks yet</p>';
-            } else {
-                projectTasks.forEach(task => {
-                    const duration = calculateTaskDuration(task.startDate, task.dueDate);
-                    html += `
-                        <div class="task-item ${task.status === 'Completed' ? 'completed' : ''}">
-                            <div class="task-info">
-                                <div class="task-title">${task.name}</div>
-                                <div class="task-meta">${task.dueDate} • ${task.priority} • ${task.status || 'Get Ready'}</div>
-                                ${duration ? `<div class="task-duration">📅 ${duration} day${duration !== 1 ? 's' : ''}</div>` : ''}
-                            </div>
-                            <div class="task-actions">
-                                <button class="icon-btn" onclick="editTask(${task.id}); closeModal('projectDetailModal');" title="Edit">✏️</button>
-                                <button class="icon-btn danger" onclick="permanentDelete(${task.id}, 'task'); closeModal('projectDetailModal');" title="Permanent Delete">🗑️</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            html += '<h4 style="font-size: 13px; margin: 15px 0 10px;">💳 Transactions (' + projectTransactions.length + ')</h4>';
-            if (projectTransactions.length === 0) {
-                html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No transactions yet</p>';
-            } else {
-                projectTransactions.forEach(trans => {
-                    html += `
-                        <div class="transaction-item">
-                            <div class="transaction-info">
-                                <div class="transaction-category">${trans.category}</div>
-                                <div class="transaction-date">${trans.date}</div>
-                            </div>
-                            <div class="transaction-amount ${trans.type}">${trans.type === 'income' ? '+' : '-'}$${trans.amount.toFixed(2)}</div>
-                            <div class="transaction-actions">
-                                <button class="icon-btn" onclick="editTransaction(${trans.id}); closeModal('projectDetailModal');" title="Edit">✏️</button>
-                                <button class="icon-btn danger" onclick="permanentDelete(${trans.id}, 'transaction'); closeModal('projectDetailModal');" title="Permanent Delete">🗑️</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            html += '</div>';
-            
-            document.getElementById('projectDetailBody').innerHTML = html;
-            document.getElementById('projectDetailModal').classList.add('show');
-        }
-
+        // Stats Update
         function updateStats() {
             document.getElementById('totalProjects').textContent = data.projects.length;
             document.getElementById('totalTasks').textContent = data.tasks.length;
             
-            const totalIncome = data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-            const totalExpenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const income = data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
             
-            document.getElementById('totalIncome').textContent = '$' + totalIncome.toFixed(0);
-            document.getElementById('totalExpenses').textContent = '$' + totalExpenses.toFixed(0);
+            document.getElementById('totalIncome').textContent = '$' + income.toFixed(0);
+            document.getElementById('totalExpenses').textContent = '$' + expenses.toFixed(0);
         }
 
-        function toggleFabMenu() {
-            document.getElementById('fabMenu').classList.toggle('show');
+        // CRUD Operations
+        function showProfileModal() {
+            document.getElementById('profileName').value = data.currentUser;
+            document.getElementById('profilePosition').value = data.userPosition;
+            document.getElementById('profileModal').classList.add('show');
+        }
+
+        function saveProfile() {
+            data.currentUser = document.getElementById('profileName').value || 'Builder Pro';
+            data.userPosition = document.getElementById('profilePosition').value || 'Project Manager';
+            updateHeader();
+            saveData();
+            closeModal('profileModal');
+            showToast('Profile updated');
         }
 
         function showProjectModal() {
-            editingProjectId = null;
+            editingId = null;
+            editingType = 'project';
             document.getElementById('projectModalTitle').textContent = 'New Project';
             document.getElementById('projectName').value = '';
             document.getElementById('projectClient').value = '';
-            document.getElementById('projectStart').value = new Date().toISOString().split('T')[0];
+            document.getElementById('projectStart').value = '';
             document.getElementById('projectEnd').value = '';
             document.getElementById('projectDescription').value = '';
-            document.getElementById('projectLocked').checked = false;
             document.getElementById('projectModal').classList.add('show');
             toggleFabMenu();
         }
 
-        function editProject(projectId) {
-            const project = data.projects.find(p => p.id === projectId);
+        function editProject(id) {
+            const project = data.projects.find(p => p.id === id);
             if (!project) return;
             
-            if (project.locked) {
-                showToast('🔒 This project is locked and cannot be edited');
-                return;
-            }
-            
-            editingProjectId = projectId;
+            editingId = id;
+            editingType = 'project';
             document.getElementById('projectModalTitle').textContent = 'Edit Project';
             document.getElementById('projectName').value = project.name;
-            document.getElementById('projectClient').value = project.client || '';
+            document.getElementById('projectClient').value = project.client;
             document.getElementById('projectStart').value = project.startDate || '';
             document.getElementById('projectEnd').value = project.endDate || '';
             document.getElementById('projectDescription').value = project.description || '';
-            document.getElementById('projectLocked').checked = project.locked || false;
             document.getElementById('projectModal').classList.add('show');
         }
 
         function saveProject() {
             const projectData = {
-                name: document.getElementById('projectName').value,
-                client: document.getElementById('projectClient').value,
+                name: document.getElementById('projectName').value.trim(),
+                client: document.getElementById('projectClient').value.trim(),
                 startDate: document.getElementById('projectStart').value,
                 endDate: document.getElementById('projectEnd').value,
-                description: document.getElementById('projectDescription').value,
-                locked: document.getElementById('projectLocked').checked,
-                status: 'active',
-                lastModified: new Date().toISOString(),
-                timestamp: new Date().toISOString()
+                description: document.getElementById('projectDescription').value.trim()
             };
             
             if (!projectData.name || !projectData.client) {
-                showToast('⚠️ Please fill required fields');
+                showToast('Please fill required fields');
                 return;
             }
             
-            if (editingProjectId) {
-                const index = data.projects.findIndex(p => p.id === editingProjectId);
+            if (editingId) {
+                const index = data.projects.findIndex(p => p.id === editingId);
                 data.projects[index] = { ...data.projects[index], ...projectData };
-                showToast('✅ Project updated');
+                showToast('Project updated');
             } else {
                 projectData.id = Date.now();
                 data.projects.push(projectData);
-                showToast('✅ Project created');
+                showToast('Project created');
             }
             
             saveData();
@@ -2445,79 +1342,72 @@
             closeModal('projectModal');
         }
 
-        function showTaskModal(projectId = null) {
-            editingTaskId = null;
+        function showTaskModal() {
+            editingId = null;
+            editingType = 'task';
             document.getElementById('taskModalTitle').textContent = 'New Task';
             document.getElementById('taskName').value = '';
             document.getElementById('taskPriority').value = 'Medium';
             document.getElementById('taskStatus').value = 'Get Ready';
-            document.getElementById('taskStart').value = new Date().toISOString().split('T')[0];
+            document.getElementById('taskStart').value = '';
             document.getElementById('taskDue').value = '';
-            document.getElementById('taskAssignee').value = '';
-            document.getElementById('taskDescription').value = '';
             
-            const projectSelect = document.getElementById('taskProject');
-            projectSelect.innerHTML = '<option value="">Select Project</option>';
+            const select = document.getElementById('taskProject');
+            select.innerHTML = '<option value="">Select Project</option>';
             data.projects.forEach(p => {
-                projectSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
             });
-            
-            if (projectId) {
-                projectSelect.value = projectId;
-            }
             
             document.getElementById('taskModal').classList.add('show');
             toggleFabMenu();
         }
 
-        function editTask(taskId) {
-            editingTaskId = taskId;
-            const task = data.tasks.find(t => t.id === taskId);
+        function editTask(id) {
+            const task = data.tasks.find(t => t.id === id);
+            if (!task) return;
+            
+            editingId = id;
+            editingType = 'task';
             document.getElementById('taskModalTitle').textContent = 'Edit Task';
             document.getElementById('taskName').value = task.name;
             document.getElementById('taskPriority').value = task.priority;
-            document.getElementById('taskStatus').value = task.status || 'Get Ready';
+            document.getElementById('taskStatus').value = task.status;
             document.getElementById('taskStart').value = task.startDate || '';
             document.getElementById('taskDue').value = task.dueDate;
-            document.getElementById('taskAssignee').value = task.assignee || '';
-            document.getElementById('taskDescription').value = task.description || '';
             
-            const projectSelect = document.getElementById('taskProject');
-            projectSelect.innerHTML = '<option value="">Select Project</option>';
+            const select = document.getElementById('taskProject');
+            select.innerHTML = '<option value="">Select Project</option>';
             data.projects.forEach(p => {
-                projectSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
             });
-            projectSelect.value = task.projectId;
+            select.value = task.projectId;
             
             document.getElementById('taskModal').classList.add('show');
         }
 
         function saveTask() {
             const taskData = {
-                name: document.getElementById('taskName').value,
+                name: document.getElementById('taskName').value.trim(),
                 projectId: parseInt(document.getElementById('taskProject').value),
                 priority: document.getElementById('taskPriority').value,
                 status: document.getElementById('taskStatus').value,
                 startDate: document.getElementById('taskStart').value,
-                dueDate: document.getElementById('taskDue').value,
-                assignee: document.getElementById('taskAssignee').value,
-                description: document.getElementById('taskDescription').value,
-                timestamp: new Date().toISOString()
+                dueDate: document.getElementById('taskDue').value
             };
             
             if (!taskData.name || !taskData.projectId || !taskData.dueDate) {
-                showToast('⚠️ Please fill required fields');
+                showToast('Please fill required fields');
                 return;
             }
             
-            if (editingTaskId) {
-                const index = data.tasks.findIndex(t => t.id === editingTaskId);
+            if (editingId) {
+                const index = data.tasks.findIndex(t => t.id === editingId);
                 data.tasks[index] = { ...data.tasks[index], ...taskData };
-                showToast('✅ Task updated');
+                showToast('Task updated');
             } else {
                 taskData.id = Date.now();
                 data.tasks.push(taskData);
-                showToast('✅ Task created');
+                showToast('Task created');
             }
             
             saveData();
@@ -2526,57 +1416,30 @@
             closeModal('taskModal');
         }
 
-        function showTransactionModal(type, projectId = null) {
-            editingTransactionId = null;
+        function showTransactionModal(type) {
+            editingId = null;
+            editingType = 'transaction';
             document.getElementById('transactionModalTitle').textContent = type === 'income' ? 'Add Income' : 'Add Expense';
             document.getElementById('transType').value = type;
             document.getElementById('transAmount').value = '';
             document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
-            document.getElementById('transDescription').value = '';
             
-            const projectSelect = document.getElementById('transProject');
-            projectSelect.innerHTML = '<option value="">Select Project</option>';
+            const select = document.getElementById('transProject');
+            select.innerHTML = '<option value="">Select Project</option>';
             data.projects.forEach(p => {
-                projectSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
             });
-            
-            if (projectId) {
-                projectSelect.value = projectId;
-            }
             
             updateCategories();
             document.getElementById('transactionModal').classList.add('show');
             toggleFabMenu();
         }
 
-        function editTransaction(transId) {
-            editingTransactionId = transId;
-            const trans = data.transactions.find(t => t.id === transId);
-            document.getElementById('transactionModalTitle').textContent = trans.type === 'income' ? 'Edit Income' : 'Edit Expense';
-            document.getElementById('transType').value = trans.type;
-            document.getElementById('transAmount').value = trans.amount;
-            document.getElementById('transDate').value = trans.date;
-            document.getElementById('transDescription').value = trans.description || '';
-            
-            const projectSelect = document.getElementById('transProject');
-            projectSelect.innerHTML = '<option value="">Select Project</option>';
-            data.projects.forEach(p => {
-                projectSelect.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-            });
-            projectSelect.value = trans.projectId;
-            
-            updateCategories();
-            document.getElementById('transCategory').value = trans.category;
-            document.getElementById('transactionModal').classList.add('show');
-        }
-
         function updateCategories() {
             const type = document.getElementById('transType').value;
             const select = document.getElementById('transCategory');
-            const categories = type === 'expense' ? expenseCategories : incomeCategories;
-            
             select.innerHTML = '<option value="">Select Category</option>';
-            categories.forEach(cat => {
+            categories[type].forEach(cat => {
                 select.innerHTML += `<option value="${cat}">${cat}</option>`;
             });
         }
@@ -2587,25 +1450,17 @@
                 projectId: parseInt(document.getElementById('transProject').value),
                 category: document.getElementById('transCategory').value,
                 amount: parseFloat(document.getElementById('transAmount').value),
-                date: document.getElementById('transDate').value,
-                description: document.getElementById('transDescription').value,
-                timestamp: new Date().toISOString()
+                date: document.getElementById('transDate').value
             };
             
-            if (!transData.projectId || !transData.category || !transData.amount) {
-                showToast('⚠️ Please fill required fields');
+            if (!transData.projectId || !transData.category || !transData.amount || isNaN(transData.amount)) {
+                showToast('Please fill all fields correctly');
                 return;
             }
             
-            if (editingTransactionId) {
-                const index = data.transactions.findIndex(t => t.id === editingTransactionId);
-                data.transactions[index] = { ...data.transactions[index], ...transData };
-                showToast('✅ Transaction updated');
-            } else {
-                transData.id = Date.now();
-                data.transactions.push(transData);
-                showToast('✅ Transaction added');
-            }
+            transData.id = Date.now();
+            data.transactions.push(transData);
+            showToast('Transaction added');
             
             saveData();
             renderView();
@@ -2613,35 +1468,188 @@
             closeModal('transactionModal');
         }
 
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('show');
+        function deleteItem(id, type) {
+            if (!confirm(`Delete this ${type}?`)) return;
+            
+            if (type === 'project') {
+                data.projects = data.projects.filter(p => p.id !== id);
+                data.tasks = data.tasks.filter(t => t.projectId !== id);
+                data.transactions = data.transactions.filter(t => t.projectId !== id);
+            } else if (type === 'task') {
+                data.tasks = data.tasks.filter(t => t.id !== id);
+            } else if (type === 'transaction') {
+                data.transactions = data.transactions.filter(t => t.id !== id);
+            }
+            
+            if (!data.deletedItems) data.deletedItems = [];
+            data.deletedItems.push({ id, type, deletedAt: new Date().toISOString() });
+            
+            saveData();
+            renderView();
+            updateStats();
+            showToast(`${type} deleted`);
         }
 
-        function dragStart(e) {
-            draggedElement = e.target;
-            e.target.classList.add('dragging');
+        // Drag and Drop
+        let draggedTaskId = null;
+        
+        function dragTask(event, taskId) {
+            draggedTaskId = taskId;
         }
 
-        function dragEnd(e) {
-            e.target.classList.remove('dragging');
+        function allowDrop(event) {
+            event.preventDefault();
         }
 
-        function dragOver(e) {
-            e.preventDefault();
-        }
-
-        function dragDrop(e) {
-            e.preventDefault();
-            if (draggedElement && e.currentTarget.classList.contains('kanban-tasks')) {
-                const newStatus = e.currentTarget.dataset.status;
-                const taskId = parseInt(draggedElement.dataset.taskId);
-                const task = data.tasks.find(t => t.id === taskId);
+        function dropTask(event, newStatus) {
+            event.preventDefault();
+            if (draggedTaskId) {
+                const task = data.tasks.find(t => t.id === draggedTaskId);
                 if (task) {
                     task.status = newStatus;
                     saveData();
                     renderKanban(document.getElementById('mainContent'));
-                    showToast(`✅ Task moved to ${newStatus}`);
+                    showToast(`Task moved to ${newStatus}`);
                 }
+                draggedTaskId = null;
+            }
+        }
+
+        // Sync Functions (Simplified)
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (!key) {
+                showToast('Please enter an API key');
+                return;
+            }
+            syncApiKey = key;
+            localStorage.setItem('builderProSyncApiKey', key);
+            document.getElementById('apiKeyInput').value = '';
+            showToast('API key saved');
+        }
+
+        function removeApiKey() {
+            if (confirm('Remove API key?')) {
+                syncApiKey = '';
+                localStorage.removeItem('builderProSyncApiKey');
+                stopAutoSync();
+                showToast('API key removed');
+            }
+        }
+
+        function toggleAutoSync() {
+            const enabled = document.getElementById('autoSyncToggle').checked;
+            if (enabled && !syncApiKey) {
+                showToast('Please add API key first');
+                document.getElementById('autoSyncToggle').checked = false;
+                return;
+            }
+            
+            localStorage.setItem('autoSyncEnabled', enabled.toString());
+            if (enabled) startAutoSync(); else stopAutoSync();
+        }
+
+        function startAutoSync() {
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            autoSyncInterval = setInterval(() => syncData(), APP_CONFIG.autoSyncInterval);
+        }
+
+        function stopAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+            }
+        }
+
+        async function manualSync() {
+            if (!syncApiKey) {
+                showToast('Please set up API key first');
+                return;
+            }
+            await syncData();
+        }
+
+        async function syncData() {
+            if (!syncApiKey) return;
+            
+            updateSyncStatus(true);
+            
+            try {
+                // Simplified sync - just save to cloud
+                const response = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': syncApiKey
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    localStorage.setItem('lastSyncTime', Date.now().toString());
+                    updateSyncDisplay();
+                    showToast('Synced successfully');
+                } else {
+                    showToast('Sync failed');
+                }
+            } catch (error) {
+                showToast('Sync error - offline');
+            }
+            
+            updateSyncStatus(false);
+        }
+
+        function updateSyncStatus(syncing) {
+            const indicator = document.getElementById('syncIndicator');
+            if (syncing) {
+                indicator.classList.add('syncing');
+                document.getElementById('syncMode').textContent = 'Syncing...';
+            } else {
+                indicator.classList.remove('syncing');
+                document.getElementById('syncMode').textContent = syncApiKey ? 'Connected' : 'Offline';
+            }
+        }
+
+        function updateSyncDisplay() {
+            const lastSync = localStorage.getItem('lastSyncTime');
+            if (lastSync) {
+                const date = new Date(parseInt(lastSync));
+                document.getElementById('lastSyncTime').textContent = date.toLocaleTimeString();
+            }
+        }
+
+        // Export/Import
+        function exportData() {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'builder-pro-backup.json';
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('Data exported');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const imported = JSON.parse(e.target.result);
+                        if (confirm('Replace all current data?')) {
+                            data = imported;
+                            saveData();
+                            applySettings();
+                            renderView();
+                            updateStats();
+                            showToast('Data imported');
+                        }
+                    } catch (error) {
+                        showToast('Import failed');
+                    }
+                };
+                reader.readAsText(file);
             }
         }
     </script>
