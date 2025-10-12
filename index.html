@@ -222,8 +222,14 @@
         
         /* Content with spacing for fixed header */
         .main-content-wrapper {
-            margin-top: 160px;
+            margin-top: 200px;
             flex: 1;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content-wrapper {
+                margin-top: 210px;
+            }
         }
         
         .container { 
@@ -481,6 +487,11 @@
             grid-template-columns: repeat(2, 1fr);
             gap: 10px;
             margin-top: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background: var(--bg-color);
+            border-radius: 8px;
         }
         
         .theme-option { 
@@ -489,7 +500,7 @@
             cursor: pointer; 
             border: 2px solid transparent; 
             transition: all 0.2s; 
-            background: var(--bg-color);
+            background: var(--card-bg);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
@@ -501,25 +512,27 @@
         .theme-option.active { 
             border-color: var(--button-primary); 
             transform: scale(1.02); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
         
         .theme-preview {
-            height: 40px;
+            height: 50px;
             border-radius: 6px;
             margin-bottom: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 10px;
+            font-size: 14px;
             font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
         .theme-name {
             font-size: 11px;
             text-align: center;
             color: var(--text-secondary);
+            font-weight: 500;
         }
         
         /* Contrast Controls */
@@ -659,6 +672,10 @@
         
         /* Mobile optimizations */
         @media (max-width: 768px) {
+            .main-content-wrapper {
+                margin-top: 210px;
+            }
+            
             .tabs {
                 -webkit-overflow-scrolling: touch;
             }
@@ -666,6 +683,40 @@
             .fab {
                 width: 56px;
                 height: 56px;
+            }
+            
+            .theme-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+                max-height: 350px;
+            }
+            
+            .theme-preview {
+                height: 40px;
+                font-size: 12px;
+            }
+            
+            .stats-bar {
+                gap: 6px;
+                padding: 8px;
+            }
+            
+            .stat-card {
+                padding: 8px;
+            }
+            
+            .stat-card h3 {
+                font-size: calc(14px * var(--font-scale));
+            }
+            
+            .stat-card p {
+                font-size: calc(10px * var(--font-scale));
+            }
+        }
+        
+        @media (max-width: 400px) {
+            .main-content-wrapper {
+                margin-top: 220px;
             }
             
             .theme-grid {
@@ -759,7 +810,9 @@
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
             <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🎨 Theme Colors (18 Premium Themes)</label>
-            <div class="theme-grid" id="themeGrid"></div>
+            <div class="theme-grid" id="themeGrid">
+                <!-- Themes will be populated here by JavaScript -->
+            </div>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
@@ -1114,16 +1167,20 @@
 
         function initThemePicker() {
             const grid = document.getElementById('themeGrid');
+            if (!grid) {
+                console.error('Theme grid element not found');
+                return;
+            }
             grid.innerHTML = '';
             
             themeColors.forEach((theme, index) => {
                 const div = document.createElement('div');
-                div.className = 'theme-option' + (index === data.themeColor ? ' active' : '');
+                div.className = 'theme-option' + (index === (data.themeColor || 0) ? ' active' : '');
                 
                 const preview = document.createElement('div');
                 preview.className = 'theme-preview';
                 preview.style.background = `linear-gradient(135deg, ${theme.accent} 0%, ${theme.highlight} 100%)`;
-                preview.textContent = 'Aa';
+                preview.innerHTML = 'Aa';
                 
                 const name = document.createElement('div');
                 name.className = 'theme-name';
@@ -1195,7 +1252,15 @@
         }
 
         function toggleSettings() {
-            document.getElementById('settingsPanel').classList.toggle('show');
+            const panel = document.getElementById('settingsPanel');
+            panel.classList.toggle('show');
+            
+            // Reinitialize theme picker when opening settings
+            if (panel.classList.contains('show')) {
+                setTimeout(() => {
+                    initThemePicker();
+                }, 100);
+            }
         }
 
         function toggleFabMenu() {
