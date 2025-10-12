@@ -6,20 +6,20 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#6b5d56">
-    <title>REFIT Interior - Project Manager</title>
+    <title>Builder Pro - Complete Project Manager</title>
     
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #e4838a 0%, #f0a0a6 100%);
-            --primary-color: #e4838a;
-            --primary-dark: #d67379;
-            --primary-light: #f0a0a6;
-            --bg-color: #f8f6f4;
+            --primary-gradient: linear-gradient(135deg, #E8A9B3 0%, #F5D6D9 100%);
+            --primary-color: #E8A9B3;
+            --primary-dark: #4B2B1A;
+            --primary-light: #F5D6D9;
+            --bg-color: #fefefe;
             --card-bg: #ffffff;
-            --text-primary: #2a2a2a;
+            --text-primary: #1C1C1C;
             --text-secondary: #5a5a5a;
             --border-color: #e8e8e8;
-            --shadow-color: rgba(228, 131, 138, 0.15);
+            --shadow-color: rgba(75, 43, 26, 0.08);
             --success: #10b981;
             --warning: #f39c12;
             --danger: #ef4444;
@@ -44,14 +44,45 @@
         body.font-xl { --font-scale: 1.3; }
         body.font-xxl { --font-scale: 1.5; }
 
-        /* Night mode */
+        /* Night mode - REFIT brand adjusted */
         .night-mode { 
-            --bg-color: #1a1a20; 
-            --card-bg: #2d2d35; 
+            --bg-color: #1a1618; 
+            --card-bg: #2d2729; 
             --text-primary: #f0f0f0; 
             --text-secondary: #c0c0c8; 
-            --border-color: #4a4a52; 
+            --border-color: #4a4246; 
             --shadow-color: rgba(0,0,0,0.3);
+        }
+        
+        /* Action buttons with REFIT brown */
+        .action-btn { 
+            background: rgba(75, 43, 26, 0.15); 
+            border: none; 
+            color: white; 
+            padding: 4px 8px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            font-size: calc(10px * var(--font-scale)); 
+        }
+        
+        /* Primary button with REFIT brown */
+        .btn-primary { 
+            background: linear-gradient(135deg, #4B2B1A 0%, #6B4332 100%); 
+            color: white; 
+        }
+        
+        /* FAB with REFIT colors */
+        .fab { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 50%; 
+            background: linear-gradient(135deg, #E8A9B3 0%, #F5D6D9 100%); 
+            color: #4B2B1A; 
+            border: none; 
+            font-size: 24px; 
+            cursor: pointer; 
+            box-shadow: 0 4px 12px rgba(75, 43, 26, 0.15); 
+            font-weight: bold;
         }
         
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -852,53 +883,51 @@
 
         // 36 Pastel Theme Colors (18 Light + 18 Dark)
         const themeColors = [
-            // REFIT Brand Color - First position for default
-            { name: 'REFIT Rose', primary: '#e4838a', gradient: 'linear-gradient(135deg, #e4838a 0%, #f0a0a6 100%)' },
+            // Light Pastels - REFIT Brand Inspired
+            { name: 'REFIT Rose', primary: '#E8A9B3', gradient: 'linear-gradient(135deg, #E8A9B3 0%, #F5D6D9 100%)' },
+            { name: 'Blush Pink', primary: '#F5D6D9', gradient: 'linear-gradient(135deg, #F5D6D9 0%, #FDEEF0 100%)' },
+            { name: 'Soft Peach', primary: '#FFDDD2', gradient: 'linear-gradient(135deg, #FFDDD2 0%, #FFE8E0 100%)' },
+            { name: 'Warm Cream', primary: '#F9E4D4', gradient: 'linear-gradient(135deg, #F9E4D4 0%, #FDF0E6 100%)' },
+            { name: 'Vanilla Bean', primary: '#F5E6D3', gradient: 'linear-gradient(135deg, #F5E6D3 0%, #FAF0E4 100%)' },
+            { name: 'Soft Taupe', primary: '#E5D4C7', gradient: 'linear-gradient(135deg, #E5D4C7 0%, #F0E5DD 100%)' },
+            { name: 'Dusty Lavender', primary: '#DCC9DB', gradient: 'linear-gradient(135deg, #DCC9DB 0%, #EDE0EC 100%)' },
+            { name: 'Warm Grey', primary: '#D4CFC9', gradient: 'linear-gradient(135deg, #D4CFC9 0%, #E5E1DD 100%)' },
+            { name: 'Soft Sand', primary: '#E8DCC7', gradient: 'linear-gradient(135deg, #E8DCC7 0%, #F2E8D9 100%)' },
+            { name: 'Pearl', primary: '#F0E8E0', gradient: 'linear-gradient(135deg, #F0E8E0 0%, #F8F2ED 100%)' },
+            { name: 'Misty Rose', primary: '#E6C4C4', gradient: 'linear-gradient(135deg, #E6C4C4 0%, #F2DCDC 100%)' },
+            { name: 'Soft Coral', primary: '#F4C7B6', gradient: 'linear-gradient(135deg, #F4C7B6 0%, #FADDD4 100%)' },
+            { name: 'Champagne', primary: '#F0DCC4', gradient: 'linear-gradient(135deg, #F0DCC4 0%, #F7E9D8 100%)' },
+            { name: 'Pale Mauve', primary: '#E0C9D4', gradient: 'linear-gradient(135deg, #E0C9D4 0%, #EDE0E6 100%)' },
+            { name: 'Soft Apricot', primary: '#FACFB6', gradient: 'linear-gradient(135deg, #FACFB6 0%, #FDE4D3 100%)' },
+            { name: 'Light Mocha', primary: '#DBC4B0', gradient: 'linear-gradient(135deg, #DBC4B0 0%, #E8D8CA 100%)' },
+            { name: 'Powder Pink', primary: '#F2D7DC', gradient: 'linear-gradient(135deg, #F2D7DC 0%, #F9E8EB 100%)' },
+            { name: 'Warm Beige', primary: '#E5D0C1', gradient: 'linear-gradient(135deg, #E5D0C1 0%, #F0E0D6 100%)' },
             
-            // Light Pastel Colors
-            { name: 'Peach', primary: '#ffdfba', gradient: 'linear-gradient(135deg, #ffdfba 0%, #ffe9cc 100%)' },
-            { name: 'Cream', primary: '#ffffba', gradient: 'linear-gradient(135deg, #ffffba 0%, #ffffcc 100%)' },
-            { name: 'Mint', primary: '#baffc9', gradient: 'linear-gradient(135deg, #baffc9 0%, #ccffd8 100%)' },
-            { name: 'Sky', primary: '#bae1ff', gradient: 'linear-gradient(135deg, #bae1ff 0%, #ccebff 100%)' },
-            { name: 'Lavender', primary: '#d4baff', gradient: 'linear-gradient(135deg, #d4baff 0%, #e0ccff 100%)' },
-            { name: 'Coral', primary: '#ffb3d9', gradient: 'linear-gradient(135deg, #ffb3d9 0%, #ffc8e3 100%)' },
-            { name: 'Sage', primary: '#c9d6b8', gradient: 'linear-gradient(135deg, #c9d6b8 0%, #d8e3c9 100%)' },
-            { name: 'Sand', primary: '#e8d5b8', gradient: 'linear-gradient(135deg, #e8d5b8 0%, #f0e0c9 100%)' },
-            { name: 'Pearl', primary: '#f0e6d2', gradient: 'linear-gradient(135deg, #f0e6d2 0%, #f5ede0 100%)' },
-            { name: 'Blush', primary: '#ffc4c4', gradient: 'linear-gradient(135deg, #ffc4c4 0%, #ffd4d4 100%)' },
-            { name: 'Aqua', primary: '#b8e6e6', gradient: 'linear-gradient(135deg, #b8e6e6 0%, #c9f0f0 100%)' },
-            { name: 'Butter', primary: '#fff5b8', gradient: 'linear-gradient(135deg, #fff5b8 0%, #fffac9 100%)' },
-            { name: 'Lilac', primary: '#e6ccff', gradient: 'linear-gradient(135deg, #e6ccff 0%, #f0e0ff 100%)' },
-            { name: 'Melon', primary: '#ffccb3', gradient: 'linear-gradient(135deg, #ffccb3 0%, #ffd9c4 100%)' },
-            { name: 'Pistachio', primary: '#d4e6b8', gradient: 'linear-gradient(135deg, #d4e6b8 0%, #e0f0c9 100%)' },
-            { name: 'Cloud', primary: '#e6e6fa', gradient: 'linear-gradient(135deg, #e6e6fa 0%, #f0f0ff 100%)' },
-            { name: 'Vanilla', primary: '#fff8e6', gradient: 'linear-gradient(135deg, #fff8e6 0%, #fffbf0 100%)' },
-            
-            // Dark Pastel Colors - Including REFIT Brown
-            { name: 'REFIT Brown', primary: '#5c3a21', gradient: 'linear-gradient(135deg, #5c3a21 0%, #7a5033 100%)' },
-            { name: 'Terracotta', primary: '#d4a574', gradient: 'linear-gradient(135deg, #d4a574 0%, #e6b888 100%)' },
-            { name: 'Olive', primary: '#a8b88a', gradient: 'linear-gradient(135deg, #a8b88a 0%, #bcc9a0 100%)' },
-            { name: 'Sage Green', primary: '#8ab8a8', gradient: 'linear-gradient(135deg, #8ab8a8 0%, #a0c9bc 100%)' },
-            { name: 'Storm Blue', primary: '#8aa5b8', gradient: 'linear-gradient(135deg, #8aa5b8 0%, #a0b8c9 100%)' },
-            { name: 'Mauve', primary: '#b8a5d4', gradient: 'linear-gradient(135deg, #b8a5d4 0%, #c9b8e6 100%)' },
-            { name: 'Dusty Pink', primary: '#d4a5c4', gradient: 'linear-gradient(135deg, #d4a5c4 0%, #e6b8d6 100%)' },
-            { name: 'Moss', primary: '#8a9d7c', gradient: 'linear-gradient(135deg, #8a9d7c 0%, #a0b091 100%)' },
-            { name: 'Clay', primary: '#c4a484', gradient: 'linear-gradient(135deg, #c4a484 0%, #d6b898 100%)' },
-            { name: 'Stone', primary: '#b8b8b0', gradient: 'linear-gradient(135deg, #b8b8b0 0%, #c9c9c2 100%)' },
-            { name: 'Berry', primary: '#c48a8a', gradient: 'linear-gradient(135deg, #c48a8a 0%, #d6a0a0 100%)' },
-            { name: 'Teal', primary: '#8ab8b8', gradient: 'linear-gradient(135deg, #8ab8b8 0%, #a0c9c9 100%)' },
-            { name: 'Mustard', primary: '#d4c474', gradient: 'linear-gradient(135deg, #d4c474 0%, #e6d688 100%)' },
-            { name: 'Plum', primary: '#b88ac4', gradient: 'linear-gradient(135deg, #b88ac4 0%, #c9a0d6 100%)' },
-            { name: 'Apricot', primary: '#d4a484', gradient: 'linear-gradient(135deg, #d4a484 0%, #e6b898 100%)' },
-            { name: 'Forest', primary: '#7c9d7c', gradient: 'linear-gradient(135deg, #7c9d7c 0%, #91b091 100%)' },
-            { name: 'Slate', primary: '#9898a8', gradient: 'linear-gradient(135deg, #9898a8 0%, #acacbc 100%)' },
-            { name: 'Taupe', primary: '#b8a898', gradient: 'linear-gradient(135deg, #b8a898 0%, #c9bcac 100%)' }
+            // Dark Pastels - REFIT Brand Inspired
+            { name: 'REFIT Brown', primary: '#4B2B1A', gradient: 'linear-gradient(135deg, #4B2B1A 0%, #6B4332 100%)' },
+            { name: 'Deep Rose', primary: '#B88891', gradient: 'linear-gradient(135deg, #B88891 0%, #D4A5AD 100%)' },
+            { name: 'Terracotta', primary: '#C4866B', gradient: 'linear-gradient(135deg, #C4866B 0%, #D9A58C 100%)' },
+            { name: 'Warm Brown', primary: '#8B6B5A', gradient: 'linear-gradient(135deg, #8B6B5A 0%, #A58876 100%)' },
+            { name: 'Dusty Plum', primary: '#9B7A8F', gradient: 'linear-gradient(135deg, #9B7A8F 0%, #B596A8 100%)' },
+            { name: 'Clay', primary: '#B5826B', gradient: 'linear-gradient(135deg, #B5826B 0%, #C9A08A 100%)' },
+            { name: 'Charcoal', primary: '#1C1C1C', gradient: 'linear-gradient(135deg, #1C1C1C 0%, #3A3A3A 100%)' },
+            { name: 'Deep Taupe', primary: '#7D6659', gradient: 'linear-gradient(135deg, #7D6659 0%, #988275 100%)' },
+            { name: 'Rosewood', primary: '#8C5959', gradient: 'linear-gradient(135deg, #8C5959 0%, #A87373 100%)' },
+            { name: 'Mocha', primary: '#6B5147', gradient: 'linear-gradient(135deg, #6B5147 0%, #876960 100%)' },
+            { name: 'Dusty Brown', primary: '#946B5C', gradient: 'linear-gradient(135deg, #946B5C 0%, #AD8878 100%)' },
+            { name: 'Antique Rose', primary: '#A67B7B', gradient: 'linear-gradient(135deg, #A67B7B 0%, #C09696 100%)' },
+            { name: 'Coffee', primary: '#5C453A', gradient: 'linear-gradient(135deg, #5C453A 0%, #7A5F52 100%)' },
+            { name: 'Mauve Grey', primary: '#8B7B7F', gradient: 'linear-gradient(135deg, #8B7B7F 0%, #A59599 100%)' },
+            { name: 'Rust', primary: '#A8654E', gradient: 'linear-gradient(135deg, #A8654E 0%, #C2826B 100%)' },
+            { name: 'Dark Sand', primary: '#9A8A73', gradient: 'linear-gradient(135deg, #9A8A73 0%, #B3A48E 100%)' },
+            { name: 'Deep Mauve', primary: '#875969', gradient: 'linear-gradient(135deg, #875969 0%, #A37383 100%)' },
+            { name: 'Bronze', primary: '#805940', gradient: 'linear-gradient(135deg, #805940 0%, #9D7459 100%)' }
         ];
 
         // App State
         let data = {
-            currentUser: 'REFIT Interior',
-            userPosition: 'Professional Services',
+            currentUser: 'Builder Pro',
+            userPosition: 'by REFIT Interior',
             currentView: 'home',
             projects: [],
             tasks: [],
@@ -1072,8 +1101,15 @@
         }
 
         function updateHeader() {
-            document.getElementById('headerName').textContent = '🏠 ' + data.currentUser;
-            document.getElementById('headerPosition').textContent = data.userPosition;
+            // Don't update the main title - it stays as "Builder Pro"
+            // The subtitle shows "by REFIT INTERIOR"
+            // Only update if user has customized their profile
+            if (data.currentUser !== 'Builder Pro') {
+                document.getElementById('headerName').innerHTML = `<span style="font-size: 20px;">🏗️</span> ${data.currentUser}`;
+            }
+            if (data.userPosition !== 'by REFIT Interior') {
+                document.getElementById('headerPosition').textContent = data.userPosition;
+            }
         }
 
         function toggleSettings() {
