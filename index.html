@@ -5,18 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="theme-color" content="#6b5d56">
+    <meta name="theme-color" content="#E8A9B3">
     <title>Builder Pro - Complete Project Manager</title>
     
     <style>
         :root {
-            --primary-gradient: linear-gradient(135deg, #E8A9B3 0%, #F5D6D9 100%);
-            --primary-color: #E8A9B3;
-            --primary-dark: #4B2B1A;
-            --primary-light: #F5D6D9;
-            --bg-color: #fefefe;
+            /* Default Rose Blush Theme */
+            --bg-color: #F4EDEB;
+            --accent-color: #E8A9B3;
+            --highlight-color: #D47C90;
+            --text-color: #1C1C1C;
+            
+            /* UI Elements */
             --card-bg: #ffffff;
-            --text-primary: #1C1C1C;
             --text-secondary: #5a5a5a;
             --border-color: #e8e8e8;
             --shadow-color: rgba(75, 43, 26, 0.08);
@@ -25,6 +26,12 @@
             --danger: #ef4444;
             --income-color: #10b981;
             --expense-color: #ef4444;
+            
+            /* Deep Brown for buttons */
+            --button-primary: #4B2B1A;
+            --button-primary-hover: #6B4332;
+            
+            /* Accessibility */
             --contrast: 1;
             --brightness: 1;
             --font-scale: 1;
@@ -44,51 +51,27 @@
         body.font-xl { --font-scale: 1.3; }
         body.font-xxl { --font-scale: 1.5; }
 
-        /* Night mode - REFIT brand adjusted */
+        /* Night mode */
         .night-mode { 
-            --bg-color: #1a1618; 
-            --card-bg: #2d2729; 
-            --text-primary: #f0f0f0; 
-            --text-secondary: #c0c0c8; 
-            --border-color: #4a4246; 
-            --shadow-color: rgba(0,0,0,0.3);
+            --bg-color: #1a1618 !important; 
+            --card-bg: #2d2729 !important; 
+            --text-color: #f0f0f0 !important; 
+            --text-secondary: #c0c0c8 !important; 
+            --border-color: #4a4246 !important; 
+            --shadow-color: rgba(0,0,0,0.3) !important;
         }
         
-        /* Action buttons with REFIT brown */
-        .action-btn { 
-            background: rgba(75, 43, 26, 0.15); 
-            border: none; 
-            color: white; 
-            padding: 4px 8px; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: calc(10px * var(--font-scale)); 
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
         }
         
-        /* Primary button with REFIT brown */
-        .btn-primary { 
-            background: linear-gradient(135deg, #4B2B1A 0%, #6B4332 100%); 
-            color: white; 
-        }
-        
-        /* FAB with REFIT colors */
-        .fab { 
-            width: 50px; 
-            height: 50px; 
-            border-radius: 50%; 
-            background: linear-gradient(135deg, #E8A9B3 0%, #F5D6D9 100%); 
-            color: #4B2B1A; 
-            border: none; 
-            font-size: 24px; 
-            cursor: pointer; 
-            box-shadow: 0 4px 12px rgba(75, 43, 26, 0.15); 
-            font-weight: bold;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
             background: var(--bg-color); 
+            color: var(--text-color);
             min-height: 100vh; 
             overflow-x: hidden; 
             transition: all 0.3s; 
@@ -113,17 +96,43 @@
         }
         
         .header { 
-            background: var(--primary-gradient); 
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%); 
             color: white; 
             padding: 10px 12px; 
             box-shadow: 0 2px 10px var(--shadow-color); 
         }
         
-        .header-content { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
-        .header-left { display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; }
-        .header h1 { font-size: calc(16px * var(--font-scale)); font-weight: 600; }
-        .header-subtitle { font-size: calc(11px * var(--font-scale)); opacity: 0.9; margin-top: 2px; }
-        .header-controls { display: flex; gap: 8px; align-items: center; }
+        .header-content { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 10px; 
+        }
+        
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            flex: 1; 
+            cursor: pointer; 
+        }
+        
+        .header h1 { 
+            font-size: calc(16px * var(--font-scale)); 
+            font-weight: 600; 
+        }
+        
+        .header-subtitle { 
+            font-size: calc(11px * var(--font-scale)); 
+            opacity: 0.9; 
+            margin-top: 2px; 
+        }
+        
+        .header-controls { 
+            display: flex; 
+            gap: 8px; 
+            align-items: center; 
+        }
         
         .header-btn { 
             background: rgba(255,255,255,0.2); 
@@ -138,6 +147,11 @@
             align-items: center; 
             justify-content: center; 
             position: relative; 
+            transition: background 0.2s;
+        }
+        
+        .header-btn:active {
+            background: rgba(255,255,255,0.3);
         }
         
         .sync-indicator { 
@@ -150,11 +164,19 @@
             background: #10b981; 
             border: 2px solid white; 
         }
-        .sync-indicator.syncing { background: #f39c12; animation: pulse 1s infinite; }
-        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        
+        .sync-indicator.syncing { 
+            background: #f39c12; 
+            animation: pulse 1s infinite; 
+        }
+        
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.5; } 
+        }
         
         .sync-status-bar { 
-            background: var(--primary-dark); 
+            background: var(--button-primary); 
             color: white; 
             padding: 4px 10px; 
             font-size: calc(11px * var(--font-scale)); 
@@ -182,8 +204,13 @@
             color: var(--text-secondary); 
             border-bottom: 3px solid transparent; 
             font-size: calc(12px * var(--font-scale)); 
+            transition: all 0.2s;
         }
-        .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+        
+        .tab.active { 
+            color: var(--accent-color); 
+            border-bottom-color: var(--accent-color); 
+        }
         
         .stats-bar { 
             display: grid; 
@@ -214,9 +241,21 @@
             box-shadow: 0 2px 5px var(--shadow-color); 
             text-align: center; 
         }
-        .stat-card h3 { font-size: calc(16px * var(--font-scale)); color: var(--primary-color); margin-bottom: 2px; font-weight: 700; }
+        
+        .stat-card h3 { 
+            font-size: calc(16px * var(--font-scale)); 
+            color: var(--accent-color); 
+            margin-bottom: 2px; 
+            font-weight: 700; 
+        }
+        
         .stat-card.income h3 { color: var(--income-color); }
         .stat-card.expense h3 { color: var(--expense-color); }
+        
+        .stat-card p {
+            color: var(--text-secondary);
+            font-size: calc(11px * var(--font-scale));
+        }
         
         .project-card { 
             background: var(--card-bg); 
@@ -227,7 +266,7 @@
         }
         
         .project-header { 
-            background: var(--primary-gradient); 
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%); 
             color: white; 
             padding: 12px; 
             border-radius: 12px 12px 0 0;
@@ -258,6 +297,11 @@
             border-radius: 4px; 
             cursor: pointer; 
             font-size: calc(10px * var(--font-scale)); 
+            transition: background 0.2s;
+        }
+        
+        .action-btn:active {
+            background: rgba(255,255,255,0.3);
         }
         
         /* Gantt Chart */
@@ -306,7 +350,7 @@
             width: 150px; 
             font-size: calc(11px * var(--font-scale)); 
             font-weight: 500; 
-            color: var(--text-primary); 
+            color: var(--text-color); 
             padding-right: 10px; 
             white-space: nowrap;
             overflow: hidden;
@@ -324,7 +368,7 @@
         .gantt-bar { 
             position: absolute; 
             height: 100%; 
-            background: var(--primary-gradient); 
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%); 
             border-radius: 4px; 
             display: flex; 
             flex-direction: column; 
@@ -356,6 +400,7 @@
             z-index: 1000; 
             padding: 20px; 
         }
+        
         .modal.show { display: flex; }
         
         .modal-content { 
@@ -375,14 +420,42 @@
             border-radius: 6px; 
             font-size: calc(13px * var(--font-scale)); 
             background: var(--bg-color); 
-            color: var(--text-primary); 
+            color: var(--text-color); 
         }
         
-        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: calc(13px * var(--font-scale)); cursor: pointer; }
-        .btn-primary { background: var(--primary-gradient); color: white; }
-        .btn-secondary { background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--border-color); }
-        .btn-success { background: var(--success); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
+        .btn { 
+            padding: 8px 16px; 
+            border: none; 
+            border-radius: 6px; 
+            font-size: calc(13px * var(--font-scale)); 
+            cursor: pointer; 
+            transition: all 0.2s;
+        }
+        
+        .btn-primary { 
+            background: var(--button-primary); 
+            color: white; 
+        }
+        
+        .btn-primary:hover {
+            background: var(--button-primary-hover);
+        }
+        
+        .btn-secondary { 
+            background: var(--bg-color); 
+            color: var(--text-color); 
+            border: 1px solid var(--border-color); 
+        }
+        
+        .btn-success { 
+            background: var(--success); 
+            color: white; 
+        }
+        
+        .btn-danger { 
+            background: var(--danger); 
+            color: white; 
+        }
         
         /* Settings Panel */
         .settings-panel { 
@@ -399,33 +472,54 @@
             overflow-y: auto; 
             padding: 20px; 
         }
+        
         .settings-panel.show { right: 0; }
         
-        /* Color Grid */
-        .color-grid { 
-            display: block;
-            width: 100%;
+        /* Color Theme Grid */
+        .theme-grid { 
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
         }
         
-        .color-option { 
-            width: 45px; 
-            height: 45px; 
+        .theme-option { 
+            padding: 10px;
             border-radius: 8px; 
             cursor: pointer; 
-            border: 3px solid transparent; 
+            border: 2px solid transparent; 
             transition: all 0.2s; 
-            position: relative;
+            background: var(--bg-color);
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .color-option:hover { 
-            transform: scale(1.1); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-            z-index: 10;
+        
+        .theme-option:hover { 
+            transform: scale(1.02); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
         }
-        .color-option.active { 
-            border-color: var(--text-primary) !important; 
-            transform: scale(1.1); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        
+        .theme-option.active { 
+            border-color: var(--button-primary); 
+            transform: scale(1.02); 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+        
+        .theme-preview {
+            height: 40px;
+            border-radius: 6px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+        }
+        
+        .theme-name {
+            font-size: 11px;
+            text-align: center;
+            color: var(--text-secondary);
         }
         
         /* Contrast Controls */
@@ -444,25 +538,40 @@
             cursor: pointer;
             font-size: calc(11px * var(--font-scale));
             transition: all 0.2s;
+            color: var(--text-color);
         }
+        
         .contrast-btn.active {
-            background: var(--primary-gradient);
+            background: var(--button-primary);
             color: white;
-            border-color: var(--primary-color);
+            border-color: var(--button-primary);
         }
         
         /* FAB */
-        .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 99; }
+        .fab-container { 
+            position: fixed; 
+            bottom: 20px; 
+            right: 20px; 
+            z-index: 99; 
+        }
+        
         .fab { 
             width: 50px; 
             height: 50px; 
             border-radius: 50%; 
-            background: var(--primary-gradient); 
+            background: var(--button-primary); 
             color: white; 
             border: none; 
             font-size: 24px; 
             cursor: pointer; 
             box-shadow: 0 4px 12px var(--shadow-color); 
+            transition: all 0.2s;
+            font-weight: bold;
+        }
+        
+        .fab:hover {
+            background: var(--button-primary-hover);
+            transform: scale(1.05);
         }
         
         .fab-menu { 
@@ -473,6 +582,7 @@
             flex-direction: column; 
             gap: 8px; 
         }
+        
         .fab-menu.show { display: flex; }
         
         .fab-option { 
@@ -481,6 +591,7 @@
             gap: 8px; 
             padding: 8px 12px; 
             background: var(--card-bg); 
+            color: var(--text-color);
             border-radius: 8px; 
             box-shadow: 0 2px 10px var(--shadow-color); 
             cursor: pointer; 
@@ -494,7 +605,7 @@
             left: 50%; 
             transform: translateX(-50%); 
             background: var(--card-bg); 
-            color: var(--text-primary); 
+            color: var(--text-color); 
             padding: 12px 20px; 
             border-radius: 8px; 
             box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
@@ -502,6 +613,7 @@
             opacity: 0; 
             transition: opacity 0.3s; 
         }
+        
         .toast.show { opacity: 1; }
         
         .empty-state { 
@@ -516,14 +628,14 @@
             margin-bottom: 8px; 
             background: var(--bg-color); 
             border-radius: 8px; 
-            border-left: 3px solid var(--primary-color); 
+            border-left: 3px solid var(--accent-color); 
             display: flex; 
             justify-content: space-between; 
             align-items: start; 
         }
         
         .icon-btn { 
-            background: var(--primary-color); 
+            background: var(--accent-color); 
             border: none; 
             color: white; 
             width: 28px; 
@@ -534,8 +646,32 @@
             display: flex; 
             align-items: center; 
             justify-content: center; 
+            transition: all 0.2s;
         }
-        .icon-btn.danger { background: var(--danger); }
+        
+        .icon-btn:hover {
+            transform: scale(1.05);
+        }
+        
+        .icon-btn.danger { 
+            background: var(--danger); 
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .tabs {
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .fab {
+                width: 56px;
+                height: 56px;
+            }
+            
+            .theme-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -547,7 +683,7 @@
                     <div class="header-left" onclick="showProfileModal()">
                         <div>
                             <h1 id="headerName">Builder Pro</h1>
-                            <div class="header-subtitle" id="headerPosition">Project Manager</div>
+                            <div class="header-subtitle" id="headerPosition">by REFIT Interior</div>
                         </div>
                     </div>
                     <div class="header-controls">
@@ -601,12 +737,12 @@
     <!-- Settings Panel -->
     <div class="settings-panel" id="settingsPanel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
-            <span style="font-size: 1.25rem; font-weight: bold;">Settings</span>
-            <button onclick="toggleSettings()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">✕</button>
+            <span style="font-size: 1.25rem; font-weight: bold; color: var(--text-color);">Settings</span>
+            <button onclick="toggleSettings()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color);">✕</button>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
-            <label style="display: block; font-weight: 600; margin-bottom: 10px;">🔑 Smart Sync API</label>
+            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🔑 Smart Sync API</label>
             <div style="display: flex; gap: 8px; margin-bottom: 10px;">
                 <input type="password" id="apiKeyInput" placeholder="JSONBin API Key" style="flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
                 <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
@@ -615,26 +751,19 @@
                 Smart Sync: Pulls cloud data → Merges with local → Pushes complete dataset
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <span style="font-weight: 500;">⚡ Auto-Sync (every 5 minutes)</span>
+                <span style="font-weight: 500; color: var(--text-color);">⚡ Auto-Sync (every 5 minutes)</span>
                 <input type="checkbox" id="autoSyncToggle" onchange="toggleAutoSync()" style="width: 44px; height: 24px;">
             </div>
             <button class="btn btn-primary" onclick="smartSync()" style="width: 100%;">Manual Sync Now</button>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
-            <label style="display: block; font-weight: 600; margin-bottom: 10px;">🎨 Theme Colors (36 Pastel Shades)</label>
-            <div style="font-size: 11px; color: var(--text-secondary); margin-bottom: 8px;">
-                <span style="background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px;">18 Light</span>
-                <span style="background: rgba(0,0,0,0.1); padding: 2px 6px; border-radius: 4px; margin-left: 5px;">18 Dark</span>
-            </div>
-            <div style="max-height: 400px; overflow-y: auto; background: var(--bg-color); padding: 10px; border-radius: 8px;">
-                <div class="color-grid" id="colorGrid"></div>
-            </div>
-            <div id="selectedColorName" style="margin-top: 10px; padding: 8px; background: var(--bg-color); border-radius: 6px; text-align: center; font-size: 12px; font-weight: 500;"></div>
+            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🎨 Theme Colors (18 Premium Themes)</label>
+            <div class="theme-grid" id="themeGrid"></div>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
-            <label style="display: block; font-weight: 600; margin-bottom: 10px;">⚡ Theme Contrast</label>
+            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">⚡ Theme Contrast</label>
             <div class="contrast-controls">
                 <button class="contrast-btn" onclick="setContrast('low')">Low</button>
                 <button class="contrast-btn active" onclick="setContrast('normal')">Normal</button>
@@ -644,7 +773,7 @@
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
-            <label style="display: block; font-weight: 600; margin-bottom: 10px;">🔤 Font Size</label>
+            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🔤 Font Size</label>
             <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
                 <button class="btn btn-secondary" onclick="setFontSize('s')">S</button>
                 <button class="btn btn-secondary" onclick="setFontSize('m')">M</button>
@@ -656,7 +785,7 @@
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
             <div style="display: flex; align-items: center; justify-content: space-between;">
-                <span style="font-weight: 600;">🌙 Night Mode</span>
+                <span style="font-weight: 600; color: var(--text-color);">🌙 Night Mode</span>
                 <input type="checkbox" id="nightToggle" onchange="toggleNightMode()" style="width: 44px; height: 24px;">
             </div>
         </div>
@@ -693,7 +822,7 @@
     <div class="modal" id="profileModal">
         <div class="modal-content">
             <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                <h2>Profile Settings</h2>
+                <h2 style="color: var(--text-color);">Profile Settings</h2>
                 <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('profileModal')">×</span>
             </div>
             <div style="padding: 15px;">
@@ -716,7 +845,7 @@
     <div class="modal" id="projectModal">
         <div class="modal-content">
             <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                <h2 id="projectModalTitle">New Project</h2>
+                <h2 id="projectModalTitle" style="color: var(--text-color);">New Project</h2>
                 <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('projectModal')">×</span>
             </div>
             <div style="padding: 15px;">
@@ -744,7 +873,7 @@
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <input type="checkbox" id="projectLocked" style="width: 20px; height: 20px;">
-                    <label for="projectLocked" style="font-size: 12px;">🔒 Lock project (prevents editing)</label>
+                    <label for="projectLocked" style="font-size: 12px; color: var(--text-color);">🔒 Lock project (prevents editing)</label>
                 </div>
             </div>
             <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 8px;">
@@ -757,7 +886,7 @@
     <div class="modal" id="taskModal">
         <div class="modal-content">
             <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                <h2 id="taskModalTitle">New Task</h2>
+                <h2 id="taskModalTitle" style="color: var(--text-color);">New Task</h2>
                 <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('taskModal')">×</span>
             </div>
             <div style="padding: 15px;">
@@ -817,7 +946,7 @@
     <div class="modal" id="transactionModal">
         <div class="modal-content">
             <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                <h2 id="transactionModalTitle">Add Transaction</h2>
+                <h2 id="transactionModalTitle" style="color: var(--text-color);">Add Transaction</h2>
                 <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('transactionModal')">×</span>
             </div>
             <div style="padding: 15px;">
@@ -859,7 +988,7 @@
     <div class="modal" id="projectDetailModal">
         <div class="modal-content" style="max-width: 600px;">
             <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
-                <h2 id="projectDetailTitle">Project Details</h2>
+                <h2 id="projectDetailTitle" style="color: var(--text-color);">Project Details</h2>
                 <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('projectDetailModal')">×</span>
             </div>
             <div id="projectDetailBody" style="padding: 15px; max-height: 60vh; overflow-y: auto;">
@@ -881,47 +1010,26 @@
             deviceType: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Laptop'
         };
 
-        // 36 Pastel Theme Colors (18 Light + 18 Dark)
+        // 18 Premium Theme Colors
         const themeColors = [
-            // Light Pastels - REFIT Brand Inspired
-            { name: 'REFIT Rose', primary: '#E8A9B3', gradient: 'linear-gradient(135deg, #E8A9B3 0%, #F5D6D9 100%)' },
-            { name: 'Blush Pink', primary: '#F5D6D9', gradient: 'linear-gradient(135deg, #F5D6D9 0%, #FDEEF0 100%)' },
-            { name: 'Soft Peach', primary: '#FFDDD2', gradient: 'linear-gradient(135deg, #FFDDD2 0%, #FFE8E0 100%)' },
-            { name: 'Warm Cream', primary: '#F9E4D4', gradient: 'linear-gradient(135deg, #F9E4D4 0%, #FDF0E6 100%)' },
-            { name: 'Vanilla Bean', primary: '#F5E6D3', gradient: 'linear-gradient(135deg, #F5E6D3 0%, #FAF0E4 100%)' },
-            { name: 'Soft Taupe', primary: '#E5D4C7', gradient: 'linear-gradient(135deg, #E5D4C7 0%, #F0E5DD 100%)' },
-            { name: 'Dusty Lavender', primary: '#DCC9DB', gradient: 'linear-gradient(135deg, #DCC9DB 0%, #EDE0EC 100%)' },
-            { name: 'Warm Grey', primary: '#D4CFC9', gradient: 'linear-gradient(135deg, #D4CFC9 0%, #E5E1DD 100%)' },
-            { name: 'Soft Sand', primary: '#E8DCC7', gradient: 'linear-gradient(135deg, #E8DCC7 0%, #F2E8D9 100%)' },
-            { name: 'Pearl', primary: '#F0E8E0', gradient: 'linear-gradient(135deg, #F0E8E0 0%, #F8F2ED 100%)' },
-            { name: 'Misty Rose', primary: '#E6C4C4', gradient: 'linear-gradient(135deg, #E6C4C4 0%, #F2DCDC 100%)' },
-            { name: 'Soft Coral', primary: '#F4C7B6', gradient: 'linear-gradient(135deg, #F4C7B6 0%, #FADDD4 100%)' },
-            { name: 'Champagne', primary: '#F0DCC4', gradient: 'linear-gradient(135deg, #F0DCC4 0%, #F7E9D8 100%)' },
-            { name: 'Pale Mauve', primary: '#E0C9D4', gradient: 'linear-gradient(135deg, #E0C9D4 0%, #EDE0E6 100%)' },
-            { name: 'Soft Apricot', primary: '#FACFB6', gradient: 'linear-gradient(135deg, #FACFB6 0%, #FDE4D3 100%)' },
-            { name: 'Light Mocha', primary: '#DBC4B0', gradient: 'linear-gradient(135deg, #DBC4B0 0%, #E8D8CA 100%)' },
-            { name: 'Powder Pink', primary: '#F2D7DC', gradient: 'linear-gradient(135deg, #F2D7DC 0%, #F9E8EB 100%)' },
-            { name: 'Warm Beige', primary: '#E5D0C1', gradient: 'linear-gradient(135deg, #E5D0C1 0%, #F0E0D6 100%)' },
-            
-            // Dark Pastels - REFIT Brand Inspired
-            { name: 'REFIT Brown', primary: '#4B2B1A', gradient: 'linear-gradient(135deg, #4B2B1A 0%, #6B4332 100%)' },
-            { name: 'Deep Rose', primary: '#B88891', gradient: 'linear-gradient(135deg, #B88891 0%, #D4A5AD 100%)' },
-            { name: 'Terracotta', primary: '#C4866B', gradient: 'linear-gradient(135deg, #C4866B 0%, #D9A58C 100%)' },
-            { name: 'Warm Brown', primary: '#8B6B5A', gradient: 'linear-gradient(135deg, #8B6B5A 0%, #A58876 100%)' },
-            { name: 'Dusty Plum', primary: '#9B7A8F', gradient: 'linear-gradient(135deg, #9B7A8F 0%, #B596A8 100%)' },
-            { name: 'Clay', primary: '#B5826B', gradient: 'linear-gradient(135deg, #B5826B 0%, #C9A08A 100%)' },
-            { name: 'Charcoal', primary: '#1C1C1C', gradient: 'linear-gradient(135deg, #1C1C1C 0%, #3A3A3A 100%)' },
-            { name: 'Deep Taupe', primary: '#7D6659', gradient: 'linear-gradient(135deg, #7D6659 0%, #988275 100%)' },
-            { name: 'Rosewood', primary: '#8C5959', gradient: 'linear-gradient(135deg, #8C5959 0%, #A87373 100%)' },
-            { name: 'Mocha', primary: '#6B5147', gradient: 'linear-gradient(135deg, #6B5147 0%, #876960 100%)' },
-            { name: 'Dusty Brown', primary: '#946B5C', gradient: 'linear-gradient(135deg, #946B5C 0%, #AD8878 100%)' },
-            { name: 'Antique Rose', primary: '#A67B7B', gradient: 'linear-gradient(135deg, #A67B7B 0%, #C09696 100%)' },
-            { name: 'Coffee', primary: '#5C453A', gradient: 'linear-gradient(135deg, #5C453A 0%, #7A5F52 100%)' },
-            { name: 'Mauve Grey', primary: '#8B7B7F', gradient: 'linear-gradient(135deg, #8B7B7F 0%, #A59599 100%)' },
-            { name: 'Rust', primary: '#A8654E', gradient: 'linear-gradient(135deg, #A8654E 0%, #C2826B 100%)' },
-            { name: 'Dark Sand', primary: '#9A8A73', gradient: 'linear-gradient(135deg, #9A8A73 0%, #B3A48E 100%)' },
-            { name: 'Deep Mauve', primary: '#875969', gradient: 'linear-gradient(135deg, #875969 0%, #A37383 100%)' },
-            { name: 'Bronze', primary: '#805940', gradient: 'linear-gradient(135deg, #805940 0%, #9D7459 100%)' }
+            { name: 'Rose Blush', bg: '#F4EDEB', accent: '#E8A9B3', highlight: '#D47C90', text: '#1C1C1C' },
+            { name: 'Mocha Cream', bg: '#FFF6F1', accent: '#C9A48F', highlight: '#8A5C4E', text: '#1C1C1C' },
+            { name: 'Sand & Coffee', bg: '#F5EFE6', accent: '#A87C5F', highlight: '#6B4C3B', text: '#1C1C1C' },
+            { name: 'Soft Plum', bg: '#F8F3F7', accent: '#B08CA5', highlight: '#8B5E83', text: '#1C1C1C' },
+            { name: 'Nude Clay', bg: '#EFE5DC', accent: '#D5AA85', highlight: '#9F6B3F', text: '#1C1C1C' },
+            { name: 'Charcoal Rose', bg: '#F0E6E9', accent: '#A77E94', highlight: '#7B4C60', text: '#1C1C1C' },
+            { name: 'Muted Mauve', bg: '#F7F2F3', accent: '#C4A3B3', highlight: '#905E78', text: '#1C1C1C' },
+            { name: 'Desert Sand', bg: '#F3E9DD', accent: '#C29D7F', highlight: '#7E5439', text: '#1C1C1C' },
+            { name: 'Pastel Taupe', bg: '#EDE6E1', accent: '#B89C92', highlight: '#805B4D', text: '#1C1C1C' },
+            { name: 'Cocoa Mint', bg: '#F6F4F2', accent: '#A68B76', highlight: '#5D3C2B', text: '#1C1C1C' },
+            { name: 'Latte Rose', bg: '#F2E9E4', accent: '#C6A9A3', highlight: '#885E58', text: '#1C1C1C' },
+            { name: 'Warm Pebble', bg: '#F4F1EE', accent: '#A39A92', highlight: '#645B52', text: '#1C1C1C' },
+            { name: 'Dusty Coral', bg: '#FAF3F0', accent: '#D6A89A', highlight: '#B06653', text: '#1C1C1C' },
+            { name: 'Almond Cocoa', bg: '#F5EFE8', accent: '#C9B29B', highlight: '#7C5A3D', text: '#1C1C1C' },
+            { name: 'Blush Beige', bg: '#F6F1EF', accent: '#E2C9C0', highlight: '#A67D75', text: '#1C1C1C' },
+            { name: 'Earthy Pink', bg: '#F3E5E1', accent: '#CF9D9E', highlight: '#804E50', text: '#1C1C1C' },
+            { name: 'Champagne Gold', bg: '#FAF4EF', accent: '#E7D2B9', highlight: '#B18F63', text: '#1C1C1C' },
+            { name: 'Neutral Blush', bg: '#F5F3F2', accent: '#D0B8AD', highlight: '#8C6A5A', text: '#1C1C1C' }
         ];
 
         // App State
@@ -934,7 +1042,7 @@
             transactions: [],
             deletedItems: [],
             nightMode: false,
-            themeColor: 0, // Default to REFIT Rose
+            themeColor: 0, // Default to Rose Blush
             fontSize: 'm',
             contrast: 'normal',
             timelineFilter: 'all',
@@ -1000,79 +1108,56 @@
 
         // UI Functions
         function initUI() {
-            initColorPicker();
+            initThemePicker();
             document.getElementById('deviceType').textContent = APP_CONFIG.deviceType;
         }
 
-        function initColorPicker() {
-            const grid = document.getElementById('colorGrid');
+        function initThemePicker() {
+            const grid = document.getElementById('themeGrid');
             grid.innerHTML = '';
             
-            // Add section headers
-            const lightHeader = document.createElement('div');
-            lightHeader.style.gridColumn = '1 / -1';
-            lightHeader.style.fontSize = '10px';
-            lightHeader.style.fontWeight = '600';
-            lightHeader.style.marginBottom = '4px';
-            lightHeader.style.color = 'var(--text-secondary)';
-            lightHeader.textContent = 'Light Pastels';
-            grid.appendChild(lightHeader);
-            
-            // Add light colors
-            for (let i = 0; i < 18; i++) {
-                const color = themeColors[i];
+            themeColors.forEach((theme, index) => {
                 const div = document.createElement('div');
-                div.className = 'color-option' + (i === data.themeColor ? ' active' : '');
-                div.style.background = color.gradient;
-                div.setAttribute('data-name', color.name);
-                div.title = color.name;
-                div.onclick = () => selectThemeColor(i);
+                div.className = 'theme-option' + (index === data.themeColor ? ' active' : '');
+                
+                const preview = document.createElement('div');
+                preview.className = 'theme-preview';
+                preview.style.background = `linear-gradient(135deg, ${theme.accent} 0%, ${theme.highlight} 100%)`;
+                preview.textContent = 'Aa';
+                
+                const name = document.createElement('div');
+                name.className = 'theme-name';
+                name.textContent = theme.name;
+                
+                div.appendChild(preview);
+                div.appendChild(name);
+                div.onclick = () => selectThemeColor(index);
+                
                 grid.appendChild(div);
-            }
-            
-            // Add dark header
-            const darkHeader = document.createElement('div');
-            darkHeader.style.gridColumn = '1 / -1';
-            darkHeader.style.fontSize = '10px';
-            darkHeader.style.fontWeight = '600';
-            darkHeader.style.marginTop = '8px';
-            darkHeader.style.marginBottom = '4px';
-            darkHeader.style.color = 'var(--text-secondary)';
-            darkHeader.textContent = 'Dark Pastels';
-            grid.appendChild(darkHeader);
-            
-            // Add dark colors
-            for (let i = 18; i < 36; i++) {
-                const color = themeColors[i];
-                const div = document.createElement('div');
-                div.className = 'color-option' + (i === data.themeColor ? ' active' : '');
-                div.style.background = color.gradient;
-                div.setAttribute('data-name', color.name);
-                div.title = color.name;
-                div.onclick = () => selectThemeColor(i);
-                grid.appendChild(div);
-            }
+            });
         }
 
         function selectThemeColor(index) {
             data.themeColor = index;
             applyThemeColor(index);
             saveData();
-            document.querySelectorAll('.color-option').forEach(el => el.classList.remove('active'));
-            document.querySelectorAll('.color-option')[index].classList.add('active');
+            
+            document.querySelectorAll('.theme-option').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.theme-option')[index].classList.add('active');
             showToast('Theme updated: ' + themeColors[index].name);
         }
 
         function applyThemeColor(index) {
-            const color = themeColors[index];
-            document.documentElement.style.setProperty('--primary-color', color.primary);
-            document.documentElement.style.setProperty('--primary-gradient', color.gradient);
-            
-            // Adjust dark version for night mode
-            if (document.body.classList.contains('night-mode')) {
-                // Keep the gradient but adjust for night mode
-                document.documentElement.style.setProperty('--primary-gradient', color.gradient);
+            const theme = themeColors[index];
+            if (!document.body.classList.contains('night-mode')) {
+                document.documentElement.style.setProperty('--bg-color', theme.bg);
+                document.documentElement.style.setProperty('--text-color', theme.text);
             }
+            document.documentElement.style.setProperty('--accent-color', theme.accent);
+            document.documentElement.style.setProperty('--highlight-color', theme.highlight);
+            
+            // Update meta theme color for mobile
+            document.querySelector('meta[name="theme-color"]').content = theme.accent;
         }
 
         function setContrast(level) {
@@ -1097,15 +1182,12 @@
             document.body.classList.toggle('night-mode');
             data.nightMode = document.body.classList.contains('night-mode');
             saveData();
-            applyThemeColor(data.themeColor); // Reapply theme for night mode
+            applyThemeColor(data.themeColor);
         }
 
         function updateHeader() {
-            // Don't update the main title - it stays as "Builder Pro"
-            // The subtitle shows "by REFIT INTERIOR"
-            // Only update if user has customized their profile
             if (data.currentUser !== 'Builder Pro') {
-                document.getElementById('headerName').innerHTML = `<span style="font-size: 20px;">🏗️</span> ${data.currentUser}`;
+                document.getElementById('headerName').textContent = data.currentUser;
             }
             if (data.userPosition !== 'by REFIT Interior') {
                 document.getElementById('headerPosition').textContent = data.userPosition;
@@ -1155,20 +1237,20 @@
             
             let html = `
                 <div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
-                    <h3 style="font-size: 14px; margin-bottom: 12px;">💰 Finance Summary</h3>
+                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-color);">💰 Finance Summary</h3>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                         <div>
                             <div style="font-size: 11px; color: var(--text-secondary);">Income</div>
-                            <div style="font-size: 18px; font-weight: bold; color: var(--income-color);">${income.toFixed(2)}</div>
+                            <div style="font-size: 18px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
                         </div>
                         <div>
                             <div style="font-size: 11px; color: var(--text-secondary);">Expenses</div>
-                            <div style="font-size: 18px; font-weight: bold; color: var(--expense-color);">${expenses.toFixed(2)}</div>
+                            <div style="font-size: 18px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
                         </div>
                         <div>
                             <div style="font-size: 11px; color: var(--text-secondary);">Profit</div>
                             <div style="font-size: 18px; font-weight: bold; color: ${income - expenses >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">
-                                ${(income - expenses).toFixed(2)}
+                                $${(income - expenses).toFixed(2)}
                             </div>
                         </div>
                     </div>
@@ -1231,7 +1313,7 @@
                     html += `
                         <div class="task-item" style="border-left-color: var(--danger);">
                             <div style="flex: 1;">
-                                <div style="font-weight: 500; margin-bottom: 5px;">${task.name}</div>
+                                <div style="font-weight: 500; margin-bottom: 5px; color: var(--text-color);">${task.name}</div>
                                 <div style="font-size: 11px; color: var(--text-secondary);">
                                     ${project ? project.name : 'No Project'} • Due: ${task.dueDate}
                                     ${task.assignee ? ` • Assigned to: ${task.assignee}` : ''}
@@ -1258,22 +1340,20 @@
         }
 
         function renderProjectTimeline() {
-            // Include ALL projects, even without dates
             const projectsWithDates = data.projects.filter(p => p.startDate && p.endDate);
             const projectsWithoutDates = data.projects.filter(p => !p.startDate || !p.endDate);
             
             if (data.projects.length === 0) return '';
             
-            let html = '<div class="gantt-container"><h3 style="font-size: 14px; margin-bottom: 15px;">📅 Project Timeline</h3>';
+            let html = '<div class="gantt-container"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📅 Project Timeline</h3>';
             
             if (projectsWithDates.length === 0) {
-                // Show all projects without timeline bars
                 html += '<div style="padding: 10px; background: var(--bg-color); border-radius: 8px;">';
                 html += '<p style="color: var(--text-secondary); margin-bottom: 10px;">No project dates set. Projects list:</p>';
                 data.projects.forEach(project => {
                     html += `
-                        <div style="padding: 8px; margin-bottom: 5px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--primary-color);">
-                            <strong>${project.name}</strong> - ${project.client}
+                        <div style="padding: 8px; margin-bottom: 5px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--accent-color);">
+                            <strong style="color: var(--text-color);">${project.name}</strong> - <span style="color: var(--text-secondary);">${project.client}</span>
                             ${project.locked ? ' 🔒' : ''}
                         </div>
                     `;
@@ -1285,7 +1365,6 @@
             let minDate = null;
             let maxDate = null;
             
-            // Find date range from projects with dates
             projectsWithDates.forEach(p => {
                 const start = new Date(p.startDate);
                 const end = new Date(p.endDate);
@@ -1295,7 +1374,6 @@
             
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
-            // Generate month labels
             const months = [];
             let current = new Date(minDate);
             while (current <= maxDate) {
@@ -1307,7 +1385,6 @@
                 current.setMonth(current.getMonth() + 1);
             }
             
-            // Add timeline header with months
             html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
             months.forEach(month => {
                 const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
@@ -1317,7 +1394,6 @@
             });
             html += '</div></div>';
             
-            // Add projects with dates
             projectsWithDates.forEach(project => {
                 const start = new Date(project.startDate);
                 const end = new Date(project.endDate);
@@ -1342,7 +1418,6 @@
                 `;
             });
             
-            // Add projects without dates at the bottom
             if (projectsWithoutDates.length > 0) {
                 html += '<div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color);">';
                 html += '<h4 style="font-size: 12px; margin-bottom: 10px; color: var(--text-secondary);">Projects without dates:</h4>';
@@ -1393,12 +1468,12 @@
                                 </div>
                                 <div style="text-align: center;">
                                     <div style="font-size: 9px; opacity: 0.8;">Income</div>
-                                    <div style="font-size: 13px; font-weight: bold; color: #4ade80;">${income.toFixed(0)}</div>
+                                    <div style="font-size: 13px; font-weight: bold; color: #4ade80;">$${income.toFixed(0)}</div>
                                 </div>
                                 <div style="text-align: center;">
                                     <div style="font-size: 9px; opacity: 0.8;">Profit</div>
                                     <div style="font-size: 13px; font-weight: bold; color: ${income - expenses >= 0 ? '#4ade80' : '#f87171'};">
-                                        ${(income - expenses).toFixed(0)}
+                                        $${(income - expenses).toFixed(0)}
                                     </div>
                                 </div>
                             </div>
@@ -1433,7 +1508,7 @@
             
             let html = `
                 <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="font-size: 13px; margin-bottom: 10px;">📋 Project Info</h4>
+                    <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Project Info</h4>
                     <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
                         <div><strong>Client:</strong> ${project.client}</div>
                         ${project.startDate ? `<div><strong>Duration:</strong> ${project.startDate} to ${project.endDate || 'Ongoing'}</div>` : ''}
@@ -1442,20 +1517,20 @@
                 </div>
                 
                 <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="font-size: 13px; margin-bottom: 10px;">💰 Finance Summary</h4>
+                    <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">💰 Finance Summary</h4>
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                         <div>
                             <div style="font-size: 10px; color: var(--text-secondary);">Income</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--income-color);">${income.toFixed(2)}</div>
+                            <div style="font-size: 16px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
                         </div>
                         <div>
                             <div style="font-size: 10px; color: var(--text-secondary);">Expenses</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--expense-color);">${expenses.toFixed(2)}</div>
+                            <div style="font-size: 16px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
                         </div>
                         <div>
                             <div style="font-size: 10px; color: var(--text-secondary);">Profit</div>
                             <div style="font-size: 16px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">
-                                ${profit.toFixed(2)}
+                                $${profit.toFixed(2)}
                             </div>
                         </div>
                     </div>
@@ -1470,7 +1545,7 @@
                     </button>
                 </div>
                 
-                <h4 style="font-size: 13px; margin-bottom: 10px;">📋 Tasks (${tasks.length})</h4>
+                <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Tasks (${tasks.length})</h4>
             `;
             
             if (tasks.length === 0) {
@@ -1481,7 +1556,7 @@
                     html += `
                         <div class="task-item ${isCompleted ? 'completed' : ''}" style="margin-bottom: 8px;">
                             <div style="flex: 1;">
-                                <div style="font-weight: 500;">${task.name}</div>
+                                <div style="font-weight: 500; color: var(--text-color);">${task.name}</div>
                                 <div style="font-size: 10px; color: var(--text-secondary);">
                                     ${task.dueDate} • ${task.priority} • ${task.status}
                                     ${task.assignee ? ` • ${task.assignee}` : ''}
@@ -1493,7 +1568,7 @@
                 });
             }
             
-            html += '<h4 style="font-size: 13px; margin: 15px 0 10px;">💳 Transactions (${transactions.length})</h4>';
+            html += `<h4 style="font-size: 13px; margin: 15px 0 10px; color: var(--text-color);">💳 Transactions (${transactions.length})</h4>`;
             
             if (transactions.length === 0) {
                 html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No transactions yet</p>';
@@ -1502,14 +1577,14 @@
                     html += `
                         <div style="display: flex; justify-content: space-between; padding: 10px; background: var(--bg-color); border-radius: 8px; margin-bottom: 8px;">
                             <div>
-                                <div style="font-weight: 500; font-size: 12px;">${trans.category}</div>
+                                <div style="font-weight: 500; font-size: 12px; color: var(--text-color);">${trans.category}</div>
                                 <div style="font-size: 10px; color: var(--text-secondary);">
                                     ${trans.date}
                                     ${trans.description ? ` • ${trans.description}` : ''}
                                 </div>
                             </div>
                             <div style="font-weight: bold; color: ${trans.type === 'income' ? 'var(--income-color)' : 'var(--expense-color)'};">
-                                ${trans.type === 'income' ? '+' : '-'}${trans.amount.toFixed(2)}
+                                ${trans.type === 'income' ? '+' : '-'}$${trans.amount.toFixed(2)}
                             </div>
                         </div>
                     `;
@@ -1536,7 +1611,6 @@
         }
 
         function renderSchedule(container) {
-            // Schedule view filters
             let html = `
                 <div style="display: flex; gap: 8px; margin-bottom: 12px; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color);">
                     <button class="btn btn-secondary ${data.scheduleView === 'day' ? 'active' : ''}" 
@@ -1550,7 +1624,6 @@
                 </div>
             `;
             
-            // Filter tasks based on schedule view
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
@@ -1585,7 +1658,6 @@
                 minDate = today;
                 maxDate = monthEnd;
             } else {
-                // All tasks - find date range
                 filteredTasks.forEach(task => {
                     if (task.startDate) {
                         const start = new Date(task.startDate);
@@ -1598,7 +1670,6 @@
                 });
             }
             
-            // Ensure at least some range
             if (maxDate - minDate < 1000 * 60 * 60 * 24) {
                 maxDate = new Date(minDate);
                 maxDate.setDate(maxDate.getDate() + 7);
@@ -1606,7 +1677,6 @@
             
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
-            // Generate month labels
             const months = [];
             let current = new Date(minDate);
             while (current <= maxDate) {
@@ -1618,21 +1688,18 @@
                 current.setMonth(current.getMonth() + 1);
             }
             
-            html += '<div class="gantt-container"><h3 style="font-size: 14px; margin-bottom: 15px;">📊 Task Schedule Gantt Chart</h3>';
+            html += '<div class="gantt-container"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📊 Task Schedule Gantt Chart</h3>';
             
             if (filteredTasks.length === 0) {
                 html += `<p class="empty-state">No tasks scheduled for ${data.scheduleView === 'all' ? 'any time' : 'this ' + data.scheduleView}</p>`;
             } else {
-                // Add timeline header with months/days
                 html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
                 
                 if (data.scheduleView === 'day') {
-                    // Show hours for day view
                     for (let hour = 0; hour < 24; hour += 3) {
                         html += `<div class="gantt-month" style="flex: 1; font-size: 9px;">${hour}:00</div>`;
                     }
                 } else if (data.scheduleView === 'week') {
-                    // Show days for week view
                     for (let d = 0; d <= 7; d++) {
                         const day = new Date(today);
                         day.setDate(today.getDate() + d);
@@ -1641,7 +1708,6 @@
                         </div>`;
                     }
                 } else {
-                    // Show months for month/all view
                     months.forEach(month => {
                         const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
                         const monthEnd = Math.min(totalDays, Math.ceil((month.end - minDate) / (1000 * 60 * 60 * 24)) + 1);
@@ -1652,7 +1718,6 @@
                 
                 html += '</div></div>';
                 
-                // Sort and add tasks
                 const sortedTasks = filteredTasks.sort((a, b) => new Date(a.dueDate || a.startDate) - new Date(b.dueDate || b.startDate));
                 
                 sortedTasks.forEach(task => {
@@ -1665,8 +1730,7 @@
                     const width = Math.max((duration / totalDays) * 100, 2);
                     const left = (startOffset / totalDays) * 100;
                     
-                    // Color based on status
-                    let barColor = 'var(--primary-gradient)';
+                    let barColor = 'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
                     if (task.status === 'Completed') barColor = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
                     else if (task.status === 'In Progress') barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)';
                     else if (dueDate < today) barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)';
@@ -1691,9 +1755,8 @@
             
             html += '</div>';
             
-            // Task list below gantt
             html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-top: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
-            html += '<h3 style="font-size: 14px; margin-bottom: 12px;">📋 Task List</h3>';
+            html += '<h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-color);">📋 Task List</h3>';
             
             if (filteredTasks.length === 0) {
                 html += '<p class="empty-state">No tasks for this period</p>';
@@ -1706,7 +1769,7 @@
                     html += `
                         <div class="task-item ${isCompleted ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
                             <div style="flex: 1;">
-                                <div style="font-weight: 500;">${task.name}</div>
+                                <div style="font-weight: 500; color: var(--text-color);">${task.name}</div>
                                 <div style="font-size: 10px; color: var(--text-secondary);">
                                     ${project ? project.name : 'No Project'} • 
                                     ${task.startDate ? `${task.startDate} to ` : ''}${task.dueDate} • 
@@ -1740,7 +1803,6 @@
         }
 
         function renderKanban(container) {
-            // Get due tasks
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
@@ -1758,7 +1820,7 @@
             const columns = [
                 { title: 'Due', status: 'Due', tasks: dueTasks, color: '#ef4444' },
                 { title: 'In Progress', status: 'In Progress', tasks: inProgressTasks, color: '#f39c12' },
-                { title: 'Get Ready', status: 'Get Ready', tasks: getReadyTasks, color: 'var(--primary-color)' }
+                { title: 'Get Ready', status: 'Get Ready', tasks: getReadyTasks, color: 'var(--accent-color)' }
             ];
             
             let html = '<div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">';
@@ -1781,11 +1843,11 @@
                         <div draggable="true" ondragstart="dragTask(event, ${task.id})" 
                              style="background: var(--bg-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: move; 
                                     border-left: 3px solid ${column.color};">
-                            <div style="font-weight: 500; margin-bottom: 5px;">${task.name}</div>
+                            <div style="font-weight: 500; margin-bottom: 5px; color: var(--text-color);">${task.name}</div>
                             <div style="font-size: 11px; color: var(--text-secondary);">
                                 ${project ? project.name : 'No Project'}
                             </div>
-                            <div style="font-size: 10px; margin-top: 5px;">
+                            <div style="font-size: 10px; margin-top: 5px; color: var(--text-secondary);">
                                 📅 ${task.dueDate} • ${task.priority} Priority
                                 ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
                             </div>
@@ -1830,7 +1892,6 @@
             
             data.tasks = data.tasks.filter(t => t.id !== id);
             
-            // Track deletion for sync
             if (!data.deletedItems) data.deletedItems = [];
             data.deletedItems.push({ id, type: 'task', deletedAt: new Date().toISOString() });
             
@@ -1840,15 +1901,82 @@
             showToast('Task deleted');
         }
         
-        // Initialize auto-sync on load
+        // Drag and Drop for Kanban
+        let draggedTaskId = null;
+        
+        function dragTask(event, taskId) {
+            draggedTaskId = taskId;
+        }
+        
+        function allowDrop(event) {
+            event.preventDefault();
+        }
+        
+        function dropTask(event, status) {
+            event.preventDefault();
+            const task = data.tasks.find(t => t.id === draggedTaskId);
+            if (task) {
+                if (status === 'Due') {
+                    // Don't allow manual move to Due column
+                    showToast('Tasks are automatically marked as Due based on date');
+                    return;
+                }
+                task.status = status;
+                saveData();
+                renderView();
+                showToast('Task moved');
+            }
+        }
+        
+        // Auto-sync functions
         function initAutoSync() {
             const savedAutoSync = localStorage.getItem('autoSyncEnabled');
             if (savedAutoSync === 'true' && syncApiKey) {
                 autoSyncEnabled = true;
                 document.getElementById('autoSyncToggle').checked = true;
                 startAutoSync();
-                // Do initial sync
                 setTimeout(() => smartSync(), 1000);
+            }
+        }
+        
+        function toggleAutoSync() {
+            autoSyncEnabled = document.getElementById('autoSyncToggle').checked;
+            localStorage.setItem('autoSyncEnabled', autoSyncEnabled.toString());
+            
+            if (autoSyncEnabled) {
+                startAutoSync();
+                showToast('Auto-sync enabled');
+            } else {
+                stopAutoSync();
+                showToast('Auto-sync disabled');
+            }
+        }
+        
+        function startAutoSync() {
+            stopAutoSync();
+            if (syncApiKey && autoSyncEnabled) {
+                autoSyncInterval = setInterval(() => {
+                    smartSync();
+                }, 5 * 60 * 1000); // 5 minutes
+            }
+        }
+        
+        function stopAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+            }
+        }
+        
+        function initializeLastSync() {
+            const lastSyncTime = localStorage.getItem('lastSyncTime');
+            if (lastSyncTime) {
+                const date = new Date(parseInt(lastSyncTime));
+                document.getElementById('lastSyncTime').textContent = date.toLocaleTimeString();
+            }
+            
+            if (syncApiKey) {
+                document.getElementById('syncMode').textContent = 'Connected';
             }
         }
 
@@ -1873,7 +2001,7 @@
 
         function saveProfile() {
             data.currentUser = document.getElementById('profileName').value || 'Builder Pro';
-            data.userPosition = document.getElementById('profilePosition').value || 'Project Manager';
+            data.userPosition = document.getElementById('profilePosition').value || 'by REFIT Interior';
             updateHeader();
             saveData();
             closeModal('profileModal');
@@ -1888,13 +2016,15 @@
             document.getElementById('projectClient').value = '';
             document.getElementById('projectStart').value = '';
             document.getElementById('projectEnd').value = '';
+            document.getElementById('projectDescription').value = '';
+            document.getElementById('projectLocked').checked = false;
             document.getElementById('projectModal').classList.add('show');
             toggleFabMenu();
         }
 
         function editProject(id) {
             const project = data.projects.find(p => p.id === id);
-            if (!project) return;
+            if (!project || project.locked) return;
             
             editingId = id;
             editingType = 'project';
@@ -1903,6 +2033,8 @@
             document.getElementById('projectClient').value = project.client;
             document.getElementById('projectStart').value = project.startDate || '';
             document.getElementById('projectEnd').value = project.endDate || '';
+            document.getElementById('projectDescription').value = project.description || '';
+            document.getElementById('projectLocked').checked = project.locked || false;
             document.getElementById('projectModal').classList.add('show');
         }
 
@@ -1911,7 +2043,9 @@
                 name: document.getElementById('projectName').value.trim(),
                 client: document.getElementById('projectClient').value.trim(),
                 startDate: document.getElementById('projectStart').value,
-                endDate: document.getElementById('projectEnd').value
+                endDate: document.getElementById('projectEnd').value,
+                description: document.getElementById('projectDescription').value.trim(),
+                locked: document.getElementById('projectLocked').checked
             };
             
             if (!projectData.name || !projectData.client) {
@@ -1942,7 +2076,6 @@
             data.tasks = data.tasks.filter(t => t.projectId !== id);
             data.transactions = data.transactions.filter(t => t.projectId !== id);
             
-            // Track deletion for sync
             if (!data.deletedItems) data.deletedItems = [];
             data.deletedItems.push({ id, type: 'project', deletedAt: new Date().toISOString() });
             
@@ -1961,6 +2094,8 @@
             document.getElementById('taskStatus').value = 'Get Ready';
             document.getElementById('taskStart').value = '';
             document.getElementById('taskDue').value = '';
+            document.getElementById('taskAssignee').value = '';
+            document.getElementById('taskDescription').value = '';
             
             const select = document.getElementById('taskProject');
             select.innerHTML = '<option value="">Select Project</option>';
@@ -1984,6 +2119,8 @@
             document.getElementById('taskStatus').value = task.status;
             document.getElementById('taskStart').value = task.startDate || '';
             document.getElementById('taskDue').value = task.dueDate;
+            document.getElementById('taskAssignee').value = task.assignee || '';
+            document.getElementById('taskDescription').value = task.description || '';
             
             const select = document.getElementById('taskProject');
             select.innerHTML = '<option value="">Select Project</option>';
@@ -2002,7 +2139,9 @@
                 priority: document.getElementById('taskPriority').value,
                 status: document.getElementById('taskStatus').value,
                 startDate: document.getElementById('taskStart').value,
-                dueDate: document.getElementById('taskDue').value
+                dueDate: document.getElementById('taskDue').value,
+                assignee: document.getElementById('taskAssignee').value.trim(),
+                description: document.getElementById('taskDescription').value.trim()
             };
             
             if (!taskData.name || !taskData.projectId || !taskData.dueDate) {
@@ -2033,6 +2172,7 @@
             document.getElementById('transType').value = type;
             document.getElementById('transAmount').value = '';
             document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('transDescription').value = '';
             
             const select = document.getElementById('transProject');
             select.innerHTML = '<option value="">Select Project</option>';
@@ -2064,7 +2204,8 @@
                 projectId: parseInt(document.getElementById('transProject').value),
                 category: document.getElementById('transCategory').value,
                 amount: parseFloat(document.getElementById('transAmount').value),
-                date: document.getElementById('transDate').value
+                date: document.getElementById('transDate').value,
+                description: document.getElementById('transDescription').value.trim()
             };
             
             if (!transData.projectId || !transData.category || !transData.amount || isNaN(transData.amount)) {
@@ -2082,7 +2223,7 @@
             closeModal('transactionModal');
         }
 
-        // Smart Sync (Pull -> Merge -> Push)
+        // Smart Sync
         async function smartSync() {
             if (!syncApiKey) {
                 showToast('Please set up API key first');
@@ -2096,7 +2237,6 @@
             syncMode.textContent = 'Syncing...';
             
             try {
-                // Step 1: Pull from cloud
                 const pullResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
                     headers: { 'X-Master-Key': syncApiKey }
                 });
@@ -2107,7 +2247,6 @@
                     cloudData = result.record || {};
                 }
                 
-                // Step 2: Merge data
                 const mergedData = {
                     projects: mergeArrays(cloudData.projects || [], data.projects, 'id'),
                     tasks: mergeArrays(cloudData.tasks || [], data.tasks, 'id'),
@@ -2123,7 +2262,6 @@
                     lastUpdateDevice: APP_CONFIG.deviceType
                 };
                 
-                // Apply deletions
                 if (mergedData.deletedItems.length > 0) {
                     const deletedIds = new Set(mergedData.deletedItems.map(d => d.id));
                     mergedData.projects = mergedData.projects.filter(p => !deletedIds.has(p.id));
@@ -2131,7 +2269,6 @@
                     mergedData.transactions = mergedData.transactions.filter(t => !deletedIds.has(t.id));
                 }
                 
-                // Step 3: Push merged data back to cloud
                 const pushResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'PUT',
                     headers: {
@@ -2142,7 +2279,6 @@
                 });
                 
                 if (pushResponse.ok) {
-                    // Update local data
                     data = mergedData;
                     saveData();
                     renderView();
