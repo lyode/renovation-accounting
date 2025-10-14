@@ -670,7 +670,115 @@
             background: var(--danger); 
         }
         
-        /* Mobile optimizations */
+        /* Calendar Styles */
+        .calendar-container {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 10px var(--shadow-color);
+            margin-bottom: 15px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+            margin-top: 10px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            padding: 5px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-color);
+            border-radius: 4px;
+            font-size: calc(10px * var(--font-scale));
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .calendar-day.other-month {
+            opacity: 0.3;
+        }
+        
+        .calendar-day.today {
+            background: var(--accent-color);
+            color: white;
+            font-weight: bold;
+        }
+        
+        .calendar-day.has-event {
+            border: 2px solid var(--highlight-color);
+        }
+        
+        .calendar-event {
+            font-size: calc(8px * var(--font-scale));
+            padding: 2px;
+            background: var(--accent-color);
+            color: white;
+            border-radius: 2px;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .sync-calendar-btn {
+            background: var(--button-primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            font-size: calc(13px * var(--font-scale));
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        /* Delete Confirmation Modal */
+        .confirm-delete-modal {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            max-width: 350px;
+            text-align: center;
+        }
+        
+        .confirm-delete-modal h3 {
+            color: var(--danger);
+            margin-bottom: 15px;
+        }
+        
+        .confirm-delete-modal p {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            font-size: calc(12px * var(--font-scale));
+        }
+        
+        .confirm-delete-modal .warning-box {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid var(--danger);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 15px 0;
+        }
+        
+        .confirm-delete-modal .btn-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
         @media (max-width: 768px) {
             .main-content-wrapper {
                 margin-top: 210px;
@@ -757,6 +865,7 @@
                 <div class="tab" onclick="switchView('kanban')">Kanban</div>
                 <div class="tab" onclick="switchView('projects')">Projects</div>
                 <div class="tab" onclick="switchView('schedule')">Schedule</div>
+                <div class="tab" onclick="switchView('calendar')">Calendar</div>
             </div>
 
             <div class="stats-bar">
@@ -1093,13 +1202,14 @@
             projects: [],
             tasks: [],
             transactions: [],
-            deletedItems: [],
+            permanentlyDeleted: [], // Track permanently deleted items
             nightMode: false,
             themeColor: 0, // Default to Rose Blush
             fontSize: 'm',
             contrast: 'normal',
             timelineFilter: 'all',
-            scheduleView: 'month'
+            scheduleView: 'month',
+            calendarEvents: []
         };
 
         let editingId = null;
@@ -1293,6 +1403,7 @@
                 case 'kanban': renderKanban(content); break;
                 case 'projects': renderProjects(content); break;
                 case 'schedule': renderSchedule(content); break;
+                case 'calendar': renderCalendar(content); break;
             }
         }
 
@@ -1510,14 +1621,15 @@
             }
             
             let html = '';
-            data.projects.forEach(project => {
+            // Fixed: Ensure all projects are accessible, not just first 15
+            data.projects.forEach((project, index) => {
                 const tasks = data.tasks.filter(t => t.projectId === project.id);
                 const transactions = data.transactions.filter(t => t.projectId === project.id);
                 const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
                 const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
                 
                 html += `
-                    <div class="project-card">
+                    <div class="project-card" data-project-index="${index}">
                         <div class="project-header" onclick="showProjectDetail(${project.id})" style="cursor: pointer;">
                             <h3>${project.name} ${project.locked ? '🔒' : ''}</h3>
                             <div style="font-size: 11px; opacity: 0.9;">Client: ${project.client}</div>
@@ -1533,12 +1645,12 @@
                                 </div>
                                 <div style="text-align: center;">
                                     <div style="font-size: 9px; opacity: 0.8;">Income</div>
-                                    <div style="font-size: 13px; font-weight: bold; color: #4ade80;">$${income.toFixed(0)}</div>
+                                    <div style="font-size: 13px; font-weight: bold; color: #4ade80;">${income.toFixed(0)}</div>
                                 </div>
                                 <div style="text-align: center;">
                                     <div style="font-size: 9px; opacity: 0.8;">Profit</div>
                                     <div style="font-size: 13px; font-weight: bold; color: ${income - expenses >= 0 ? '#4ade80' : '#f87171'};">
-                                        $${(income - expenses).toFixed(0)}
+                                        ${(income - expenses).toFixed(0)}
                                     </div>
                                 </div>
                             </div>
@@ -1549,7 +1661,7 @@
                                 <button class="action-btn" onclick="toggleProjectLock(${project.id})">
                                     ${project.locked ? 'Unlock' : 'Lock'}
                                 </button>
-                                <button class="action-btn" onclick="deleteProject(${project.id})">Delete</button>
+                                <button class="action-btn" onclick="permanentDeleteProject(${project.id})">Delete</button>
                             </div>
                         </div>
                     </div>
