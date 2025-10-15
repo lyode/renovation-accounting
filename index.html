@@ -555,9 +555,60 @@
             z-index: 1001; 
             overflow-y: auto; 
             padding: 20px; 
+            /* Add safe area padding for iOS */
+            padding-top: calc(20px + var(--safe-area-inset-top));
+            padding-bottom: calc(20px + var(--safe-area-inset-bottom));
         }
         
         .settings-panel.show { right: 0; }
+        
+        /* Settings backdrop overlay */
+        .settings-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            transition: opacity 0.3s;
+        }
+        
+        .settings-backdrop.show {
+            display: block;
+        }
+        
+        /* Settings header with proper spacing */
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            /* Extra padding for mobile */
+            padding-top: 10px;
+        }
+        
+        .settings-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        
+        .settings-close-btn:active {
+            background: var(--bg-color);
+        }
         
         /* Color Theme Grid */
         .theme-grid { 
@@ -972,11 +1023,14 @@
         </div>
     </div>
 
+    <!-- Settings Backdrop -->
+    <div class="settings-backdrop" id="settingsBackdrop" onclick="toggleSettings()"></div>
+    
     <!-- Settings Panel -->
     <div class="settings-panel" id="settingsPanel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
-            <span style="font-size: 1.25rem; font-weight: bold; color: var(--text-color);">Settings</span>
-            <button onclick="toggleSettings()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color);">✕</button>
+        <div class="settings-header">
+            <span style="font-size: 1.25rem; font-weight: bold; color: var(--text-color);">⚙️ Settings</span>
+            <button class="settings-close-btn" onclick="toggleSettings()">✕</button>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
@@ -1504,15 +1558,42 @@
 
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
-            panel.classList.toggle('show');
+            const backdrop = document.getElementById('settingsBackdrop');
             
-            // Reinitialize theme picker when opening settings
             if (panel.classList.contains('show')) {
+                // Close settings
+                panel.classList.remove('show');
+                backdrop.classList.remove('show');
+                document.body.style.overflow = ''; // Restore scrolling
+            } else {
+                // Open settings
+                panel.classList.add('show');
+                backdrop.classList.add('show');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                
+                // Reinitialize theme picker when opening settings
                 setTimeout(() => {
                     initThemePicker();
                 }, 100);
             }
         }
+        
+        // Close settings with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.getElementById('settingsPanel').classList.contains('show')) {
+                toggleSettings();
+            }
+        });
+        
+        // Prevent settings panel from closing when clicking inside it
+        document.addEventListener('DOMContentLoaded', () => {
+            const settingsPanel = document.getElementById('settingsPanel');
+            if (settingsPanel) {
+                settingsPanel.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                });
+            }
+        });
 
         function toggleFabMenu() {
             document.getElementById('fabMenu').classList.toggle('show');
