@@ -1358,8 +1358,12 @@
             saveData();
             
             // Update button states
-            document.querySelectorAll('.contrast-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
+            document.querySelectorAll('.contrast-btn').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.toLowerCase() === level) {
+                    btn.classList.add('active');
+                }
+            });
         }
 
         function setFontSize(size) {
@@ -2639,9 +2643,11 @@
                 // First, test the API key validity
                 const testResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'GET',
+                    mode: 'cors',
                     headers: { 
                         'X-Master-Key': syncApiKey,
-                        'X-Bin-Meta': 'false'
+                        'X-Bin-Meta': 'false',
+                        'Content-Type': 'application/json'
                     }
                 });
                 
@@ -2697,9 +2703,12 @@
                 
                 // Pull from cloud
                 const pullResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
+                    method: 'GET',
+                    mode: 'cors',
                     headers: { 
                         'X-Master-Key': syncApiKey,
-                        'X-Bin-Meta': 'false'
+                        'X-Bin-Meta': 'false',
+                        'Content-Type': 'application/json'
                     }
                 });
                 
@@ -2744,6 +2753,7 @@
                 // Push merged data back to cloud
                 const pushResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'PUT',
+                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-Master-Key': syncApiKey,
@@ -2818,11 +2828,45 @@
                 showToast('Please enter an API key');
                 return;
             }
+            
+            // Test the API key immediately
             syncApiKey = key;
             localStorage.setItem('builderProSyncApiKey', key);
             document.getElementById('apiKeyInput').value = '';
-            document.getElementById('syncMode').textContent = 'Connected';
-            showToast('API key saved - Smart Sync ready!');
+            document.getElementById('syncMode').textContent = 'Testing...';
+            
+            // Test connection with the new key
+            testConnection(key);
+        }
+        
+        async function testConnection(apiKey) {
+            try {
+                const response = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
+                    method: 'GET',
+                    headers: { 
+                        'X-Master-Key': apiKey,
+                        'X-Bin-Meta': 'false'
+                    }
+                });
+                
+                if (response.status === 401) {
+                    showToast('Invalid API key - please check and try again');
+                    document.getElementById('syncMode').textContent = 'Invalid Key';
+                } else if (response.status === 404) {
+                    showToast('API key valid! Bin will be created on first sync');
+                    document.getElementById('syncMode').textContent = 'Ready';
+                } else if (response.ok) {
+                    showToast('API key saved - Connected to existing data!');
+                    document.getElementById('syncMode').textContent = 'Connected';
+                } else {
+                    showToast(`Connection test failed: ${response.status}`);
+                    document.getElementById('syncMode').textContent = 'Error';
+                }
+            } catch (error) {
+                console.error('Connection test error:', error);
+                showToast('Connection test failed - check console for details');
+                document.getElementById('syncMode').textContent = 'Offline';
+            }
         }
 
         // Export/Import
