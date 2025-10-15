@@ -2,10 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Builder Pro">
+    <meta name="apple-mobile-web-app-title" content="Builder Pro">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
     <meta name="theme-color" content="#E8A9B3">
+    <meta name="msapplication-navbutton-color" content="#E8A9B3">
+    <meta name="msapplication-starturl" content="/">
+    <meta name="format-detection" content="telephone=no">
+    
     <title>Builder Pro - Complete Project Manager</title>
     
     <!-- Favicon and App Icons -->
@@ -22,6 +31,11 @@
     
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Splash Screens -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-startup-image" href="web-app-manifest-512x512.png">
     
     <!-- PWA Meta Tags -->
     <meta name="application-name" content="Builder Pro">
@@ -1267,7 +1281,66 @@
                     showToast('👋 Welcome to Builder Pro! Press + to get started');
                 }, 1000);
             }
+            
+            // Register Service Worker for PWA
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            }
+            
+            // PWA Install Prompt
+            let deferredPrompt;
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e;
+                // Show install button if not already installed
+                if (!window.matchMedia('(display-mode: standalone)').matches) {
+                    setTimeout(() => {
+                        showInstallPrompt();
+                    }, 30000); // Show after 30 seconds
+                }
+            });
         });
+        
+        // Show install prompt for PWA
+        function showInstallPrompt() {
+            if (!window.deferredPrompt) return;
+            
+            const installBtn = document.createElement('button');
+            installBtn.textContent = '📱 Install App';
+            installBtn.style.cssText = `
+                position: fixed;
+                bottom: 90px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: var(--button-primary);
+                color: white;
+                padding: 12px 20px;
+                border: none;
+                border-radius: 25px;
+                font-size: 14px;
+                font-weight: bold;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+                cursor: pointer;
+                z-index: 1000;
+            `;
+            
+            installBtn.onclick = async () => {
+                window.deferredPrompt.prompt();
+                const result = await window.deferredPrompt.userChoice;
+                if (result.outcome === 'accepted') {
+                    showToast('App installed successfully!');
+                }
+                window.deferredPrompt = null;
+                installBtn.remove();
+            };
+            
+            document.body.appendChild(installBtn);
+            
+            // Auto remove after 10 seconds
+            setTimeout(() => installBtn.remove(), 10000);
+        }
 
         // Data Management
         function loadData() {
