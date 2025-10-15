@@ -1,20 +1,64 @@
 {
-  "start_url": "./",
+  "name": "Builder Pro - Project Manager",
+  "short_name": "Builder Pro",
+  "description": "Complete Project Management by REFIT Interior",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F4EDEB",
+  "theme_color": "#E8A9B3",
+  "categories": ["productivity", "business"],
+  "dir": "ltr",
+  "lang": "en-US",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "./favicon.ico",
-      "sizes": "16x16 32x32 48x48",
+      "src": "favicon.ico",
+      "sizes": "48x48",
       "type": "image/x-icon"
     },
     {
-      "src": "./web-app-manifest-192x192.png",
+      "src": "web-app-manifest-192x192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "./web-app-manifest-512x512.png",
+      "src": "web-app-manifest-512x512.png",
       "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "apple-touch-icon.png",
+      "sizes": "180x180",
       "type": "image/png"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "New Project",
+      "short_name": "Project",
+      "description": "Create a new project",
+      "url": "./index.html?action=new-project",
+      "icons": [{ "src": "web-app-manifest-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "View Tasks",
+      "short_name": "Tasks",
+      "description": "View all tasks",
+      "url": "./index.html?view=kanban",
+      "icons": [{ "src": "web-app-manifest-192x192.png", "sizes": "192x192" }]
+    }
+  ],
+  "share_target": {
+    "action": "./index.html",
+    "method": "GET",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
