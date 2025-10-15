@@ -1335,6 +1335,8 @@
             tasks: [],
             transactions: [],
             permanentlyDeleted: [], // Track permanently deleted items
+            archivedProjects: [], // Track archived projects
+            showArchived: false, // Toggle to show/hide archived projects
             nightMode: false,
             themeColor: 0, // Default to Rose Blush
             fontSize: 'm',
@@ -1355,6 +1357,13 @@
             loadData();
             initUI();
             updateStats();
+            
+            // Auto-add dates to existing projects without dates
+            addDatesToExistingProjects();
+            
+            // Auto-archive old projects
+            autoArchiveOldProjects();
+            
             renderView();
             initAutoSync();
             initializeLastSync();
@@ -1394,6 +1403,60 @@
                 }
             });
         });
+        
+        // Add dates to existing projects without dates
+        function addDatesToExistingProjects() {
+            let updated = false;
+            data.projects.forEach(project => {
+                if (!project.startDate || !project.endDate) {
+                    // Set default dates: Oct 1 to Oct 15, 2025
+                    project.startDate = '2025-10-01';
+                    project.endDate = '2025-10-15';
+                    updated = true;
+                }
+            });
+            
+            if (updated) {
+                saveData();
+                showToast('📅 Added dates to projects (Oct 1-15, 2025)');
+            }
+        }
+        
+        // Auto-archive old projects (instead of deleting)
+        function autoArchiveOldProjects() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let archivedCount = 0;
+            
+            // Initialize archived projects array if not exists
+            if (!data.archivedProjects) {
+                data.archivedProjects = [];
+            }
+            
+            data.projects = data.projects.filter(project => {
+                if (project.endDate) {
+                    const endDate = new Date(project.endDate);
+                    endDate.setHours(23, 59, 59, 999);
+                    
+                    // If project ended more than 7 days ago, archive it
+                    const daysSinceEnd = Math.floor((today - endDate) / (1000 * 60 * 60 * 24));
+                    if (daysSinceEnd > 7 && !project.locked) {
+                        // Move to archived
+                        project.archivedAt = new Date().toISOString();
+                        project.archived = true;
+                        data.archivedProjects.push(project);
+                        archivedCount++;
+                        return false; // Remove from active projects
+                    }
+                }
+                return true; // Keep in active projects
+            });
+            
+            if (archivedCount > 0) {
+                saveData();
+                showToast(`📦 Archived ${archivedCount} completed project(s)`);
+            }
+        }
         
         // Show install prompt for PWA
         function showInstallPrompt() {
