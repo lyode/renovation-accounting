@@ -8,39 +8,12 @@
     <meta name="theme-color" content="#E8A9B3">
     <title>Builder Pro - Complete Project Manager</title>
     
-    <!-- Favicon and App Icons -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="shortcut icon" href="favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="manifest" href="site.webmanifest">
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- PWA Icons for Home Screen -->
-    <link rel="apple-touch-icon" href="web-app-manifest-192x192.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="web-app-manifest-512x512.png">
-    
-    <!-- PWA Meta Tags -->
-    <meta name="application-name" content="Builder Pro">
-    <meta name="apple-mobile-web-app-title" content="Builder Pro">
-    <meta name="description" content="Complete Project Management App by REFIT Interior">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- Microsoft Tiles -->
-    <meta name="msapplication-TileColor" content="#E8A9B3">
-    <meta name="msapplication-TileImage" content="favicon/ms-icon-144x144.png">
-    
     <style>
         :root {
-            /* Default Rose Blush Theme */
             --bg-color: #F4EDEB;
             --accent-color: #E8A9B3;
             --highlight-color: #D47C90;
             --text-color: #1C1C1C;
-            
-            /* UI Elements */
             --card-bg: #ffffff;
             --text-secondary: #5a5a5a;
             --border-color: #e8e8e8;
@@ -50,32 +23,25 @@
             --danger: #ef4444;
             --income-color: #10b981;
             --expense-color: #ef4444;
-            
-            /* Deep Brown for buttons */
             --button-primary: #4B2B1A;
             --button-primary-hover: #6B4332;
-            
-            /* Accessibility */
             --contrast: 1;
             --brightness: 1;
             --font-scale: 1;
         }
         
-        /* Contrast levels */
         body.low-contrast { --contrast: 0.85; --brightness: 1.1; }
         body.normal-contrast { --contrast: 1; --brightness: 1; }
         body.high-contrast { --contrast: 1.25; --brightness: 0.95; }
         body.extra-contrast { --contrast: 1.5; --brightness: 0.9; }
         body { filter: contrast(var(--contrast)) brightness(var(--brightness)); }
         
-        /* Font sizes */
         body.font-s { --font-scale: 0.85; }
         body.font-m { --font-scale: 1; }
         body.font-l { --font-scale: 1.15; }
         body.font-xl { --font-scale: 1.3; }
         body.font-xxl { --font-scale: 1.5; }
 
-        /* Night mode */
         .night-mode { 
             --bg-color: #1a1618 !important; 
             --card-bg: #2d2729 !important; 
@@ -85,12 +51,7 @@
             --shadow-color: rgba(0,0,0,0.3) !important;
         }
         
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            -webkit-tap-highlight-color: transparent; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
         body { 
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
@@ -102,22 +63,8 @@
             font-size: calc(14px * var(--font-scale));
         }
         
-        .app-container { 
-            max-width: 100vw; 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column;
-        }
-        
-        /* Fixed header */
-        .fixed-header-section {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            background: var(--bg-color);
-        }
+        .app-container { max-width: 100vw; min-height: 100vh; display: flex; flex-direction: column; }
+        .fixed-header-section { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: var(--bg-color); }
         
         .header { 
             background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%); 
@@ -126,37 +73,11 @@
             box-shadow: 0 2px 10px var(--shadow-color); 
         }
         
-        .header-content { 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            gap: 10px; 
-        }
-        
-        .header-left { 
-            display: flex; 
-            align-items: center; 
-            gap: 10px; 
-            flex: 1; 
-            cursor: pointer; 
-        }
-        
-        .header h1 { 
-            font-size: calc(16px * var(--font-scale)); 
-            font-weight: 600; 
-        }
-        
-        .header-subtitle { 
-            font-size: calc(11px * var(--font-scale)); 
-            opacity: 0.9; 
-            margin-top: 2px; 
-        }
-        
-        .header-controls { 
-            display: flex; 
-            gap: 8px; 
-            align-items: center; 
-        }
+        .header-content { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+        .header-left { display: flex; align-items: center; gap: 10px; flex: 1; cursor: pointer; }
+        .header h1 { font-size: calc(16px * var(--font-scale)); font-weight: 600; }
+        .header-subtitle { font-size: calc(11px * var(--font-scale)); opacity: 0.9; margin-top: 2px; }
+        .header-controls { display: flex; gap: 8px; align-items: center; }
         
         .header-btn { 
             background: rgba(255,255,255,0.2); 
@@ -174,9 +95,7 @@
             transition: background 0.2s;
         }
         
-        .header-btn:active {
-            background: rgba(255,255,255,0.3);
-        }
+        .header-btn:active { background: rgba(255,255,255,0.3); }
         
         .sync-indicator { 
             position: absolute; 
@@ -189,15 +108,9 @@
             border: 2px solid white; 
         }
         
-        .sync-indicator.syncing { 
-            background: #f39c12; 
-            animation: pulse 1s infinite; 
-        }
+        .sync-indicator.syncing { background: #f39c12; animation: pulse 1s infinite; }
         
-        @keyframes pulse { 
-            0%, 100% { opacity: 1; } 
-            50% { opacity: 0.5; } 
-        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
         
         .sync-status-bar { 
             background: var(--button-primary); 
@@ -211,12 +124,7 @@
             gap: 10px; 
         }
         
-        .tabs { 
-            background: var(--card-bg); 
-            display: flex; 
-            border-bottom: 2px solid var(--border-color); 
-            overflow-x: auto; 
-        }
+        .tabs { background: var(--card-bg); display: flex; border-bottom: 2px solid var(--border-color); overflow-x: auto; }
         
         .tab { 
             flex: 1; 
@@ -231,39 +139,15 @@
             transition: all 0.2s;
         }
         
-        .tab.active { 
-            color: var(--accent-color); 
-            border-bottom-color: var(--accent-color); 
-        }
+        .tab.active { color: var(--accent-color); border-bottom-color: var(--accent-color); }
         
-        .stats-bar { 
-            display: grid; 
-            grid-template-columns: repeat(4, 1fr); 
-            gap: 8px; 
-            padding: 10px; 
-            background: var(--bg-color); 
-        }
+        .stats-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 10px; background: var(--bg-color); }
+        .main-content-wrapper { margin-top: 200px; flex: 1; }
         
-        /* Content with spacing for fixed header */
-        .main-content-wrapper {
-            margin-top: 200px;
-            flex: 1;
-        }
+        @media (max-width: 768px) { .main-content-wrapper { margin-top: 210px; } }
         
-        @media (max-width: 768px) {
-            .main-content-wrapper {
-                margin-top: 210px;
-            }
-        }
+        .container { padding: 10px; overflow-y: auto; -webkit-overflow-scrolling: touch; padding-bottom: 80px; }
         
-        .container { 
-            padding: 10px; 
-            overflow-y: auto; 
-            -webkit-overflow-scrolling: touch; 
-            padding-bottom: 80px; 
-        }
-        
-        /* Cards and components */
         .stat-card { 
             background: var(--card-bg); 
             padding: 10px; 
@@ -272,20 +156,10 @@
             text-align: center; 
         }
         
-        .stat-card h3 { 
-            font-size: calc(16px * var(--font-scale)); 
-            color: var(--accent-color); 
-            margin-bottom: 2px; 
-            font-weight: 700; 
-        }
-        
+        .stat-card h3 { font-size: calc(16px * var(--font-scale)); color: var(--accent-color); margin-bottom: 2px; font-weight: 700; }
         .stat-card.income h3 { color: var(--income-color); }
         .stat-card.expense h3 { color: var(--expense-color); }
-        
-        .stat-card p {
-            color: var(--text-secondary);
-            font-size: calc(11px * var(--font-scale));
-        }
+        .stat-card p { color: var(--text-secondary); font-size: calc(11px * var(--font-scale)); }
         
         .project-card { 
             background: var(--card-bg); 
@@ -312,12 +186,7 @@
             border-radius: 8px;
         }
         
-        .project-actions { 
-            display: flex; 
-            gap: 5px; 
-            margin-top: 8px; 
-            flex-wrap: wrap; 
-        }
+        .project-actions { display: flex; gap: 5px; margin-top: 8px; flex-wrap: wrap; }
         
         .action-btn { 
             background: rgba(255,255,255,0.2); 
@@ -330,11 +199,9 @@
             transition: background 0.2s;
         }
         
-        .action-btn:active {
-            background: rgba(255,255,255,0.3);
-        }
+        .action-btn:active { background: rgba(255,255,255,0.3); }
+        .action-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         
-        /* Gantt Chart */
         .gantt-container { 
             background: var(--card-bg); 
             border-radius: 10px; 
@@ -344,19 +211,8 @@
             margin-bottom: 15px; 
         }
         
-        .gantt-timeline-header {
-            display: flex;
-            border-bottom: 2px solid var(--border-color);
-            padding-bottom: 8px;
-            margin-bottom: 10px;
-        }
-        
-        .gantt-timeline-months {
-            margin-left: 150px;
-            display: flex;
-            flex: 1;
-            gap: 2px;
-        }
+        .gantt-timeline-header { display: flex; border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 10px; }
+        .gantt-timeline-months { margin-left: 150px; display: flex; flex: 1; gap: 2px; }
         
         .gantt-month {
             flex: 1;
@@ -369,12 +225,7 @@
             border-radius: 4px;
         }
         
-        .gantt-row { 
-            display: flex; 
-            align-items: center; 
-            margin-bottom: 8px; 
-            min-height: 40px; 
-        }
+        .gantt-row { display: flex; align-items: center; margin-bottom: 8px; min-height: 40px; }
         
         .gantt-label { 
             width: 150px; 
@@ -387,13 +238,7 @@
             text-overflow: ellipsis;
         }
         
-        .gantt-timeline { 
-            flex: 1; 
-            position: relative; 
-            height: 35px; 
-            background: var(--bg-color); 
-            border-radius: 4px; 
-        }
+        .gantt-timeline { flex: 1; position: relative; height: 35px; background: var(--bg-color); border-radius: 4px; }
         
         .gantt-bar { 
             position: absolute; 
@@ -411,12 +256,8 @@
             cursor: pointer;
         }
         
-        .gantt-bar-dates {
-            font-size: calc(8px * var(--font-scale));
-            opacity: 0.9;
-        }
+        .gantt-bar-dates { font-size: calc(8px * var(--font-scale)); opacity: 0.9; }
         
-        /* Modals */
         .modal { 
             display: none; 
             position: fixed; 
@@ -432,17 +273,8 @@
         }
         
         .modal.show { display: flex; }
+        .modal-content { background: var(--card-bg); border-radius: 12px; width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; }
         
-        .modal-content { 
-            background: var(--card-bg); 
-            border-radius: 12px; 
-            width: 100%; 
-            max-width: 400px; 
-            max-height: 80vh; 
-            overflow-y: auto; 
-        }
-        
-        /* Forms */
         .form-group input, .form-group select, .form-group textarea { 
             width: 100%; 
             padding: 8px 10px; 
@@ -453,41 +285,13 @@
             color: var(--text-color); 
         }
         
-        .btn { 
-            padding: 8px 16px; 
-            border: none; 
-            border-radius: 6px; 
-            font-size: calc(13px * var(--font-scale)); 
-            cursor: pointer; 
-            transition: all 0.2s;
-        }
+        .btn { padding: 8px 16px; border: none; border-radius: 6px; font-size: calc(13px * var(--font-scale)); cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: var(--button-primary); color: white; }
+        .btn-primary:hover { background: var(--button-primary-hover); }
+        .btn-secondary { background: var(--bg-color); color: var(--text-color); border: 1px solid var(--border-color); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-danger { background: var(--danger); color: white; }
         
-        .btn-primary { 
-            background: var(--button-primary); 
-            color: white; 
-        }
-        
-        .btn-primary:hover {
-            background: var(--button-primary-hover);
-        }
-        
-        .btn-secondary { 
-            background: var(--bg-color); 
-            color: var(--text-color); 
-            border: 1px solid var(--border-color); 
-        }
-        
-        .btn-success { 
-            background: var(--success); 
-            color: white; 
-        }
-        
-        .btn-danger { 
-            background: var(--danger); 
-            color: white; 
-        }
-        
-        /* Settings Panel */
         .settings-panel { 
             position: fixed; 
             top: 0; 
@@ -505,7 +309,6 @@
         
         .settings-panel.show { right: 0; }
         
-        /* Color Theme Grid */
         .theme-grid { 
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -528,16 +331,8 @@
             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         
-        .theme-option:hover { 
-            transform: scale(1.02); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-        }
-        
-        .theme-option.active { 
-            border-color: var(--button-primary); 
-            transform: scale(1.02); 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
+        .theme-option:hover { transform: scale(1.02); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        .theme-option.active { border-color: var(--button-primary); transform: scale(1.02); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
         
         .theme-preview {
             height: 50px;
@@ -552,20 +347,9 @@
             text-shadow: 0 1px 2px rgba(0,0,0,0.2);
         }
         
-        .theme-name {
-            font-size: 11px;
-            text-align: center;
-            color: var(--text-secondary);
-            font-weight: 500;
-        }
+        .theme-name { font-size: 11px; text-align: center; color: var(--text-secondary); font-weight: 500; }
         
-        /* Contrast Controls */
-        .contrast-controls {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
-            margin-top: 10px;
-        }
+        .contrast-controls { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 10px; }
         
         .contrast-btn {
             padding: 8px;
@@ -578,19 +362,9 @@
             color: var(--text-color);
         }
         
-        .contrast-btn.active {
-            background: var(--button-primary);
-            color: white;
-            border-color: var(--button-primary);
-        }
+        .contrast-btn.active { background: var(--button-primary); color: white; border-color: var(--button-primary); }
         
-        /* FAB */
-        .fab-container { 
-            position: fixed; 
-            bottom: 20px; 
-            right: 20px; 
-            z-index: 99; 
-        }
+        .fab-container { position: fixed; bottom: 20px; right: 20px; z-index: 99; }
         
         .fab { 
             width: 50px; 
@@ -606,20 +380,9 @@
             font-weight: bold;
         }
         
-        .fab:hover {
-            background: var(--button-primary-hover);
-            transform: scale(1.05);
-        }
+        .fab:hover { background: var(--button-primary-hover); transform: scale(1.05); }
         
-        .fab-menu { 
-            position: absolute; 
-            bottom: 60px; 
-            right: 0; 
-            display: none; 
-            flex-direction: column; 
-            gap: 8px; 
-        }
-        
+        .fab-menu { position: absolute; bottom: 60px; right: 0; display: none; flex-direction: column; gap: 8px; }
         .fab-menu.show { display: flex; }
         
         .fab-option { 
@@ -653,13 +416,8 @@
         
         .toast.show { opacity: 1; }
         
-        .empty-state { 
-            text-align: center; 
-            padding: 40px 20px; 
-            color: var(--text-secondary); 
-        }
+        .empty-state { text-align: center; padding: 40px 20px; color: var(--text-secondary); }
         
-        /* Task items */
         .task-item { 
             padding: 10px; 
             margin-bottom: 8px; 
@@ -686,15 +444,9 @@
             transition: all 0.2s;
         }
         
-        .icon-btn:hover {
-            transform: scale(1.05);
-        }
+        .icon-btn:hover { transform: scale(1.05); }
+        .icon-btn.danger { background: var(--danger); }
         
-        .icon-btn.danger { 
-            background: var(--danger); 
-        }
-        
-        /* Calendar Styles */
         .calendar-container {
             background: var(--card-bg);
             border-radius: 10px;
@@ -728,21 +480,14 @@
             font-size: calc(10px * var(--font-scale));
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
         }
         
-        .calendar-day.other-month {
-            opacity: 0.3;
-        }
-        
-        .calendar-day.today {
-            background: var(--accent-color);
-            color: white;
-            font-weight: bold;
-        }
-        
-        .calendar-day.has-event {
-            border: 2px solid var(--highlight-color);
-        }
+        .calendar-day:hover { background: var(--card-bg); transform: scale(1.05); }
+        .calendar-day.other-month { opacity: 0.3; }
+        .calendar-day.today { background: var(--accent-color); color: white; font-weight: bold; }
+        .calendar-day.has-event { border: 2px solid var(--highlight-color); }
         
         .calendar-event {
             font-size: calc(8px * var(--font-scale));
@@ -756,110 +501,26 @@
             text-overflow: ellipsis;
         }
         
-        .sync-calendar-btn {
-            background: var(--button-primary);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            font-size: calc(13px * var(--font-scale));
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin: 15px 0;
-        }
-        
-        /* Delete Confirmation Modal */
-        .confirm-delete-modal {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 350px;
-            text-align: center;
-        }
-        
-        .confirm-delete-modal h3 {
-            color: var(--danger);
-            margin-bottom: 15px;
-        }
-        
-        .confirm-delete-modal p {
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            font-size: calc(12px * var(--font-scale));
-        }
-        
-        .confirm-delete-modal .warning-box {
-            background: rgba(239, 68, 68, 0.1);
-            border: 2px solid var(--danger);
-            border-radius: 8px;
-            padding: 10px;
-            margin: 15px 0;
-        }
-        
-        .confirm-delete-modal .btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
         @media (max-width: 768px) {
-            .main-content-wrapper {
-                margin-top: 210px;
-            }
-            
-            .tabs {
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            .fab {
-                width: 56px;
-                height: 56px;
-            }
-            
-            .theme-grid {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 8px;
-                max-height: 350px;
-            }
-            
-            .theme-preview {
-                height: 40px;
-                font-size: 12px;
-            }
-            
-            .stats-bar {
-                gap: 6px;
-                padding: 8px;
-            }
-            
-            .stat-card {
-                padding: 8px;
-            }
-            
-            .stat-card h3 {
-                font-size: calc(14px * var(--font-scale));
-            }
-            
-            .stat-card p {
-                font-size: calc(10px * var(--font-scale));
-            }
+            .main-content-wrapper { margin-top: 210px; }
+            .tabs { -webkit-overflow-scrolling: touch; }
+            .fab { width: 56px; height: 56px; }
+            .theme-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; max-height: 350px; }
+            .theme-preview { height: 40px; font-size: 12px; }
+            .stats-bar { gap: 6px; padding: 8px; }
+            .stat-card { padding: 8px; }
+            .stat-card h3 { font-size: calc(14px * var(--font-scale)); }
+            .stat-card p { font-size: calc(10px * var(--font-scale)); }
         }
         
         @media (max-width: 400px) {
-            .main-content-wrapper {
-                margin-top: 220px;
-            }
-            
-            .theme-grid {
-                grid-template-columns: 1fr;
-            }
+            .main-content-wrapper { margin-top: 220px; }
+            .theme-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Fixed Header Section -->
         <div class="fixed-header-section">
             <div class="header">
                 <div class="header-content">
@@ -912,13 +573,11 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content-wrapper">
             <div class="container" id="mainContent"></div>
         </div>
     </div>
 
-    <!-- Settings Panel -->
     <div class="settings-panel" id="settingsPanel">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
             <span style="font-size: 1.25rem; font-weight: bold; color: var(--text-color);">Settings</span>
@@ -928,28 +587,30 @@
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
             <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🔑 Smart Sync API</label>
             <div style="display: flex; gap: 8px; margin-bottom: 10px;">
-                <input type="password" id="apiKeyInput" placeholder="JSONBin API Key" style="flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
+                <input type="password" id="apiKeyInput" placeholder="JSONBin API Key" style="flex: 1; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-color);">
                 <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
             </div>
             <div style="padding: 8px; background: var(--bg-color); border-radius: 6px; font-size: 11px; color: var(--text-secondary); margin-bottom: 10px;">
-                Smart Sync: Pulls cloud data → Merges with local → Pushes complete dataset
+                <strong>How to get API Key:</strong><br>
+                1. Visit <a href="https://jsonbin.io" target="_blank" style="color: var(--accent-color);">jsonbin.io</a><br>
+                2. Sign up (free)<br>
+                3. Copy your Master Key<br>
+                4. Paste here and click Save
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <span style="font-weight: 500; color: var(--text-color);">⚡ Auto-Sync (every 5 minutes)</span>
+                <span style="font-weight: 500; color: var(--text-color);">⚡ Auto-Sync (every 5 min)</span>
                 <input type="checkbox" id="autoSyncToggle" onchange="toggleAutoSync()" style="width: 44px; height: 24px;">
             </div>
-            <button class="btn btn-primary" onclick="smartSync()" style="width: 100%;">Manual Sync Now</button>
+            <button class="btn btn-primary" onclick="smartSync()" style="width: 100%;">🔄 Manual Sync Now</button>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
-            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🎨 Theme Colors (18 Premium Themes)</label>
-            <div class="theme-grid" id="themeGrid">
-                <!-- Themes will be populated here by JavaScript -->
-            </div>
+            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🎨 Theme Colors</label>
+            <div class="theme-grid" id="themeGrid"></div>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
-            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">⚡ Theme Contrast</label>
+            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">⚡ Contrast</label>
             <div class="contrast-controls">
                 <button class="contrast-btn" onclick="setContrast('low')">Low</button>
                 <button class="contrast-btn active" onclick="setContrast('normal')">Normal</button>
@@ -985,7 +646,6 @@
         </div>
     </div>
 
-    <!-- FAB Menu -->
     <div class="fab-container">
         <div class="fab-menu" id="fabMenu">
             <div class="fab-option" onclick="showProjectModal()">
@@ -1004,7 +664,6 @@
         <button class="fab" onclick="toggleFabMenu()">+</button>
     </div>
 
-    <!-- Modals -->
     <div class="modal" id="profileModal">
         <div class="modal-content">
             <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
@@ -1014,11 +673,11 @@
             <div style="padding: 15px;">
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--text-secondary);">Your Name</label>
-                    <input type="text" id="profileName" placeholder="John Doe" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
+                    <input type="text" id="profileName" placeholder="John Doe" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-color);">
                 </div>
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--text-secondary);">Position</label>
-                    <input type="text" id="profilePosition" placeholder="Project Manager" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px;">
+                    <input type="text" id="profilePosition" placeholder="Project Manager" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; background: var(--bg-color); color: var(--text-color);">
                 </div>
             </div>
             <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 8px;">
@@ -1055,11 +714,11 @@
                 </div>
                 <div class="form-group" style="margin-bottom: 12px;">
                     <label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--text-secondary);">Description</label>
-                    <textarea id="projectDescription" rows="3" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; resize: none;"></textarea>
+                    <textarea id="projectDescription" rows="3" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; resize: none; background: var(--bg-color); color: var(--text-color);"></textarea>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
                     <input type="checkbox" id="projectLocked" style="width: 20px; height: 20px;">
-                    <label for="projectLocked" style="font-size: 12px; color: var(--text-color);">🔒 Lock project (prevents editing)</label>
+                    <label for="projectLocked" style="font-size: 12px; color: var(--text-color);">🔒 Lock project</label>
                 </div>
             </div>
             <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 8px;">
@@ -1119,7 +778,7 @@
                 </div>
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--text-secondary);">Description</label>
-                    <textarea id="taskDescription" rows="3" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; resize: none;"></textarea>
+                    <textarea id="taskDescription" rows="3" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; resize: none; background: var(--bg-color); color: var(--text-color);"></textarea>
                 </div>
             </div>
             <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 8px;">
@@ -1161,7 +820,7 @@
                 </div>
                 <div class="form-group">
                     <label style="display: block; margin-bottom: 4px; font-size: 12px; color: var(--text-secondary);">Description</label>
-                    <textarea id="transDescription" rows="2" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; resize: none;"></textarea>
+                    <textarea id="transDescription" rows="2" style="width: 100%; padding: 8px; border: 1px solid var(--border-color); border-radius: 6px; font-family: inherit; resize: none; background: var(--bg-color); color: var(--text-color);"></textarea>
                 </div>
             </div>
             <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; gap: 8px;">
@@ -1177,9 +836,7 @@
                 <h2 id="projectDetailTitle" style="color: var(--text-color);">Project Details</h2>
                 <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('projectDetailModal')">×</span>
             </div>
-            <div id="projectDetailBody" style="padding: 15px; max-height: 60vh; overflow-y: auto;">
-                <!-- Dynamic content -->
-            </div>
+            <div id="projectDetailBody" style="padding: 15px; max-height: 60vh; overflow-y: auto;"></div>
             <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
                 <button class="btn btn-secondary" onclick="closeModal('projectDetailModal')">Close</button>
             </div>
@@ -1189,14 +846,12 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // Configuration
         const APP_CONFIG = {
             binId: '68e121b8ae596e708f05df17',
             baseUrl: 'https://api.jsonbin.io/v3',
             deviceType: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Laptop'
         };
 
-        // 18 Premium Theme Colors
         const themeColors = [
             { name: 'Rose Blush', bg: '#F4EDEB', accent: '#E8A9B3', highlight: '#D47C90', text: '#1C1C1C' },
             { name: 'Mocha Cream', bg: '#FFF6F1', accent: '#C9A48F', highlight: '#8A5C4E', text: '#1C1C1C' },
@@ -1218,7 +873,6 @@
             { name: 'Neutral Blush', bg: '#F5F3F2', accent: '#D0B8AD', highlight: '#8C6A5A', text: '#1C1C1C' }
         ];
 
-        // App State
         let data = {
             currentUser: 'Builder Pro',
             userPosition: 'by REFIT Interior',
@@ -1226,9 +880,9 @@
             projects: [],
             tasks: [],
             transactions: [],
-            permanentlyDeleted: [], // Track permanently deleted items
+            permanentlyDeleted: [],
             nightMode: false,
-            themeColor: 0, // Default to Rose Blush
+            themeColor: 0,
             fontSize: 'm',
             contrast: 'normal',
             timelineFilter: 'all',
@@ -1241,8 +895,16 @@
         let syncApiKey = '';
         let autoSyncInterval = null;
         let autoSyncEnabled = false;
+        let draggedTaskId = null;
 
-        // Initialize App
+        // Utility function to sanitize HTML
+        function sanitize(str) {
+            if (!str) return '';
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
             initUI();
@@ -1251,15 +913,12 @@
             initAutoSync();
             initializeLastSync();
             
-            // Check online status
             if (!navigator.onLine) {
                 document.getElementById('syncMode').textContent = 'Offline';
             }
             
-            // Set initial device type
             document.getElementById('deviceType').textContent = APP_CONFIG.deviceType;
             
-            // Show welcome message for new users
             if (data.projects.length === 0 && data.tasks.length === 0) {
                 setTimeout(() => {
                     showToast('👋 Welcome to Builder Pro! Press + to get started');
@@ -1267,11 +926,14 @@
             }
         });
 
-        // Data Management
         function loadData() {
             const saved = localStorage.getItem('builderProData');
             if (saved) {
-                data = { ...data, ...JSON.parse(saved) };
+                try {
+                    data = { ...data, ...JSON.parse(saved) };
+                } catch (e) {
+                    console.error('Failed to load data:', e);
+                }
             }
             syncApiKey = localStorage.getItem('builderProSyncApiKey') || '';
             applySettings();
@@ -1293,7 +955,6 @@
             updateHeader();
         }
 
-        // UI Functions
         function initUI() {
             initThemePicker();
             document.getElementById('deviceType').textContent = APP_CONFIG.deviceType;
@@ -1301,10 +962,7 @@
 
         function initThemePicker() {
             const grid = document.getElementById('themeGrid');
-            if (!grid) {
-                console.error('Theme grid element not found');
-                return;
-            }
+            if (!grid) return;
             grid.innerHTML = '';
             
             themeColors.forEach((theme, index) => {
@@ -1314,7 +972,7 @@
                 const preview = document.createElement('div');
                 preview.className = 'theme-preview';
                 preview.style.background = `linear-gradient(135deg, ${theme.accent} 0%, ${theme.highlight} 100%)`;
-                preview.innerHTML = 'Aa';
+                preview.textContent = 'Aa';
                 
                 const name = document.createElement('div');
                 name.className = 'theme-name';
@@ -1346,8 +1004,6 @@
             }
             document.documentElement.style.setProperty('--accent-color', theme.accent);
             document.documentElement.style.setProperty('--highlight-color', theme.highlight);
-            
-            // Update meta theme color for mobile
             document.querySelector('meta[name="theme-color"]').content = theme.accent;
         }
 
@@ -1357,7 +1013,6 @@
             data.contrast = level;
             saveData();
             
-            // Update button states
             document.querySelectorAll('.contrast-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.textContent.toLowerCase() === level) {
@@ -1381,19 +1036,14 @@
         }
 
         function updateHeader() {
-            if (data.currentUser !== 'Builder Pro') {
-                document.getElementById('headerName').textContent = data.currentUser;
-            }
-            if (data.userPosition !== 'by REFIT Interior') {
-                document.getElementById('headerPosition').textContent = data.userPosition;
-            }
+            document.getElementById('headerName').textContent = sanitize(data.currentUser || 'Builder Pro');
+            document.getElementById('headerPosition').textContent = sanitize(data.userPosition || 'by REFIT Interior');
         }
 
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
             panel.classList.toggle('show');
             
-            // Reinitialize theme picker when opening settings
             if (panel.classList.contains('show')) {
                 setTimeout(() => {
                     initThemePicker();
@@ -1416,7 +1066,6 @@
             document.getElementById(modalId).classList.remove('show');
         }
 
-        // View Management
         function switchView(view) {
             data.currentView = view;
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -1461,7 +1110,6 @@
                 </div>
             `;
             
-            // Timeline filters
             html += `
                 <div style="display: flex; gap: 8px; margin-bottom: 12px; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color);">
                     <button class="btn btn-secondary ${data.timelineFilter === 'all' ? 'active' : ''}" 
@@ -1475,7 +1123,6 @@
                 </div>
             `;
             
-            // Due tasks with timeline filter
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
@@ -1485,7 +1132,6 @@
                 return due <= today && t.status !== 'Completed';
             });
             
-            // Apply timeline filter
             if (data.timelineFilter === 'day') {
                 dueTasks = dueTasks.filter(t => {
                     const due = new Date(t.dueDate);
@@ -1517,10 +1163,10 @@
                     html += `
                         <div class="task-item" style="border-left-color: var(--danger);">
                             <div style="flex: 1;">
-                                <div style="font-weight: 500; margin-bottom: 5px; color: var(--text-color);">${task.name}</div>
+                                <div style="font-weight: 500; margin-bottom: 5px; color: var(--text-color);">${sanitize(task.name)}</div>
                                 <div style="font-size: 11px; color: var(--text-secondary);">
-                                    ${project ? project.name : 'No Project'} • Due: ${task.dueDate}
-                                    ${task.assignee ? ` • Assigned to: ${task.assignee}` : ''}
+                                    ${project ? sanitize(project.name) : 'No Project'} • Due: ${task.dueDate}
+                                    ${task.assignee ? ` • Assigned to: ${sanitize(task.assignee)}` : ''}
                                 </div>
                             </div>
                             <button class="icon-btn" onclick="editTask(${task.id})">✏️</button>
@@ -1545,7 +1191,6 @@
 
         function renderProjectTimeline() {
             const projectsWithDates = data.projects.filter(p => p.startDate && p.endDate);
-            const projectsWithoutDates = data.projects.filter(p => !p.startDate || !p.endDate);
             
             if (data.projects.length === 0) return '';
             
@@ -1557,7 +1202,7 @@
                 data.projects.forEach(project => {
                     html += `
                         <div style="padding: 8px; margin-bottom: 5px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--accent-color);">
-                            <strong style="color: var(--text-color);">${project.name}</strong> - <span style="color: var(--text-secondary);">${project.client}</span>
+                            <strong style="color: var(--text-color);">${sanitize(project.name)}</strong> - <span style="color: var(--text-secondary);">${sanitize(project.client)}</span>
                             ${project.locked ? ' 🔒' : ''}
                         </div>
                     `;
@@ -1566,14 +1211,14 @@
                 return html;
             }
             
-            let minDate = null;
-            let maxDate = null;
+            let minDate = new Date(projectsWithDates[0].startDate);
+            let maxDate = new Date(projectsWithDates[0].endDate);
             
             projectsWithDates.forEach(p => {
                 const start = new Date(p.startDate);
                 const end = new Date(p.endDate);
-                if (!minDate || start < minDate) minDate = start;
-                if (!maxDate || end > maxDate) maxDate = end;
+                if (start < minDate) minDate = start;
+                if (end > maxDate) maxDate = end;
             });
             
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
@@ -1608,7 +1253,7 @@
                 
                 html += `
                     <div class="gantt-row">
-                        <div class="gantt-label">${project.name} ${project.locked ? '🔒' : ''}</div>
+                        <div class="gantt-label">${sanitize(project.name)} ${project.locked ? '🔒' : ''}</div>
                         <div class="gantt-timeline">
                             <div class="gantt-bar" style="left: ${left}%; width: ${width}%;" onclick="showProjectDetail(${project.id})">
                                 <div>${duration} days</div>
@@ -1622,22 +1267,6 @@
                 `;
             });
             
-            if (projectsWithoutDates.length > 0) {
-                html += '<div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color);">';
-                html += '<h4 style="font-size: 12px; margin-bottom: 10px; color: var(--text-secondary);">Projects without dates:</h4>';
-                projectsWithoutDates.forEach(project => {
-                    html += `
-                        <div class="gantt-row">
-                            <div class="gantt-label">${project.name} ${project.locked ? '🔒' : ''}</div>
-                            <div class="gantt-timeline" style="display: flex; align-items: center; padding-left: 10px;">
-                                <span style="font-size: 11px; color: var(--text-secondary);">No dates set - ${project.client}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-            }
-            
             html += '</div>';
             return html;
         }
@@ -1649,18 +1278,17 @@
             }
             
             let html = '';
-            // Fixed: Ensure all projects are accessible, not just first 15
-            data.projects.forEach((project, index) => {
+            data.projects.forEach(project => {
                 const tasks = data.tasks.filter(t => t.projectId === project.id);
                 const transactions = data.transactions.filter(t => t.projectId === project.id);
                 const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
                 const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
                 
                 html += `
-                    <div class="project-card" data-project-index="${index}">
+                    <div class="project-card">
                         <div class="project-header" onclick="showProjectDetail(${project.id})" style="cursor: pointer;">
-                            <h3>${project.name} ${project.locked ? '🔒' : ''}</h3>
-                            <div style="font-size: 11px; opacity: 0.9;">Client: ${project.client}</div>
+                            <h3>${sanitize(project.name)} ${project.locked ? '🔒' : ''}</h3>
+                            <div style="font-size: 11px; opacity: 0.9;">Client: ${sanitize(project.client)}</div>
                             ${project.startDate && project.endDate ? 
                                 `<div style="font-size: 11px; opacity: 0.9; margin-top: 4px;">
                                     ${new Date(project.startDate).toLocaleDateString()} - 
@@ -1709,15 +1337,15 @@
             const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
             const profit = income - expenses;
             
-            document.getElementById('projectDetailTitle').textContent = project.name + (project.locked ? ' 🔒' : '');
+            document.getElementById('projectDetailTitle').textContent = sanitize(project.name) + (project.locked ? ' 🔒' : '');
             
             let html = `
                 <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
                     <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Project Info</h4>
                     <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
-                        <div><strong>Client:</strong> ${project.client}</div>
+                        <div><strong>Client:</strong> ${sanitize(project.client)}</div>
                         ${project.startDate ? `<div><strong>Duration:</strong> ${project.startDate} to ${project.endDate || 'Ongoing'}</div>` : ''}
-                        ${project.description ? `<div style="margin-top: 8px;"><strong>Description:</strong><br>${project.description}</div>` : ''}
+                        ${project.description ? `<div style="margin-top: 8px;"><strong>Description:</strong><br>${sanitize(project.description)}</div>` : ''}
                     </div>
                 </div>
                 
@@ -1757,14 +1385,13 @@
                 html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No tasks yet</p>';
             } else {
                 tasks.forEach(task => {
-                    const isCompleted = task.status === 'Completed';
                     html += `
-                        <div class="task-item ${isCompleted ? 'completed' : ''}" style="margin-bottom: 8px;">
+                        <div class="task-item" style="margin-bottom: 8px;">
                             <div style="flex: 1;">
-                                <div style="font-weight: 500; color: var(--text-color);">${task.name}</div>
+                                <div style="font-weight: 500; color: var(--text-color);">${sanitize(task.name)}</div>
                                 <div style="font-size: 10px; color: var(--text-secondary);">
                                     ${task.dueDate} • ${task.priority} • ${task.status}
-                                    ${task.assignee ? ` • ${task.assignee}` : ''}
+                                    ${task.assignee ? ` • ${sanitize(task.assignee)}` : ''}
                                 </div>
                             </div>
                             <button class="icon-btn" onclick="closeModal('projectDetailModal'); editTask(${task.id});">✏️</button>
@@ -1782,10 +1409,10 @@
                     html += `
                         <div style="display: flex; justify-content: space-between; padding: 10px; background: var(--bg-color); border-radius: 8px; margin-bottom: 8px;">
                             <div>
-                                <div style="font-weight: 500; font-size: 12px; color: var(--text-color);">${trans.category}</div>
+                                <div style="font-weight: 500; font-size: 12px; color: var(--text-color);">${sanitize(trans.category)}</div>
                                 <div style="font-size: 10px; color: var(--text-secondary);">
                                     ${trans.date}
-                                    ${trans.description ? ` • ${trans.description}` : ''}
+                                    ${trans.description ? ` • ${sanitize(trans.description)}` : ''}
                                 </div>
                             </div>
                             <div style="font-weight: bold; color: ${trans.type === 'income' ? 'var(--income-color)' : 'var(--expense-color)'};">
@@ -1804,6 +1431,7 @@
             const project = data.projects.find(p => p.id === id);
             if (project) {
                 project.locked = !project.locked;
+                project.lastUpdated = new Date().toISOString();
                 saveData();
                 renderView();
                 showToast(project.locked ? 'Project locked' : 'Project unlocked');
@@ -1833,8 +1461,6 @@
             today.setHours(0, 0, 0, 0);
             
             let filteredTasks = [...data.tasks];
-            let minDate = new Date();
-            let maxDate = new Date();
             
             if (data.scheduleView === 'day') {
                 filteredTasks = filteredTasks.filter(task => {
@@ -1842,8 +1468,6 @@
                     taskDate.setHours(0, 0, 0, 0);
                     return taskDate.getTime() === today.getTime();
                 });
-                minDate = today;
-                maxDate = today;
             } else if (data.scheduleView === 'week') {
                 const weekEnd = new Date(today);
                 weekEnd.setDate(today.getDate() + 7);
@@ -1851,8 +1475,6 @@
                     const taskDate = new Date(task.dueDate);
                     return taskDate >= today && taskDate <= weekEnd;
                 });
-                minDate = today;
-                maxDate = weekEnd;
             } else if (data.scheduleView === 'month') {
                 const monthEnd = new Date(today);
                 monthEnd.setMonth(today.getMonth() + 1);
@@ -1860,107 +1482,9 @@
                     const taskDate = new Date(task.dueDate);
                     return taskDate >= today && taskDate <= monthEnd;
                 });
-                minDate = today;
-                maxDate = monthEnd;
-            } else {
-                filteredTasks.forEach(task => {
-                    if (task.startDate) {
-                        const start = new Date(task.startDate);
-                        if (start < minDate) minDate = start;
-                    }
-                    if (task.dueDate) {
-                        const due = new Date(task.dueDate);
-                        if (due > maxDate) maxDate = due;
-                    }
-                });
             }
             
-            if (maxDate - minDate < 1000 * 60 * 60 * 24) {
-                maxDate = new Date(minDate);
-                maxDate.setDate(maxDate.getDate() + 7);
-            }
-            
-            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
-            
-            const months = [];
-            let current = new Date(minDate);
-            while (current <= maxDate) {
-                months.push({
-                    label: current.toLocaleDateString('en', { month: 'short', year: 'numeric' }),
-                    start: new Date(current),
-                    end: new Date(current.getFullYear(), current.getMonth() + 1, 0)
-                });
-                current.setMonth(current.getMonth() + 1);
-            }
-            
-            html += '<div class="gantt-container"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📊 Task Schedule Gantt Chart</h3>';
-            
-            if (filteredTasks.length === 0) {
-                html += `<p class="empty-state">No tasks scheduled for ${data.scheduleView === 'all' ? 'any time' : 'this ' + data.scheduleView}</p>`;
-            } else {
-                html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
-                
-                if (data.scheduleView === 'day') {
-                    for (let hour = 0; hour < 24; hour += 3) {
-                        html += `<div class="gantt-month" style="flex: 1; font-size: 9px;">${hour}:00</div>`;
-                    }
-                } else if (data.scheduleView === 'week') {
-                    for (let d = 0; d <= 7; d++) {
-                        const day = new Date(today);
-                        day.setDate(today.getDate() + d);
-                        html += `<div class="gantt-month" style="flex: 1; font-size: 9px;">
-                            ${day.toLocaleDateString('en', { weekday: 'short', day: 'numeric' })}
-                        </div>`;
-                    }
-                } else {
-                    months.forEach(month => {
-                        const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
-                        const monthEnd = Math.min(totalDays, Math.ceil((month.end - minDate) / (1000 * 60 * 60 * 24)) + 1);
-                        const width = ((monthEnd - monthStart) / totalDays) * 100;
-                        html += `<div class="gantt-month" style="width: ${width}%;">${month.label}</div>`;
-                    });
-                }
-                
-                html += '</div></div>';
-                
-                const sortedTasks = filteredTasks.sort((a, b) => new Date(a.dueDate || a.startDate) - new Date(b.dueDate || b.startDate));
-                
-                sortedTasks.forEach(task => {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    const startDate = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
-                    const dueDate = new Date(task.dueDate);
-                    
-                    const startOffset = Math.max(0, Math.ceil((startDate - minDate) / (1000 * 60 * 60 * 24)));
-                    const duration = Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-                    const width = Math.max((duration / totalDays) * 100, 2);
-                    const left = (startOffset / totalDays) * 100;
-                    
-                    let barColor = 'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
-                    if (task.status === 'Completed') barColor = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
-                    else if (task.status === 'In Progress') barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)';
-                    else if (dueDate < today) barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)';
-                    
-                    html += `
-                        <div class="gantt-row">
-                            <div class="gantt-label" title="${task.name} - ${project ? project.name : 'No Project'}">${task.name}</div>
-                            <div class="gantt-timeline">
-                                <div class="gantt-bar" style="left: ${left}%; width: ${width}%; background: ${barColor};" 
-                                     onclick="editTask(${task.id})" title="${task.priority} Priority - ${task.status}">
-                                    <div style="font-size: 9px;">${duration}d</div>
-                                    <div class="gantt-bar-dates" style="font-size: 8px;">
-                                        ${startDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })} - 
-                                        ${dueDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            html += '</div>';
-            
-            html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-top: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
+            html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
             html += '<h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-color);">📋 Task List</h3>';
             
             if (filteredTasks.length === 0) {
@@ -1974,17 +1498,17 @@
                     html += `
                         <div class="task-item ${isCompleted ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
                             <div style="flex: 1;">
-                                <div style="font-weight: 500; color: var(--text-color);">${task.name}</div>
+                                <div style="font-weight: 500; color: var(--text-color);">${sanitize(task.name)}</div>
                                 <div style="font-size: 10px; color: var(--text-secondary);">
-                                    ${project ? project.name : 'No Project'} • 
+                                    ${project ? sanitize(project.name) : 'No Project'} • 
                                     ${task.startDate ? `${task.startDate} to ` : ''}${task.dueDate} • 
                                     ${task.status} • 
                                     ${task.priority} Priority
-                                    ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
+                                    ${task.assignee ? ` • 👤 ${sanitize(task.assignee)}` : ''}
                                 </div>
                                 ${task.description ? `
                                     <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">
-                                        ${task.description}
+                                        ${sanitize(task.description)}
                                     </div>
                                 ` : ''}
                             </div>
@@ -2040,26 +1564,23 @@
                 
                 column.tasks.forEach(task => {
                     const project = data.projects.find(p => p.id === task.projectId);
-                    const today = new Date();
-                    const dueDate = new Date(task.dueDate);
-                    const isOverdue = dueDate < today && task.status !== 'Completed';
                     
                     html += `
                         <div draggable="true" ondragstart="dragTask(event, ${task.id})" 
                              style="background: var(--bg-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: move; 
                                     border-left: 3px solid ${column.color};">
-                            <div style="font-weight: 500; margin-bottom: 5px; color: var(--text-color);">${task.name}</div>
+                            <div style="font-weight: 500; margin-bottom: 5px; color: var(--text-color);">${sanitize(task.name)}</div>
                             <div style="font-size: 11px; color: var(--text-secondary);">
-                                ${project ? project.name : 'No Project'}
+                                ${project ? sanitize(project.name) : 'No Project'}
                             </div>
                             <div style="font-size: 10px; margin-top: 5px; color: var(--text-secondary);">
                                 📅 ${task.dueDate} • ${task.priority} Priority
-                                ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
+                                ${task.assignee ? ` • 👤 ${sanitize(task.assignee)}` : ''}
                             </div>
                             ${task.description ? `
                                 <div style="font-size: 10px; color: var(--text-secondary); margin-top: 5px; 
                                             padding-top: 5px; border-top: 1px solid var(--border-color);">
-                                    ${task.description.substring(0, 50)}${task.description.length > 50 ? '...' : ''}
+                                    ${sanitize(task.description.substring(0, 50))}${task.description.length > 50 ? '...' : ''}
                                 </div>
                             ` : ''}
                             <div style="display: flex; gap: 4px; margin-top: 8px;">
@@ -2081,7 +1602,6 @@
             container.innerHTML = html;
         }
         
-        // Calendar Functions
         function renderCalendar(container) {
             const today = new Date();
             const currentMonth = today.getMonth();
@@ -2093,21 +1613,6 @@
                         <h3 style="font-size: 16px; color: var(--text-color);">
                             ${today.toLocaleDateString('en', { month: 'long', year: 'numeric' })}
                         </h3>
-                        <button class="sync-calendar-btn" onclick="syncToiPhoneCalendar()">
-                            📱 Sync to iPhone Calendar
-                        </button>
-                    </div>
-                    
-                    <div style="padding: 10px; background: var(--bg-color); border-radius: 8px; margin-bottom: 15px;">
-                        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
-                            📅 Calendar Sync Instructions:
-                        </p>
-                        <ol style="font-size: 11px; color: var(--text-secondary); padding-left: 20px;">
-                            <li>Click "Sync to iPhone Calendar" to generate calendar file</li>
-                            <li>Open the downloaded .ics file on your iPhone</li>
-                            <li>Choose "Add All" to sync events to your calendar</li>
-                            <li>Updates will maintain latest changes only</li>
-                        </ol>
                     </div>
                     
                     <div class="calendar-grid">
@@ -2120,22 +1625,18 @@
                         <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Sat</div>
             `;
             
-            // Calculate calendar days
             const firstDay = new Date(currentYear, currentMonth, 1).getDay();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             
-            // Add empty cells for days before month starts
             for (let i = 0; i < firstDay; i++) {
                 html += '<div class="calendar-day other-month"></div>';
             }
             
-            // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(currentYear, currentMonth, day);
                 const dateStr = date.toISOString().split('T')[0];
                 const isToday = date.toDateString() === today.toDateString();
                 
-                // Get tasks for this day
                 const dayTasks = data.tasks.filter(t => {
                     return t.dueDate === dateStr || t.startDate === dateStr;
                 });
@@ -2145,7 +1646,7 @@
                 
                 if (dayTasks.length > 0) {
                     dayTasks.slice(0, 2).forEach(task => {
-                        html += `<div class="calendar-event" title="${task.name}">${task.name.substring(0, 10)}</div>`;
+                        html += `<div class="calendar-event" title="${sanitize(task.name)}">${sanitize(task.name.substring(0, 10))}</div>`;
                     });
                     if (dayTasks.length > 2) {
                         html += `<div style="font-size: 9px; color: var(--text-secondary);">+${dayTasks.length - 2} more</div>`;
@@ -2157,7 +1658,6 @@
             
             html += '</div></div>';
             
-            // Upcoming tasks
             const upcomingTasks = data.tasks
                 .filter(t => t.dueDate && new Date(t.dueDate) >= today)
                 .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
@@ -2176,9 +1676,9 @@
                     html += `
                         <div class="task-item">
                             <div style="flex: 1;">
-                                <div style="font-weight: 500; color: var(--text-color);">${task.name}</div>
+                                <div style="font-weight: 500; color: var(--text-color);">${sanitize(task.name)}</div>
                                 <div style="font-size: 10px; color: var(--text-secondary);">
-                                    ${project ? project.name : 'No Project'} • 
+                                    ${project ? sanitize(project.name) : 'No Project'} • 
                                     ${task.dueDate} • 
                                     ${daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `In ${daysUntil} days`}
                                 </div>
@@ -2193,55 +1693,6 @@
             container.innerHTML = html;
         }
         
-        function syncToiPhoneCalendar() {
-            // Generate iCalendar (.ics) file
-            let icsContent = 'BEGIN:VCALENDAR\n';
-            icsContent += 'VERSION:2.0\n';
-            icsContent += 'PRODID:-//Builder Pro//REFIT Interior//EN\n';
-            icsContent += 'CALSCALE:GREGORIAN\n';
-            icsContent += 'METHOD:PUBLISH\n';
-            
-            // Add tasks as events
-            data.tasks.forEach(task => {
-                if (task.dueDate) {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    const startDate = task.startDate || task.dueDate;
-                    const dueDate = task.dueDate;
-                    
-                    // Convert dates to iCalendar format (YYYYMMDD)
-                    const formatDate = (dateStr) => dateStr.replace(/-/g, '');
-                    
-                    icsContent += 'BEGIN:VEVENT\n';
-                    icsContent += `UID:${task.id}@builderproapp.com\n`;
-                    icsContent += `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z\n`;
-                    icsContent += `DTSTART:${formatDate(startDate)}\n`;
-                    icsContent += `DTEND:${formatDate(dueDate)}\n`;
-                    icsContent += `SUMMARY:${task.name}\n`;
-                    icsContent += `DESCRIPTION:Project: ${project ? project.name : 'None'}\\nPriority: ${task.priority}\\nStatus: ${task.status}${task.assignee ? '\\nAssignee: ' + task.assignee : ''}\n`;
-                    icsContent += `LOCATION:${project ? project.client : 'Builder Pro'}\n`;
-                    icsContent += `STATUS:${task.status === 'Completed' ? 'COMPLETED' : 'CONFIRMED'}\n`;
-                    icsContent += `LAST-MODIFIED:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z\n`;
-                    icsContent += 'END:VEVENT\n';
-                }
-            });
-            
-            icsContent += 'END:VCALENDAR';
-            
-            // Download the file
-            const blob = new Blob([icsContent], { type: 'text/calendar' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'builder-pro-calendar.ics';
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            showToast('📱 Calendar file created! Open it on your iPhone to sync.');
-        }
-        
-        // Drag and Drop for Kanban
-        let draggedTaskId = null;
-        
         function dragTask(event, taskId) {
             draggedTaskId = taskId;
         }
@@ -2255,18 +1706,17 @@
             const task = data.tasks.find(t => t.id === draggedTaskId);
             if (task) {
                 if (status === 'Due') {
-                    // Don't allow manual move to Due column
                     showToast('Tasks are automatically marked as Due based on date');
                     return;
                 }
                 task.status = status;
+                task.lastUpdated = new Date().toISOString();
                 saveData();
                 renderView();
                 showToast('Task moved');
             }
         }
         
-        // Auto-sync functions
         function initAutoSync() {
             const savedAutoSync = localStorage.getItem('autoSyncEnabled');
             if (savedAutoSync === 'true' && syncApiKey) {
@@ -2283,10 +1733,10 @@
             
             if (autoSyncEnabled) {
                 startAutoSync();
-                showToast('Auto-sync enabled');
+                showToast('⚡ Auto-sync enabled');
             } else {
                 stopAutoSync();
-                showToast('Auto-sync disabled');
+                showToast('⚡ Auto-sync disabled');
             }
         }
         
@@ -2295,7 +1745,7 @@
             if (syncApiKey && autoSyncEnabled) {
                 autoSyncInterval = setInterval(() => {
                     smartSync();
-                }, 5 * 60 * 1000); // 5 minutes
+                }, 5 * 60 * 1000);
             }
         }
         
@@ -2318,7 +1768,6 @@
             }
         }
 
-        // Stats
         function updateStats() {
             document.getElementById('totalProjects').textContent = data.projects.length;
             document.getElementById('totalTasks').textContent = data.tasks.length;
@@ -2330,7 +1779,6 @@
             document.getElementById('totalExpenses').textContent = '$' + expenses.toFixed(0);
         }
 
-        // CRUD Operations
         function showProfileModal() {
             document.getElementById('profileName').value = data.currentUser;
             document.getElementById('profilePosition').value = data.userPosition;
@@ -2343,7 +1791,7 @@
             updateHeader();
             saveData();
             closeModal('profileModal');
-            showToast('Profile updated');
+            showToast('✅ Profile updated');
         }
 
         function showProjectModal() {
@@ -2383,22 +1831,23 @@
                 startDate: document.getElementById('projectStart').value,
                 endDate: document.getElementById('projectEnd').value,
                 description: document.getElementById('projectDescription').value.trim(),
-                locked: document.getElementById('projectLocked').checked
+                locked: document.getElementById('projectLocked').checked,
+                lastUpdated: new Date().toISOString()
             };
             
             if (!projectData.name || !projectData.client) {
-                showToast('Please fill required fields');
+                showToast('⚠️ Please fill required fields');
                 return;
             }
             
             if (editingId) {
                 const index = data.projects.findIndex(p => p.id === editingId);
                 data.projects[index] = { ...data.projects[index], ...projectData };
-                showToast('Project updated');
+                showToast('✅ Project updated');
             } else {
                 projectData.id = Date.now();
                 data.projects.push(projectData);
-                showToast('Project created');
+                showToast('✅ Project created');
             }
             
             saveData();
@@ -2407,73 +1856,30 @@
             closeModal('projectModal');
         }
 
-        // Permanent Delete Functions with Double Confirmation
         function permanentDeleteProject(id) {
             const project = data.projects.find(p => p.id === id);
             if (!project) return;
             
-            const firstConfirm = confirm(`⚠️ First Confirmation:\n\nDelete project "${project.name}"?\n\nThis will also delete:\n• All associated tasks\n• All associated transactions\n\nThis action CANNOT be undone.`);
+            const firstConfirm = confirm(`⚠️ Delete project "${project.name}"?\n\nThis will also delete all tasks and transactions.\n\nThis action CANNOT be undone.`);
             
             if (firstConfirm) {
-                const secondConfirm = confirm(`⛔ FINAL WARNING:\n\nPermanently delete "${project.name}"?\n\nType OK to confirm PERMANENT DELETION.\n\nThis will be deleted from ALL devices after sync.`);
+                if (!data.permanentlyDeleted) data.permanentlyDeleted = [];
+                data.permanentlyDeleted.push({ 
+                    id, 
+                    type: 'project', 
+                    deletedAt: new Date().toISOString(),
+                    name: project.name 
+                });
                 
-                if (secondConfirm) {
-                    // Add to permanently deleted list
-                    if (!data.permanentlyDeleted) data.permanentlyDeleted = [];
-                    data.permanentlyDeleted.push({ 
-                        id, 
-                        type: 'project', 
-                        deletedAt: new Date().toISOString(),
-                        name: project.name 
-                    });
-                    
-                    // Remove project and all related data
-                    data.projects = data.projects.filter(p => p.id !== id);
-                    data.tasks = data.tasks.filter(t => t.projectId !== id);
-                    data.transactions = data.transactions.filter(t => t.projectId !== id);
-                    
-                    saveData();
-                    renderView();
-                    updateStats();
-                    showToast(`Project "${project.name}" permanently deleted`);
-                }
-            }
-        }
-        
-        function permanentDeleteTask(id) {
-            const task = data.tasks.find(t => t.id === id);
-            if (!task) return;
-            
-            const firstConfirm = confirm(`⚠️ First Confirmation:\n\nDelete task "${task.name}"?\n\nThis action CANNOT be undone.`);
-            
-            if (firstConfirm) {
-                const secondConfirm = confirm(`⛔ FINAL WARNING:\n\nPermanently delete "${task.name}"?\n\nType OK to confirm PERMANENT DELETION.`);
+                data.projects = data.projects.filter(p => p.id !== id);
+                data.tasks = data.tasks.filter(t => t.projectId !== id);
+                data.transactions = data.transactions.filter(t => t.projectId !== id);
                 
-                if (secondConfirm) {
-                    if (!data.permanentlyDeleted) data.permanentlyDeleted = [];
-                    data.permanentlyDeleted.push({ 
-                        id, 
-                        type: 'task', 
-                        deletedAt: new Date().toISOString(),
-                        name: task.name 
-                    });
-                    
-                    data.tasks = data.tasks.filter(t => t.id !== id);
-                    
-                    saveData();
-                    renderView();
-                    updateStats();
-                    showToast(`Task "${task.name}" permanently deleted`);
-                }
+                saveData();
+                renderView();
+                updateStats();
+                showToast(`🗑️ Project "${project.name}" deleted`);
             }
-        }
-        
-        function deleteProject(id) {
-            permanentDeleteProject(id);
-        }
-        
-        function deleteTask(id) {
-            permanentDeleteTask(id);
         }
 
         function showTaskModal() {
@@ -2491,7 +1897,7 @@
             const select = document.getElementById('taskProject');
             select.innerHTML = '<option value="">Select Project</option>';
             data.projects.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                select.innerHTML += `<option value="${p.id}">${sanitize(p.name)}</option>`;
             });
             
             document.getElementById('taskModal').classList.add('show');
@@ -2516,7 +1922,7 @@
             const select = document.getElementById('taskProject');
             select.innerHTML = '<option value="">Select Project</option>';
             data.projects.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                select.innerHTML += `<option value="${p.id}">${sanitize(p.name)}</option>`;
             });
             select.value = task.projectId;
             
@@ -2532,28 +1938,63 @@
                 startDate: document.getElementById('taskStart').value,
                 dueDate: document.getElementById('taskDue').value,
                 assignee: document.getElementById('taskAssignee').value.trim(),
-                description: document.getElementById('taskDescription').value.trim()
+                description: document.getElementById('taskDescription').value.trim(),
+                lastUpdated: new Date().toISOString()
             };
             
             if (!taskData.name || !taskData.projectId || !taskData.dueDate) {
-                showToast('Please fill required fields');
+                showToast('⚠️ Please fill required fields');
                 return;
             }
             
             if (editingId) {
                 const index = data.tasks.findIndex(t => t.id === editingId);
                 data.tasks[index] = { ...data.tasks[index], ...taskData };
-                showToast('Task updated');
+                showToast('✅ Task updated');
             } else {
                 taskData.id = Date.now();
                 data.tasks.push(taskData);
-                showToast('Task created');
+                showToast('✅ Task created');
             }
             
             saveData();
             renderView();
             updateStats();
             closeModal('taskModal');
+        }
+
+        function completeTask(id) {
+            const task = data.tasks.find(t => t.id === id);
+            if (task) {
+                task.status = 'Completed';
+                task.completedAt = new Date().toISOString();
+                task.lastUpdated = new Date().toISOString();
+                saveData();
+                renderView();
+                showToast('✅ Task completed');
+            }
+        }
+
+        function deleteTask(id) {
+            const task = data.tasks.find(t => t.id === id);
+            if (!task) return;
+            
+            if (confirm(`⚠️ Delete task "${task.name}"?`)) {
+                if (!data.permanentlyDeleted) data.permanentlyDeleted = [];
+                data.permanentlyDeleted.push({ 
+                    id, 
+                    type: 'task', 
+                    deletedAt: new Date().toISOString(),
+                    name: task.name 
+                });
+                
+                data.tasks = data.tasks.filter(t => t.id !== id);
+                
+                saveData();
+                renderView();
+                updateStats();
+                showToast('🗑️ Task deleted');
+            }
         }
 
         function showTransactionModal(type) {
@@ -2568,7 +2009,7 @@
             const select = document.getElementById('transProject');
             select.innerHTML = '<option value="">Select Project</option>';
             data.projects.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+                select.innerHTML += `<option value="${p.id}">${sanitize(p.name)}</option>`;
             });
             
             updateCategories();
@@ -2596,17 +2037,18 @@
                 category: document.getElementById('transCategory').value,
                 amount: parseFloat(document.getElementById('transAmount').value),
                 date: document.getElementById('transDate').value,
-                description: document.getElementById('transDescription').value.trim()
+                description: document.getElementById('transDescription').value.trim(),
+                lastUpdated: new Date().toISOString()
             };
             
             if (!transData.projectId || !transData.category || !transData.amount || isNaN(transData.amount)) {
-                showToast('Please fill all fields correctly');
+                showToast('⚠️ Please fill all fields correctly');
                 return;
             }
             
             transData.id = Date.now();
             data.transactions.push(transData);
-            showToast('Transaction added');
+            showToast('✅ Transaction added');
             
             saveData();
             renderView();
@@ -2614,22 +2056,10 @@
             closeModal('transactionModal');
         }
 
-        // Task completion function
-        function completeTask(id) {
-            const task = data.tasks.find(t => t.id === id);
-            if (task) {
-                task.status = 'Completed';
-                task.completedAt = new Date().toISOString();
-                saveData();
-                renderView();
-                showToast('✅ Task completed');
-            }
-        }
-        
-        // Smart Sync with Permanent Deletion Support
+        // FIXED SMART SYNC
         async function smartSync() {
             if (!syncApiKey) {
-                showToast('Please set up API key first');
+                showToast('⚠️ Please set up API key first');
                 return;
             }
             
@@ -2640,245 +2070,292 @@
             syncMode.textContent = 'Syncing...';
             
             try {
-                // First, test the API key validity
-                const testResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: { 
-                        'X-Master-Key': syncApiKey,
-                        'X-Bin-Meta': 'false',
-                        'Content-Type': 'application/json'
-                    }
-                });
+                console.log('🔄 Starting Smart Sync...');
                 
-                if (testResponse.status === 401) {
-                    showToast('Invalid API key - please check and try again');
-                    indicator.classList.remove('syncing');
-                    syncMode.textContent = 'Invalid Key';
-                    return;
-                }
-                
-                if (testResponse.status === 404) {
-                    showToast('Bin not found - creating new bin...');
-                    // Create initial data structure
-                    const initialData = {
-                        projects: data.projects || [],
-                        tasks: data.tasks || [],
-                        transactions: data.transactions || [],
-                        permanentlyDeleted: data.permanentlyDeleted || [],
-                        currentUser: data.currentUser,
-                        userPosition: data.userPosition,
-                        themeColor: data.themeColor,
-                        fontSize: data.fontSize,
-                        contrast: data.contrast,
-                        nightMode: data.nightMode,
-                        timelineFilter: data.timelineFilter,
-                        scheduleView: data.scheduleView,
-                        calendarEvents: data.calendarEvents || [],
-                        lastUpdated: new Date().toISOString(),
-                        lastUpdateDevice: APP_CONFIG.deviceType
-                    };
-                    
-                    // Try to create/update the bin
-                    const createResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': syncApiKey,
-                            'X-Bin-Versioning': 'false'
-                        },
-                        body: JSON.stringify(initialData)
-                    });
-                    
-                    if (createResponse.ok) {
-                        showToast('Initial sync successful!');
-                        localStorage.setItem('lastSyncTime', Date.now().toString());
-                        document.getElementById('lastSyncTime').textContent = new Date().toLocaleTimeString();
-                    }
-                    
-                    indicator.classList.remove('syncing');
-                    syncMode.textContent = 'Connected';
-                    return;
-                }
-                
-                // Pull from cloud
-                const pullResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: { 
-                        'X-Master-Key': syncApiKey,
-                        'X-Bin-Meta': 'false',
-                        'Content-Type': 'application/json'
-                    }
-                });
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
                 
                 let cloudData = {};
-                if (pullResponse.ok) {
-                    const result = await pullResponse.json();
-                    cloudData = result.record || result || {};
-                    console.log('Cloud data retrieved:', cloudData);
+                
+                try {
+                    const pullResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
+                        method: 'GET',
+                        signal: controller.signal,
+                        headers: { 
+                            'X-Master-Key': syncApiKey,
+                            'X-Bin-Meta': 'false'
+                        }
+                    });
+                    
+                    clearTimeout(timeoutId);
+                    
+                    console.log('📥 Pull Response Status:', pullResponse.status);
+                    
+                    if (pullResponse.status === 401) {
+                        throw new Error('Invalid API Key');
+                    }
+                    
+                    if (pullResponse.status === 404) {
+                        console.log('📦 Bin not found - will create new one');
+                        cloudData = {};
+                    } else if (pullResponse.ok) {
+                        const result = await pullResponse.json();
+                        cloudData = result.record || result || {};
+                        console.log('✅ Cloud data retrieved:', Object.keys(cloudData));
+                    } else {
+                        throw new Error(`HTTP ${pullResponse.status}: ${pullResponse.statusText}`);
+                    }
+                } catch (fetchError) {
+                    clearTimeout(timeoutId);
+                    if (fetchError.name === 'AbortError') {
+                        throw new Error('Request timeout - check your internet connection');
+                    }
+                    throw fetchError;
                 }
                 
-                // Merge permanent deletions first
                 const allPermanentlyDeleted = [
                     ...(cloudData.permanentlyDeleted || []),
                     ...(data.permanentlyDeleted || [])
                 ];
                 
-                // Get unique permanently deleted items
-                const permanentlyDeletedIds = new Set(allPermanentlyDeleted.map(d => d.id));
+                const uniqueDeleted = Array.from(
+                    new Map(allPermanentlyDeleted.map(item => [item.id, item])).values()
+                );
                 
-                // Merge data excluding permanently deleted items
+                const permanentlyDeletedIds = new Set(uniqueDeleted.map(d => d.id));
+                
+                console.log('🗑️ Permanently deleted items:', permanentlyDeletedIds.size);
+                
                 const mergedData = {
-                    projects: mergeArrays(cloudData.projects || [], data.projects, 'id')
-                        .filter(p => !permanentlyDeletedIds.has(p.id)),
-                    tasks: mergeArrays(cloudData.tasks || [], data.tasks, 'id')
-                        .filter(t => !permanentlyDeletedIds.has(t.id)),
-                    transactions: mergeArrays(cloudData.transactions || [], data.transactions, 'id')
-                        .filter(t => !permanentlyDeletedIds.has(t.id)),
-                    permanentlyDeleted: allPermanentlyDeleted,
-                    currentUser: data.currentUser,
-                    userPosition: data.userPosition,
-                    themeColor: data.themeColor,
-                    fontSize: data.fontSize,
-                    contrast: data.contrast,
-                    nightMode: data.nightMode,
-                    timelineFilter: data.timelineFilter,
-                    scheduleView: data.scheduleView,
-                    calendarEvents: mergeArrays(cloudData.calendarEvents || [], data.calendarEvents || [], 'id'),
+                    projects: smartMergeArrays(
+                        (cloudData.projects || []).filter(p => !permanentlyDeletedIds.has(p.id)),
+                        (data.projects || []).filter(p => !permanentlyDeletedIds.has(p.id)),
+                        'id'
+                    ),
+                    tasks: smartMergeArrays(
+                        (cloudData.tasks || []).filter(t => !permanentlyDeletedIds.has(t.id)),
+                        (data.tasks || []).filter(t => !permanentlyDeletedIds.has(t.id)),
+                        'id'
+                    ),
+                    transactions: smartMergeArrays(
+                        (cloudData.transactions || []).filter(t => !permanentlyDeletedIds.has(t.id)),
+                        (data.transactions || []).filter(t => !permanentlyDeletedIds.has(t.id)),
+                        'id'
+                    ),
+                    permanentlyDeleted: uniqueDeleted,
+                    
+                    currentUser: data.currentUser || 'Builder Pro',
+                    userPosition: data.userPosition || 'by REFIT Interior',
+                    themeColor: data.themeColor || 0,
+                    fontSize: data.fontSize || 'm',
+                    contrast: data.contrast || 'normal',
+                    nightMode: data.nightMode || false,
+                    timelineFilter: data.timelineFilter || 'all',
+                    scheduleView: data.scheduleView || 'month',
+                    calendarEvents: data.calendarEvents || [],
+                    
                     lastUpdated: new Date().toISOString(),
-                    lastUpdateDevice: APP_CONFIG.deviceType
+                    lastUpdateDevice: APP_CONFIG.deviceType,
+                    syncCount: (cloudData.syncCount || 0) + 1
                 };
                 
-                // Push merged data back to cloud
-                const pushResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
-                    method: 'PUT',
-                    mode: 'cors',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': syncApiKey,
-                        'X-Bin-Versioning': 'false'
-                    },
-                    body: JSON.stringify(mergedData)
+                console.log('🔀 Merged data:', {
+                    projects: mergedData.projects.length,
+                    tasks: mergedData.tasks.length,
+                    transactions: mergedData.transactions.length,
+                    deleted: mergedData.permanentlyDeleted.length
                 });
                 
-                if (pushResponse.ok) {
-                    // Update local data
+                const pushController = new AbortController();
+                const pushTimeoutId = setTimeout(() => pushController.abort(), 15000);
+                
+                try {
+                    const pushResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
+                        method: 'PUT',
+                        signal: pushController.signal,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-Master-Key': syncApiKey,
+                            'X-Bin-Versioning': 'false'
+                        },
+                        body: JSON.stringify(mergedData)
+                    });
+                    
+                    clearTimeout(pushTimeoutId);
+                    
+                    console.log('📤 Push Response Status:', pushResponse.status);
+                    
+                    if (!pushResponse.ok) {
+                        const errorText = await pushResponse.text();
+                        console.error('❌ Push failed:', errorText);
+                        throw new Error(`Push failed: ${pushResponse.status} - ${errorText}`);
+                    }
+                    
                     data = mergedData;
                     saveData();
                     renderView();
                     updateStats();
-                    applySettings();
                     
                     localStorage.setItem('lastSyncTime', Date.now().toString());
                     document.getElementById('lastSyncTime').textContent = new Date().toLocaleTimeString();
                     
-                    showToast('Smart sync complete!');
                     indicator.classList.remove('syncing');
                     syncMode.textContent = 'Connected';
-                } else {
-                    const errorText = await pushResponse.text();
-                    console.error('Push failed:', pushResponse.status, errorText);
-                    showToast(`Sync failed - ${pushResponse.status}`);
-                    indicator.classList.remove('syncing');
-                    syncMode.textContent = 'Error';
+                    
+                    console.log('✅ Smart sync complete!');
+                    showToast(`✅ Synced! ${mergedData.projects.length} projects, ${mergedData.tasks.length} tasks`);
+                    
+                } catch (pushError) {
+                    clearTimeout(pushTimeoutId);
+                    if (pushError.name === 'AbortError') {
+                        throw new Error('Upload timeout - check your internet connection');
+                    }
+                    throw pushError;
                 }
-            } catch (error) {
-                console.error('Sync error details:', error);
                 
-                // More specific error messages
-                if (error.message.includes('Failed to fetch')) {
-                    showToast('Network error - check internet connection');
-                } else if (error.message.includes('CORS')) {
-                    showToast('CORS error - try opening in a new tab');
-                } else {
-                    showToast(`Sync error: ${error.message}`);
-                }
+            } catch (error) {
+                console.error('❌ Sync error:', error);
                 
                 indicator.classList.remove('syncing');
-                syncMode.textContent = 'Offline';
+                
+                if (error.message.includes('Invalid API Key')) {
+                    syncMode.textContent = 'Invalid Key';
+                    showToast('❌ Invalid API Key - Please check settings');
+                } else if (error.message.includes('timeout')) {
+                    syncMode.textContent = 'Timeout';
+                    showToast('⏱️ Sync timeout - Try again later');
+                } else if (error.message.includes('Failed to fetch') || !navigator.onLine) {
+                    syncMode.textContent = 'Offline';
+                    showToast('📡 No internet connection');
+                } else if (error.message.includes('NetworkError')) {
+                    syncMode.textContent = 'Network Error';
+                    showToast('🌐 Network error - Check your connection');
+                } else {
+                    syncMode.textContent = 'Error';
+                    showToast(`❌ Sync failed: ${error.message}`);
+                }
             }
         }
-        
-        function mergeArrays(cloudArray, localArray, key) {
-            const merged = [...cloudArray];
-            const cloudIds = new Set(cloudArray.map(item => item[key]));
+
+        function smartMergeArrays(cloudArray, localArray, key) {
+            const merged = new Map();
+            
+            cloudArray.forEach(item => {
+                merged.set(item[key], {
+                    ...item,
+                    source: 'cloud',
+                    cloudTimestamp: item.lastUpdated || item.completedAt || 0
+                });
+            });
             
             localArray.forEach(localItem => {
-                const existingIndex = merged.findIndex(item => item[key] === localItem[key]);
-                if (existingIndex >= 0) {
-                    // Update existing item if local is newer
-                    const cloudItem = merged[existingIndex];
-                    if (localItem.lastModified > cloudItem.lastModified || 
-                        localItem.completedAt > cloudItem.completedAt ||
-                        !cloudItem.lastModified) {
-                        merged[existingIndex] = localItem;
-                    }
+                const existingItem = merged.get(localItem[key]);
+                
+                if (!existingItem) {
+                    merged.set(localItem[key], {
+                        ...localItem,
+                        source: 'local'
+                    });
                 } else {
-                    merged.push(localItem);
+                    const cloudTime = new Date(existingItem.lastUpdated || existingItem.completedAt || 0).getTime();
+                    const localTime = new Date(localItem.lastUpdated || localItem.completedAt || 0).getTime();
+                    
+                    if (localTime > cloudTime) {
+                        merged.set(localItem[key], {
+                            ...localItem,
+                            source: 'local-newer'
+                        });
+                    }
                 }
             });
             
-            return merged;
+            return Array.from(merged.values()).map(item => {
+                const { source, cloudTimestamp, ...cleanItem } = item;
+                return cleanItem;
+            });
         }
 
-        function saveApiKey() {
-            const key = document.getElementById('apiKeyInput').value.trim();
-            if (!key) {
-                showToast('Please enter an API key');
-                return;
-            }
-            
-            // Test the API key immediately
-            syncApiKey = key;
-            localStorage.setItem('builderProSyncApiKey', key);
-            document.getElementById('apiKeyInput').value = '';
-            document.getElementById('syncMode').textContent = 'Testing...';
-            
-            // Test connection with the new key
-            testConnection(key);
-        }
-        
         async function testConnection(apiKey) {
+            const syncMode = document.getElementById('syncMode');
+            syncMode.textContent = 'Testing...';
+            
             try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 10000);
+                
                 const response = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'GET',
+                    signal: controller.signal,
                     headers: { 
                         'X-Master-Key': apiKey,
                         'X-Bin-Meta': 'false'
                     }
                 });
                 
+                clearTimeout(timeoutId);
+                
                 if (response.status === 401) {
-                    showToast('Invalid API key - please check and try again');
-                    document.getElementById('syncMode').textContent = 'Invalid Key';
+                    syncMode.textContent = 'Invalid Key';
+                    showToast('❌ Invalid API key - Check your key');
+                    return false;
                 } else if (response.status === 404) {
-                    showToast('API key valid! Bin will be created on first sync');
-                    document.getElementById('syncMode').textContent = 'Ready';
+                    syncMode.textContent = 'Ready';
+                    showToast('✅ API key valid! Bin will be created on first sync');
+                    return true;
                 } else if (response.ok) {
-                    showToast('API key saved - Connected to existing data!');
-                    document.getElementById('syncMode').textContent = 'Connected';
+                    syncMode.textContent = 'Connected';
+                    showToast('✅ Connected to existing data!');
+                    return true;
                 } else {
-                    showToast(`Connection test failed: ${response.status}`);
-                    document.getElementById('syncMode').textContent = 'Error';
+                    syncMode.textContent = 'Error';
+                    showToast(`⚠️ Connection test failed: ${response.status}`);
+                    return false;
                 }
             } catch (error) {
-                console.error('Connection test error:', error);
-                showToast('Connection test failed - check console for details');
-                document.getElementById('syncMode').textContent = 'Offline';
+                if (error.name === 'AbortError') {
+                    syncMode.textContent = 'Timeout';
+                    showToast('⏱️ Connection test timeout');
+                } else {
+                    syncMode.textContent = 'Offline';
+                    showToast('❌ Connection test failed');
+                }
+                console.error('Test connection error:', error);
+                return false;
             }
         }
 
-        // Export/Import
+        async function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (!key) {
+                showToast('⚠️ Please enter an API key');
+                return;
+            }
+            
+            if (key.length < 20) {
+                showToast('⚠️ API key seems too short - Please check');
+                return;
+            }
+            
+            syncApiKey = key;
+            localStorage.setItem('builderProSyncApiKey', key);
+            document.getElementById('apiKeyInput').value = '';
+            
+            const isValid = await testConnection(key);
+            
+            if (isValid) {
+                setTimeout(() => smartSync(), 1000);
+            }
+        }
+
         function exportData() {
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'builder-pro-backup.json';
+            a.download = `builder-pro-backup-${new Date().toISOString().split('T')[0]}.json`;
             a.click();
             URL.revokeObjectURL(url);
-            showToast('Data exported');
+            showToast('📤 Data exported');
         }
 
         function importData(event) {
@@ -2888,16 +2365,16 @@
                 reader.onload = function(e) {
                     try {
                         const imported = JSON.parse(e.target.result);
-                        if (confirm('Replace all current data?')) {
-                            data = imported;
+                        if (confirm('⚠️ Replace all current data with imported data?')) {
+                            data = { ...data, ...imported };
                             saveData();
                             applySettings();
                             renderView();
                             updateStats();
-                            showToast('Data imported');
+                            showToast('✅ Data imported successfully');
                         }
                     } catch (error) {
-                        showToast('Import failed');
+                        showToast('❌ Import failed - invalid file');
                     }
                 };
                 reader.readAsText(file);
