@@ -50,6 +50,12 @@
     
     <style>
         :root {
+            /* Safe area insets for iOS */
+            --safe-area-inset-top: env(safe-area-inset-top, 0px);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-inset-left: env(safe-area-inset-left, 0px);
+            --safe-area-inset-right: env(safe-area-inset-right, 0px);
+            
             /* Default Rose Blush Theme */
             --bg-color: #F4EDEB;
             --accent-color: #E8A9B3;
@@ -123,6 +129,36 @@
             min-height: 100vh; 
             display: flex; 
             flex-direction: column;
+            /* Respect safe areas on all sides */
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
+        }
+        
+        /* iOS Standalone App Mode */
+        @media (display-mode: standalone) {
+            .fixed-header-section {
+                padding-top: max(20px, env(safe-area-inset-top));
+            }
+            
+            .main-content-wrapper {
+                margin-top: calc(220px + max(20px, env(safe-area-inset-top)));
+            }
+            
+            /* Hide browser-specific elements in app mode */
+            .install-prompt {
+                display: none !important;
+            }
+        }
+        
+        /* iPhone X and newer (with notch) specific */
+        @supports (padding-top: max(0px)) {
+            .fixed-header-section {
+                padding-top: max(20px, env(safe-area-inset-top));
+            }
+            
+            .header {
+                padding-top: 12px;
+            }
         }
         
         /* Fixed header */
@@ -133,6 +169,8 @@
             right: 0;
             z-index: 100;
             background: var(--bg-color);
+            /* Add padding for iOS status bar */
+            padding-top: var(--safe-area-inset-top);
         }
         
         .header { 
@@ -603,7 +641,7 @@
         /* FAB */
         .fab-container { 
             position: fixed; 
-            bottom: 20px; 
+            bottom: calc(20px + var(--safe-area-inset-bottom)); 
             right: 20px; 
             z-index: 99; 
         }
