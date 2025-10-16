@@ -59,6 +59,12 @@
         body.font-xl { --font-scale: 1.3; }
         body.font-xxl { --font-scale: 1.5; }
 
+        /* Saturation levels */
+        body.sat-low { filter: saturate(0.7) contrast(var(--contrast)) brightness(var(--brightness)); }
+        body.sat-normal { filter: saturate(1) contrast(var(--contrast)) brightness(var(--brightness)); }
+        body.sat-high { filter: saturate(1.3) contrast(var(--contrast)) brightness(var(--brightness)); }
+        body.sat-vibrant { filter: saturate(1.6) contrast(var(--contrast)) brightness(var(--brightness)); }
+
         .night-mode { 
             --bg-color: #1a1618 !important; 
             --card-bg: #2d2729 !important; 
@@ -1029,6 +1035,16 @@
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
+            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🎨 Color Saturation</label>
+            <div class="contrast-controls">
+                <button class="contrast-btn" onclick="setSaturation('low')">Low</button>
+                <button class="contrast-btn active" onclick="setSaturation('normal')">Normal</button>
+                <button class="contrast-btn" onclick="setSaturation('high')">High</button>
+                <button class="contrast-btn" onclick="setSaturation('vibrant')">Vibrant</button>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
             <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🔤 Font Size</label>
             <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px;">
                 <button class="btn btn-secondary" onclick="setFontSize('s')">S</button>
@@ -1310,6 +1326,7 @@
             themeColor: 0,
             fontSize: 'm',
             contrast: 'normal',
+            saturation: 'normal',
             timelineFilter: 'all',
             scheduleView: 'month',
             calendarEvents: []
@@ -1364,6 +1381,7 @@
             applyThemeColor(data.themeColor || 0);
             setFontSize(data.fontSize || 'm');
             setContrast(data.contrast || 'normal');
+            setSaturation(data.saturation || 'normal');
             updateHeader();
         }
 
@@ -1432,6 +1450,27 @@
                     btn.classList.add('active');
                 }
             });
+            
+            // Reapply saturation
+            setSaturation(data.saturation || 'normal');
+        }
+
+        function setSaturation(level) {
+            document.body.classList.remove('sat-low', 'sat-normal', 'sat-high', 'sat-vibrant');
+            document.body.classList.add('sat-' + level);
+            data.saturation = level;
+            saveData();
+            
+            // Update active button in saturation section
+            const saturationSection = document.querySelectorAll('.contrast-controls')[1];
+            if (saturationSection) {
+                saturationSection.querySelectorAll('.contrast-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.textContent.toLowerCase() === level) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
         }
 
         function setFontSize(size) {
@@ -1545,16 +1584,135 @@
         function renderProjectTimeline() {
             if (data.projects.length === 0) return '';
             
+            const projectsWithDates = data.projects.filter(p => p.startDate && p.endDate);
+            const projectsWithoutDates = data.projects.filter(p => !p.startDate || !p.endDate);
+            
             let html = '<div class="gantt-container"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📅 Project Timeline</h3>';
             
-            data.projects.forEach(project => {
+            if (projectsWithDates.length === 0) {
+                html += '<div style="padding: 10px; background: var(--bg-color); border-radius: 8px;">';
+                html += '<p style="color: var(--text-secondary); margin-bottom: 10px;">No project dates set. Projects list:</p>';
+                data.projects.forEach(project => {
+                    html += `
+                        <div style="padding: 8px; margin-bottom: 5px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--accent-color); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: var(--text-color);">${project.name}</strong> - <span style="color: var(--text-secondary);">${project.client}</span>
+                                ${project.locked ? ' 🔒' : ''}
+                            </div>
+                            <button class="icon-btn" onclick="editProject(${project.id})" ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>✏️</button>
+                        </div>
+                    `;
+                });
+                html += '</div></div>';
+                return html;
+            }
+            
+            // Calculate date range
+            let minDate = null;
+            let maxDate = null;
+            
+            projectsWithDates.forEach(p => {
+                const start = new Date(p.startDate);
+                const end = new Date(p.endDate);
+                if (!minDate || start < minDate) minDate = start;
+                if (!maxDate || end > maxDate) maxDate = end;
+            });
+            
+            // Add some padding to the timeline
+            const paddingDays = 3;
+            minDate.setDate(minDate.getDate() - paddingDays);
+            maxDate.setDate(maxDate.getDate() + paddingDays);
+            
+            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
+            
+            // Generate months for header
+            const months = [];
+            let current = new Date(minDate);
+            while (current <= maxDate) {
+                months.push({
+                    label: current.toLocaleDateString('en', { month: 'short', year: 'numeric' }),
+                    start: new Date(current),
+                    end: new Date(current.getFullYear(), current.getMonth() + 1, 0)
+                });
+                current.setMonth(current.getMonth() + 1);
+            }
+            
+            // Render timeline header
+            html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
+            months.forEach(month => {
+                const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
+                const monthEnd = Math.min(totalDays, Math.ceil((month.end - minDate) / (1000 * 60 * 60 * 24)) + 1);
+                const width = ((monthEnd - monthStart) / totalDays) * 100;
+                html += `<div class="gantt-month" style="width: ${width}%;">${month.label}</div>`;
+            });
+            html += '</div></div>';
+            
+            // Add TODAY line if within range
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (today >= minDate && today <= maxDate) {
+                const todayOffset = Math.ceil((today - minDate) / (1000 * 60 * 60 * 24));
+                const todayPosition = (todayOffset / totalDays) * 100;
+                html += `<div class="today-line" style="left: calc(150px + ${todayPosition}%);"></div>`;
+            }
+            
+            // Render project bars
+            projectsWithDates.forEach(project => {
+                const start = new Date(project.startDate);
+                const end = new Date(project.endDate);
+                const startOffset = Math.ceil((start - minDate) / (1000 * 60 * 60 * 24));
+                const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                const width = (duration / totalDays) * 100;
+                const left = (startOffset / totalDays) * 100;
+                
+                // Check if project is overdue
+                const isOverdue = end < today && !project.locked;
+                const barColor = isOverdue ? 
+                    'linear-gradient(135deg, #ef4444 0%, #f87171 100%)' : 
+                    'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
+                
                 html += `
-                    <div style="padding: 8px; margin-bottom: 5px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--accent-color);">
-                        <strong style="color: var(--text-color);">${project.name}</strong> - <span style="color: var(--text-secondary);">${project.client}</span>
-                        ${project.locked ? ' 🔒' : ''}
+                    <div class="gantt-row">
+                        <div class="gantt-label" style="display: flex; align-items: center; gap: 8px;">
+                            <span title="${project.name}">${project.name} ${project.locked ? '🔒' : ''}</span>
+                            <button class="icon-btn" onclick="editProject(${project.id})" 
+                                    ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed; width: 24px; height: 24px;"' : 'style="width: 24px; height: 24px;"'}
+                                    title="${project.locked ? 'Project is locked' : 'Edit project'}">✏️</button>
+                        </div>
+                        <div class="gantt-timeline">
+                            <div class="gantt-bar" style="left: ${left}%; width: ${width}%; background: ${barColor};" 
+                                 onclick="showProjectDetail(${project.id})" title="Click for details">
+                                <div style="font-weight: 600;">${duration} days</div>
+                                <div class="gantt-bar-dates">
+                                    ${start.toLocaleDateString('en', { month: 'short', day: 'numeric' })} - 
+                                    ${end.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 `;
             });
+            
+            // Show projects without dates
+            if (projectsWithoutDates.length > 0) {
+                html += '<div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color);">';
+                html += '<h4 style="font-size: 12px; margin-bottom: 10px; color: var(--text-secondary);">⚠️ Projects without dates:</h4>';
+                projectsWithoutDates.forEach(project => {
+                    html += `
+                        <div class="gantt-row">
+                            <div class="gantt-label" style="display: flex; align-items: center; gap: 8px;">
+                                <span>${project.name} ${project.locked ? '🔒' : ''}</span>
+                                <button class="icon-btn" onclick="editProject(${project.id})" 
+                                        ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed; width: 24px; height: 24px;"' : 'style="width: 24px; height: 24px;"'}>✏️</button>
+                            </div>
+                            <div class="gantt-timeline" style="display: flex; align-items: center; padding-left: 10px;">
+                                <span style="font-size: 11px; color: var(--text-secondary);">No dates set - ${project.client}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+            }
             
             html += '</div>';
             return html;
