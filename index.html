@@ -2550,3 +2550,313 @@
                 showToast('Task updated');
             } else {
                 taskData.id = Date.
+                    // CONTINUING FROM: taskData.id = Date.
+        function saveTask() {
+            const taskData = {
+                name: document.getElementById('taskName').value.trim(),
+                projectId: parseInt(document.getElementById('taskProject').value),
+                priority: document.getElementById('taskPriority').value,
+                status: document.getElementById('taskStatus').value,
+                startDate: document.getElementById('taskStart').value,
+                dueDate: document.getElementById('taskDue').value,
+                assignee: document.getElementById('taskAssignee').value.trim(),
+                description: document.getElementById('taskDescription').value.trim()
+            };
+            
+            if (!taskData.name || !taskData.projectId || !taskData.dueDate) {
+                showToast('Please fill required fields');
+                return;
+            }
+            
+            if (editingId) {
+                const index = data.tasks.findIndex(t => t.id === editingId);
+                data.tasks[index] = { ...data.tasks[index], ...taskData };
+                showToast('Task updated');
+            } else {
+                taskData.id = Date.now();
+                data.tasks.push(taskData);
+                showToast('Task created');
+            }
+            
+            saveData();
+            renderView();
+            updateStats();
+            closeModal('taskModal');
+        }
+
+        function completeTask(id) {
+            const task = data.tasks.find(t => t.id === id);
+            if (task) {
+                task.status = 'Completed';
+                saveData();
+                renderView();
+                showToast('Task marked complete ✅');
+            }
+        }
+
+        function deleteTask(id) {
+            if (confirm('Delete this task?')) {
+                data.tasks = data.tasks.filter(t => t.id !== id);
+                saveData();
+                renderView();
+                updateStats();
+                showToast('Task deleted');
+            }
+        }
+
+        function showTransactionModal(type) {
+            editingId = null;
+            document.getElementById('transactionModalTitle').textContent = type === 'income' ? 'Add Income' : 'Add Expense';
+            document.getElementById('transType').value = type;
+            document.getElementById('transAmount').value = '';
+            document.getElementById('transDate').value = new Date().toISOString().split('T')[0];
+            document.getElementById('transDescription').value = '';
+            
+            const select = document.getElementById('transProject');
+            select.innerHTML = '<option value="">Select Project</option>';
+            data.projects.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
+            
+            updateCategories();
+            document.getElementById('transactionModal').classList.add('show');
+            toggleFabMenu();
+        }
+
+        function updateCategories() {
+            const type = document.getElementById('transType').value;
+            const categories = type === 'income' 
+                ? ['Client Payment', 'Retainer', 'Bonus', 'Refund', 'Other']
+                : ['Materials', 'Labor', 'Equipment', 'Transport', 'Tools', 'Other'];
+            
+            const select = document.getElementById('transCategory');
+            select.innerHTML = '';
+            categories.forEach(cat => {
+                select.innerHTML += `<option value="${cat}">${cat}</option>`;
+            });
+        }
+
+        function saveTransaction() {
+            const transData = {
+                type: document.getElementById('transType').value,
+                projectId: parseInt(document.getElementById('transProject').value),
+                category: document.getElementById('transCategory').value,
+                amount: parseFloat(document.getElementById('transAmount').value),
+                date: document.getElementById('transDate').value,
+                description: document.getElementById('transDescription').value.trim()
+            };
+            
+            if (!transData.projectId || !transData.amount || transData.amount <= 0) {
+                showToast('Please fill all required fields');
+                return;
+            }
+            
+            if (editingId) {
+                const index = data.transactions.findIndex(t => t.id === editingId);
+                data.transactions[index] = { ...data.transactions[index], ...transData };
+                showToast('Transaction updated');
+            } else {
+                transData.id = Date.now();
+                data.transactions.push(transData);
+                showToast('Transaction recorded');
+            }
+            
+            saveData();
+            renderView();
+            updateStats();
+            closeModal('transactionModal');
+        }
+
+        function deleteTransaction(id) {
+            if (confirm('Delete this transaction?')) {
+                data.transactions = data.transactions.filter(t => t.id !== id);
+                saveData();
+                renderView();
+                updateStats();
+                showToast('Transaction deleted');
+            }
+        }
+
+        // SMART SYNC FUNCTIONS
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (!key) {
+                showToast('Please enter an API key');
+                return;
+            }
+            syncApiKey = key;
+            localStorage.setItem('builderProSyncApiKey', key);
+            showToast('API key saved! ✅');
+        }
+
+        function toggleAutoSync() {
+            autoSyncEnabled = document.getElementById('autoSyncToggle').checked;
+            if (autoSyncEnabled) {
+                initAutoSync();
+                showToast('Auto-sync enabled');
+            } else {
+                if (autoSyncInterval) clearInterval(autoSyncInterval);
+                showToast('Auto-sync disabled');
+            }
+        }
+
+        function initAutoSync() {
+            if (autoSyncInterval) clearInterval(autoSyncInterval);
+            if (autoSyncEnabled && syncApiKey) {
+                autoSyncInterval = setInterval(smartSync, 5 * 60 * 1000);
+            }
+        }
+
+        async function smartSync() {
+            if (!syncApiKey) {
+                showToast('⚠️ No API key configured');
+                return;
+            }
+
+            const indicator = document.getElementById('syncIndicator');
+            indicator.classList.add('syncing');
+
+            try {
+                // Pull from cloud
+                const response = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.binId}`, {
+                    headers: { 'X-Master-Key': syncApiKey }
+                });
+
+                if (!response.ok) throw new Error('Sync failed');
+
+                const cloudData = await response.json();
+                const cloudContent = cloudData.record;
+
+                // Merge logic: Cloud data takes priority for timestamps
+                if (cloudContent.projects) {
+                    cloudContent.projects.forEach(cloudProj => {
+                        const localProj = data.projects.find(p => p.id === cloudProj.id);
+                        if (!localProj) {
+                            data.projects.push(cloudProj);
+                        }
+                    });
+                }
+
+                if (cloudContent.tasks) {
+                    cloudContent.tasks.forEach(cloudTask => {
+                        const localTask = data.tasks.find(t => t.id === cloudTask.id);
+                        if (!localTask) {
+                            data.tasks.push(cloudTask);
+                        }
+                    });
+                }
+
+                if (cloudContent.transactions) {
+                    cloudContent.transactions.forEach(cloudTrans => {
+                        const localTrans = data.transactions.find(t => t.id === cloudTrans.id);
+                        if (!localTrans) {
+                            data.transactions.push(cloudTrans);
+                        }
+                    });
+                }
+
+                // Push complete dataset to cloud
+                const pushResponse = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.binId}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Master-Key': syncApiKey
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!pushResponse.ok) throw new Error('Push failed');
+
+                saveData();
+                updateLastSync();
+                renderView();
+                updateStats();
+                showToast('✅ Synced successfully');
+
+            } catch (error) {
+                console.error('Sync error:', error);
+                showToast('❌ Sync failed: ' + error.message);
+            } finally {
+                indicator.classList.remove('syncing');
+            }
+        }
+
+        function updateLastSync() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('lastSyncTime').textContent = 'Last: ' + timeString;
+            document.getElementById('syncMode').textContent = syncApiKey ? 'Online' : 'Offline';
+        }
+
+        function initializeLastSync() {
+            updateLastSync();
+        }
+
+        // EXPORT/IMPORT FUNCTIONS
+        function exportData() {
+            const json = JSON.stringify(data, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `builder-pro-backup-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('✅ Data exported');
+        }
+
+        function exportToCSV() {
+            let csv = 'PROJECTS\n';
+            csv += 'Name,Client,Start,End,Description\n';
+            data.projects.forEach(p => {
+                csv += `"${p.name}","${p.client}","${p.startDate}","${p.endDate}","${p.description}"\n`;
+            });
+
+            csv += '\nTASKS\n';
+            csv += 'Name,Project,Priority,Status,Due Date,Assignee\n';
+            data.tasks.forEach(t => {
+                const proj = data.projects.find(p => p.id === t.projectId);
+                csv += `"${t.name}","${proj?.name || 'N/A'}","${t.priority}","${t.status}","${t.dueDate}","${t.assignee}"\n`;
+            });
+
+            csv += '\nTRANSACTIONS\n';
+            csv += 'Type,Project,Category,Amount,Date,Description\n';
+            data.transactions.forEach(t => {
+                const proj = data.projects.find(p => p.id === t.projectId);
+                csv += `"${t.type}","${proj?.name || 'N/A'}","${t.category}","${t.amount}","${t.date}","${t.description}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `builder-pro-export-${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast('✅ CSV exported');
+        }
+
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    data.projects = imported.projects || data.projects;
+                    data.tasks = imported.tasks || data.tasks;
+                    data.transactions = imported.transactions || data.transactions;
+                    saveData();
+                    renderView();
+                    updateStats();
+                    showToast('✅ Data imported successfully');
+                } catch (error) {
+                    showToast('❌ Import failed: Invalid file');
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>
