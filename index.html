@@ -17,52 +17,18 @@
     
     <title>Builder Pro - Complete Project Manager</title>
     
-    <!-- Favicon and App Icons -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="shortcut icon" href="favicon.ico">
-    <link rel="apple-touch-icon" href="apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="apple-touch-icon" sizes="192x192" href="web-app-manifest-192x192.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="web-app-manifest-512x512.png">
-    
-    <!-- Android/Chrome PWA -->
-    <link rel="icon" type="image/png" sizes="192x192" href="web-app-manifest-192x192.png">
-    <link rel="icon" type="image/png" sizes="512x512" href="web-app-manifest-512x512.png">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Apple Splash Screens -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-startup-image" href="web-app-manifest-512x512.png">
-    
-    <!-- PWA Meta Tags -->
-    <meta name="application-name" content="Builder Pro">
-    <meta name="apple-mobile-web-app-title" content="Builder Pro">
-    <meta name="description" content="Complete Project Management App by REFIT Interior">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <!-- Microsoft Tiles -->
-    <meta name="msapplication-TileColor" content="#E8A9B3">
-    <meta name="msapplication-TileImage" content="favicon/ms-icon-144x144.png">
-    
     <style>
         :root {
-            /* Safe area insets for iOS */
             --safe-area-inset-top: env(safe-area-inset-top, 0px);
             --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
             --safe-area-inset-left: env(safe-area-inset-left, 0px);
             --safe-area-inset-right: env(safe-area-inset-right, 0px);
             
-            /* Default Rose Blush Theme */
             --bg-color: #F4EDEB;
             --accent-color: #E8A9B3;
             --highlight-color: #D47C90;
             --text-color: #1C1C1C;
             
-            /* UI Elements */
             --card-bg: #ffffff;
             --text-secondary: #5a5a5a;
             --border-color: #e8e8e8;
@@ -73,31 +39,26 @@
             --income-color: #10b981;
             --expense-color: #ef4444;
             
-            /* Deep Brown for buttons */
             --button-primary: #4B2B1A;
             --button-primary-hover: #6B4332;
             
-            /* Accessibility */
             --contrast: 1;
             --brightness: 1;
             --font-scale: 1;
         }
         
-        /* Contrast levels */
         body.low-contrast { --contrast: 0.85; --brightness: 1.1; }
         body.normal-contrast { --contrast: 1; --brightness: 1; }
         body.high-contrast { --contrast: 1.25; --brightness: 0.95; }
         body.extra-contrast { --contrast: 1.5; --brightness: 0.9; }
         body { filter: contrast(var(--contrast)) brightness(var(--brightness)); }
         
-        /* Font sizes */
         body.font-s { --font-scale: 0.85; }
         body.font-m { --font-scale: 1; }
         body.font-l { --font-scale: 1.15; }
         body.font-xl { --font-scale: 1.3; }
         body.font-xxl { --font-scale: 1.5; }
 
-        /* Night mode */
         .night-mode { 
             --bg-color: #1a1618 !important; 
             --card-bg: #2d2729 !important; 
@@ -129,12 +90,10 @@
             min-height: 100vh; 
             display: flex; 
             flex-direction: column;
-            /* Respect safe areas on all sides */
             padding-left: env(safe-area-inset-left);
             padding-right: env(safe-area-inset-right);
         }
         
-        /* iOS Standalone App Mode */
         @media (display-mode: standalone) {
             .fixed-header-section {
                 padding-top: max(20px, env(safe-area-inset-top));
@@ -144,13 +103,11 @@
                 margin-top: calc(220px + max(20px, env(safe-area-inset-top)));
             }
             
-            /* Hide browser-specific elements in app mode */
             .install-prompt {
                 display: none !important;
             }
         }
         
-        /* iPhone X and newer (with notch) specific */
         @supports (padding-top: max(0px)) {
             .fixed-header-section {
                 padding-top: max(20px, env(safe-area-inset-top));
@@ -161,7 +118,6 @@
             }
         }
         
-        /* Fixed header */
         .fixed-header-section {
             position: fixed;
             top: 0;
@@ -169,7 +125,6 @@
             right: 0;
             z-index: 100;
             background: var(--bg-color);
-            /* Add padding for iOS status bar */
             padding-top: var(--safe-area-inset-top);
         }
         
@@ -298,7 +253,6 @@
             background: var(--bg-color); 
         }
         
-        /* Content with spacing for fixed header */
         .main-content-wrapper {
             margin-top: 200px;
             flex: 1;
@@ -317,7 +271,6 @@
             padding-bottom: 80px; 
         }
         
-        /* Cards and components */
         .stat-card { 
             background: var(--card-bg); 
             padding: 10px; 
@@ -388,7 +341,6 @@
             background: rgba(255,255,255,0.3);
         }
         
-        /* Gantt Chart */
         .gantt-container { 
             background: var(--card-bg); 
             border-radius: 10px; 
@@ -449,6 +401,38 @@
             border-radius: 4px; 
         }
         
+        .today-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--danger);
+            z-index: 10;
+            box-shadow: 0 0 8px rgba(239, 68, 68, 0.6);
+            animation: pulse-line 2s infinite;
+        }
+        
+        .today-line::before {
+            content: 'TODAY';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--danger);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 8px;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes pulse-line {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
         .gantt-bar { 
             position: absolute; 
             height: 100%; 
@@ -470,7 +454,6 @@
             opacity: 0.9;
         }
         
-        /* Modals */
         .modal { 
             display: none; 
             position: fixed; 
@@ -496,7 +479,6 @@
             overflow-y: auto; 
         }
         
-        /* Forms */
         .form-group input, .form-group select, .form-group textarea { 
             width: 100%; 
             padding: 8px 10px; 
@@ -541,7 +523,6 @@
             color: white; 
         }
         
-        /* Settings Panel */
         .settings-panel { 
             position: fixed; 
             top: 0; 
@@ -555,14 +536,12 @@
             z-index: 1001; 
             overflow-y: auto; 
             padding: 20px; 
-            /* Add safe area padding for iOS */
             padding-top: calc(20px + var(--safe-area-inset-top));
             padding-bottom: calc(20px + var(--safe-area-inset-bottom));
         }
         
         .settings-panel.show { right: 0; }
         
-        /* Settings backdrop overlay */
         .settings-backdrop {
             position: fixed;
             top: 0;
@@ -579,7 +558,6 @@
             display: block;
         }
         
-        /* Settings header with proper spacing */
         .settings-header {
             display: flex;
             justify-content: space-between;
@@ -587,7 +565,6 @@
             margin-bottom: 20px;
             padding-bottom: 10px;
             border-bottom: 1px solid var(--border-color);
-            /* Extra padding for mobile */
             padding-top: 10px;
         }
         
@@ -610,7 +587,6 @@
             background: var(--bg-color);
         }
         
-        /* Color Theme Grid */
         .theme-grid { 
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -664,7 +640,6 @@
             font-weight: 500;
         }
         
-        /* Contrast Controls */
         .contrast-controls {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -689,7 +664,6 @@
             border-color: var(--button-primary);
         }
         
-        /* FAB */
         .fab-container { 
             position: fixed; 
             bottom: calc(20px + var(--safe-area-inset-bottom)); 
@@ -764,7 +738,6 @@
             color: var(--text-secondary); 
         }
         
-        /* Task items */
         .task-item { 
             padding: 10px; 
             margin-bottom: 8px; 
@@ -799,7 +772,6 @@
             background: var(--danger); 
         }
         
-        /* Calendar Styles */
         .calendar-container {
             background: var(--card-bg);
             border-radius: 10px;
@@ -833,6 +805,15 @@
             font-size: calc(10px * var(--font-scale));
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-day:hover {
+            background: var(--card-bg);
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px var(--shadow-color);
+            z-index: 10;
         }
         
         .calendar-day.other-month {
@@ -843,6 +824,19 @@
             background: var(--accent-color);
             color: white;
             font-weight: bold;
+            box-shadow: 0 0 0 3px var(--highlight-color), 0 4px 12px rgba(0,0,0,0.3);
+            transform: scale(1.1);
+            z-index: 5;
+            animation: pulse-today 2s infinite;
+        }
+        
+        .calendar-day.today:hover {
+            background: var(--highlight-color);
+        }
+        
+        @keyframes pulse-today {
+            0%, 100% { box-shadow: 0 0 0 3px var(--highlight-color), 0 4px 12px rgba(0,0,0,0.3); }
+            50% { box-shadow: 0 0 0 3px var(--danger), 0 4px 12px rgba(0,0,0,0.4); }
         }
         
         .calendar-day.has-event {
@@ -875,39 +869,6 @@
             margin: 15px 0;
         }
         
-        /* Delete Confirmation Modal */
-        .confirm-delete-modal {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 350px;
-            text-align: center;
-        }
-        
-        .confirm-delete-modal h3 {
-            color: var(--danger);
-            margin-bottom: 15px;
-        }
-        
-        .confirm-delete-modal p {
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            font-size: calc(12px * var(--font-scale));
-        }
-        
-        .confirm-delete-modal .warning-box {
-            background: rgba(239, 68, 68, 0.1);
-            border: 2px solid var(--danger);
-            border-radius: 8px;
-            padding: 10px;
-            margin: 15px 0;
-        }
-        
-        .confirm-delete-modal .btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
         @media (max-width: 768px) {
             .main-content-wrapper {
                 margin-top: 210px;
@@ -964,7 +925,6 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Fixed Header Section -->
         <div class="fixed-header-section">
             <div class="header">
                 <div class="header-content">
@@ -1017,16 +977,13 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content-wrapper">
             <div class="container" id="mainContent"></div>
         </div>
     </div>
 
-    <!-- Settings Backdrop -->
     <div class="settings-backdrop" id="settingsBackdrop" onclick="toggleSettings()"></div>
     
-    <!-- Settings Panel -->
     <div class="settings-panel" id="settingsPanel">
         <div class="settings-header">
             <span style="font-size: 1.25rem; font-weight: bold; color: var(--text-color);">⚙️ Settings</span>
@@ -1051,9 +1008,7 @@
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
             <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🎨 Theme Colors (18 Premium Themes)</label>
-            <div class="theme-grid" id="themeGrid">
-                <!-- Themes will be populated here by JavaScript -->
-            </div>
+            <div class="theme-grid" id="themeGrid"></div>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
@@ -1093,7 +1048,6 @@
         </div>
     </div>
 
-    <!-- FAB Menu -->
     <div class="fab-container">
         <div class="fab-menu" id="fabMenu">
             <div class="fab-option" onclick="showProjectModal()">
@@ -1285,11 +1239,22 @@
                 <h2 id="projectDetailTitle" style="color: var(--text-color);">Project Details</h2>
                 <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('projectDetailModal')">×</span>
             </div>
-            <div id="projectDetailBody" style="padding: 15px; max-height: 60vh; overflow-y: auto;">
-                <!-- Dynamic content -->
-            </div>
+            <div id="projectDetailBody" style="padding: 15px; max-height: 60vh; overflow-y: auto;"></div>
             <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
                 <button class="btn btn-secondary" onclick="closeModal('projectDetailModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="dayDetailModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <h2 id="dayDetailTitle" style="color: var(--text-color);">📅 Day Details</h2>
+                <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('dayDetailModal')">×</span>
+            </div>
+            <div id="dayDetailBody" style="padding: 15px; max-height: 60vh; overflow-y: auto;"></div>
+            <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeModal('dayDetailModal')">Close</button>
             </div>
         </div>
     </div>
@@ -1297,14 +1262,12 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // Configuration
         const APP_CONFIG = {
             binId: '68e121b8ae596e708f05df17',
             baseUrl: 'https://api.jsonbin.io/v3',
             deviceType: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Laptop'
         };
 
-        // 18 Premium Theme Colors
         const themeColors = [
             { name: 'Rose Blush', bg: '#F4EDEB', accent: '#E8A9B3', highlight: '#D47C90', text: '#1C1C1C' },
             { name: 'Mocha Cream', bg: '#FFF6F1', accent: '#C9A48F', highlight: '#8A5C4E', text: '#1C1C1C' },
@@ -1326,7 +1289,6 @@
             { name: 'Neutral Blush', bg: '#F5F3F2', accent: '#D0B8AD', highlight: '#8C6A5A', text: '#1C1C1C' }
         ];
 
-        // App State
         let data = {
             currentUser: 'Builder Pro',
             userPosition: 'by REFIT Interior',
@@ -1334,11 +1296,11 @@
             projects: [],
             tasks: [],
             transactions: [],
-            permanentlyDeleted: [], // Track permanently deleted items
-            archivedProjects: [], // Track archived projects
-            showArchived: false, // Toggle to show/hide archived projects
+            permanentlyDeleted: [],
+            archivedProjects: [],
+            showArchived: false,
             nightMode: false,
-            themeColor: 0, // Default to Rose Blush
+            themeColor: 0,
             fontSize: 'm',
             contrast: 'normal',
             timelineFilter: 'all',
@@ -1352,64 +1314,39 @@
         let autoSyncInterval = null;
         let autoSyncEnabled = false;
 
-        // Initialize App
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
             initUI();
             updateStats();
-            
-            // Auto-add dates to existing projects without dates
             addDatesToExistingProjects();
-            
-            // Auto-archive old projects
             autoArchiveOldProjects();
-            
             renderView();
             initAutoSync();
             initializeLastSync();
             
-            // Check online status
             if (!navigator.onLine) {
                 document.getElementById('syncMode').textContent = 'Offline';
             }
             
-            // Set initial device type
             document.getElementById('deviceType').textContent = APP_CONFIG.deviceType;
             
-            // Show welcome message for new users
             if (data.projects.length === 0 && data.tasks.length === 0) {
                 setTimeout(() => {
                     showToast('👋 Welcome to Builder Pro! Press + to get started');
                 }, 1000);
             }
             
-            // Register Service Worker for PWA
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register('sw.js')
                     .then(reg => console.log('Service Worker registered'))
                     .catch(err => console.log('Service Worker registration failed'));
             }
-            
-            // PWA Install Prompt
-            let deferredPrompt;
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                // Show install button if not already installed
-                if (!window.matchMedia('(display-mode: standalone)').matches) {
-                    setTimeout(() => {
-                        showInstallPrompt();
-                    }, 30000); // Show after 30 seconds
-                }
-            });
         });
         
-        // Add dates to existing projects without dates
         function addDatesToExistingProjects() {
             let updated = false;
             data.projects.forEach(project => {
                 if (!project.startDate || !project.endDate) {
-                    // Set default dates: Oct 1 to Oct 15, 2025
                     project.startDate = '2025-10-01';
                     project.endDate = '2025-10-15';
                     updated = true;
@@ -1422,13 +1359,11 @@
             }
         }
         
-        // Auto-archive old projects (instead of deleting)
         function autoArchiveOldProjects() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             let archivedCount = 0;
             
-            // Initialize archived projects array if not exists
             if (!data.archivedProjects) {
                 data.archivedProjects = [];
             }
@@ -1438,18 +1373,16 @@
                     const endDate = new Date(project.endDate);
                     endDate.setHours(23, 59, 59, 999);
                     
-                    // If project ended more than 7 days ago, archive it
                     const daysSinceEnd = Math.floor((today - endDate) / (1000 * 60 * 60 * 24));
                     if (daysSinceEnd > 7 && !project.locked) {
-                        // Move to archived
                         project.archivedAt = new Date().toISOString();
                         project.archived = true;
                         data.archivedProjects.push(project);
                         archivedCount++;
-                        return false; // Remove from active projects
+                        return false;
                     }
                 }
-                return true; // Keep in active projects
+                return true;
             });
             
             if (archivedCount > 0) {
@@ -1457,47 +1390,7 @@
                 showToast(`📦 Archived ${archivedCount} completed project(s)`);
             }
         }
-        
-        // Show install prompt for PWA
-        function showInstallPrompt() {
-            if (!window.deferredPrompt) return;
-            
-            const installBtn = document.createElement('button');
-            installBtn.textContent = '📱 Install App';
-            installBtn.style.cssText = `
-                position: fixed;
-                bottom: 90px;
-                left: 50%;
-                transform: translateX(-50%);
-                background: var(--button-primary);
-                color: white;
-                padding: 12px 20px;
-                border: none;
-                border-radius: 25px;
-                font-size: 14px;
-                font-weight: bold;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                cursor: pointer;
-                z-index: 1000;
-            `;
-            
-            installBtn.onclick = async () => {
-                window.deferredPrompt.prompt();
-                const result = await window.deferredPrompt.userChoice;
-                if (result.outcome === 'accepted') {
-                    showToast('App installed successfully!');
-                }
-                window.deferredPrompt = null;
-                installBtn.remove();
-            };
-            
-            document.body.appendChild(installBtn);
-            
-            // Auto remove after 10 seconds
-            setTimeout(() => installBtn.remove(), 10000);
-        }
 
-        // Data Management
         function loadData() {
             const saved = localStorage.getItem('builderProData');
             if (saved) {
@@ -1523,7 +1416,6 @@
             updateHeader();
         }
 
-        // UI Functions
         function initUI() {
             initThemePicker();
             document.getElementById('deviceType').textContent = APP_CONFIG.deviceType;
@@ -1531,10 +1423,7 @@
 
         function initThemePicker() {
             const grid = document.getElementById('themeGrid');
-            if (!grid) {
-                console.error('Theme grid element not found');
-                return;
-            }
+            if (!grid) return;
             grid.innerHTML = '';
             
             themeColors.forEach((theme, index) => {
@@ -1577,7 +1466,6 @@
             document.documentElement.style.setProperty('--accent-color', theme.accent);
             document.documentElement.style.setProperty('--highlight-color', theme.highlight);
             
-            // Update meta theme color for mobile
             document.querySelector('meta[name="theme-color"]').content = theme.accent;
         }
 
@@ -1587,7 +1475,6 @@
             data.contrast = level;
             saveData();
             
-            // Update button states
             document.querySelectorAll('.contrast-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.textContent.toLowerCase() === level) {
@@ -1624,37 +1511,23 @@
             const backdrop = document.getElementById('settingsBackdrop');
             
             if (panel.classList.contains('show')) {
-                // Close settings
                 panel.classList.remove('show');
                 backdrop.classList.remove('show');
-                document.body.style.overflow = ''; // Restore scrolling
+                document.body.style.overflow = '';
             } else {
-                // Open settings
                 panel.classList.add('show');
                 backdrop.classList.add('show');
-                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+                document.body.style.overflow = 'hidden';
                 
-                // Reinitialize theme picker when opening settings
                 setTimeout(() => {
                     initThemePicker();
                 }, 100);
             }
         }
         
-        // Close settings with Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && document.getElementById('settingsPanel').classList.contains('show')) {
                 toggleSettings();
-            }
-        });
-        
-        // Prevent settings panel from closing when clicking inside it
-        document.addEventListener('DOMContentLoaded', () => {
-            const settingsPanel = document.getElementById('settingsPanel');
-            if (settingsPanel) {
-                settingsPanel.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                });
             }
         });
 
@@ -1673,7 +1546,6 @@
             document.getElementById(modalId).classList.remove('show');
         }
 
-        // View Management
         function switchView(view) {
             data.currentView = view;
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -1718,7 +1590,6 @@
                 </div>
             `;
             
-            // Timeline filters
             html += `
                 <div style="display: flex; gap: 8px; margin-bottom: 12px; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color);">
                     <button class="btn btn-secondary ${data.timelineFilter === 'all' ? 'active' : ''}" 
@@ -1732,7 +1603,6 @@
                 </div>
             `;
             
-            // Due tasks with timeline filter
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
@@ -1742,7 +1612,6 @@
                 return due <= today && t.status !== 'Completed';
             });
             
-            // Apply timeline filter
             if (data.timelineFilter === 'day') {
                 dueTasks = dueTasks.filter(t => {
                     const due = new Date(t.dueDate);
@@ -1863,10 +1732,17 @@
                 const width = (duration / totalDays) * 100;
                 const left = (startOffset / totalDays) * 100;
                 
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const todayOffset = Math.ceil((today - minDate) / (1000 * 60 * 60 * 24));
+                const todayPosition = (todayOffset / totalDays) * 100;
+                const showTodayLine = todayOffset >= 0 && todayOffset <= totalDays;
+                
                 html += `
                     <div class="gantt-row">
                         <div class="gantt-label">${project.name} ${project.locked ? '🔒' : ''}</div>
                         <div class="gantt-timeline">
+                            ${showTodayLine ? `<div class="today-line" style="left: ${todayPosition}%;"></div>` : ''}
                             <div class="gantt-bar" style="left: ${left}%; width: ${width}%;" onclick="showProjectDetail(${project.id})">
                                 <div>${duration} days</div>
                                 <div class="gantt-bar-dates">
@@ -1906,7 +1782,6 @@
             }
             
             let html = '';
-            // Fixed: Ensure all projects are accessible, not just first 15
             data.projects.forEach((project, index) => {
                 const tasks = data.tasks.filter(t => t.projectId === project.id);
                 const transactions = data.transactions.filter(t => t.projectId === project.id);
@@ -2197,10 +2072,15 @@
                     else if (task.status === 'In Progress') barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)';
                     else if (dueDate < today) barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)';
                     
+                    const todayOffset = Math.ceil((today - minDate) / (1000 * 60 * 60 * 24));
+                    const todayPosition = (todayOffset / totalDays) * 100;
+                    const showTodayLine = todayOffset >= 0 && todayOffset <= totalDays;
+                    
                     html += `
                         <div class="gantt-row">
                             <div class="gantt-label" title="${task.name} - ${project ? project.name : 'No Project'}">${task.name}</div>
                             <div class="gantt-timeline">
+                                ${showTodayLine ? `<div class="today-line" style="left: ${todayPosition}%;"></div>` : ''}
                                 <div class="gantt-bar" style="left: ${left}%; width: ${width}%; background: ${barColor};" 
                                      onclick="editTask(${task.id})" title="${task.priority} Priority - ${task.status}">
                                     <div style="font-size: 9px;">${duration}d</div>
@@ -2338,7 +2218,6 @@
             container.innerHTML = html;
         }
         
-        // Calendar Functions
         function renderCalendar(container) {
             const today = new Date();
             const currentMonth = today.getMonth();
@@ -2377,27 +2256,24 @@
                         <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Sat</div>
             `;
             
-            // Calculate calendar days
             const firstDay = new Date(currentYear, currentMonth, 1).getDay();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             
-            // Add empty cells for days before month starts
             for (let i = 0; i < firstDay; i++) {
                 html += '<div class="calendar-day other-month"></div>';
             }
             
-            // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(currentYear, currentMonth, day);
                 const dateStr = date.toISOString().split('T')[0];
                 const isToday = date.toDateString() === today.toDateString();
                 
-                // Get tasks for this day
                 const dayTasks = data.tasks.filter(t => {
                     return t.dueDate === dateStr || t.startDate === dateStr;
                 });
                 
-                html += `<div class="calendar-day ${isToday ? 'today' : ''} ${dayTasks.length > 0 ? 'has-event' : ''}">
+                html += `<div class="calendar-day ${isToday ? 'today' : ''} ${dayTasks.length > 0 ? 'has-event' : ''}" 
+                             onclick="showDayDetail('${dateStr}')" title="Click to view details">
                     <div style="font-weight: bold;">${day}</div>`;
                 
                 if (dayTasks.length > 0) {
@@ -2414,7 +2290,6 @@
             
             html += '</div></div>';
             
-            // Upcoming tasks
             const upcomingTasks = data.tasks
                 .filter(t => t.dueDate && new Date(t.dueDate) >= today)
                 .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
@@ -2451,21 +2326,18 @@
         }
         
         function syncToiPhoneCalendar() {
-            // Generate iCalendar (.ics) file
             let icsContent = 'BEGIN:VCALENDAR\n';
             icsContent += 'VERSION:2.0\n';
             icsContent += 'PRODID:-//Builder Pro//REFIT Interior//EN\n';
             icsContent += 'CALSCALE:GREGORIAN\n';
             icsContent += 'METHOD:PUBLISH\n';
             
-            // Add tasks as events
             data.tasks.forEach(task => {
                 if (task.dueDate) {
                     const project = data.projects.find(p => p.id === task.projectId);
                     const startDate = task.startDate || task.dueDate;
                     const dueDate = task.dueDate;
                     
-                    // Convert dates to iCalendar format (YYYYMMDD)
                     const formatDate = (dateStr) => dateStr.replace(/-/g, '');
                     
                     icsContent += 'BEGIN:VEVENT\n';
@@ -2484,7 +2356,6 @@
             
             icsContent += 'END:VCALENDAR';
             
-            // Download the file
             const blob = new Blob([icsContent], { type: 'text/calendar' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -2496,7 +2367,130 @@
             showToast('📱 Calendar file created! Open it on your iPhone to sync.');
         }
         
-        // Drag and Drop for Kanban
+        function showDayDetail(dateStr) {
+            const date = new Date(dateStr);
+            const formattedDate = date.toLocaleDateString('en', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            document.getElementById('dayDetailTitle').textContent = formattedDate;
+            
+            const dayTasks = data.tasks.filter(t => {
+                return t.dueDate === dateStr || t.startDate === dateStr;
+            });
+            
+            let html = '';
+            
+            if (dayTasks.length === 0) {
+                html = `
+                    <div class="empty-state" style="padding: 40px 20px;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📅</div>
+                        <p>No tasks scheduled for this day</p>
+                        <button class="btn btn-primary" style="margin-top: 15px;" onclick="closeModal('dayDetailModal'); showTaskModal();">
+                            + Add Task
+                        </button>
+                    </div>
+                `;
+            } else {
+                html += `
+                    <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                        <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">
+                            📋 Tasks for this day (${dayTasks.length})
+                        </h4>
+                    </div>
+                `;
+                
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                const overdueTasks = dayTasks.filter(t => new Date(t.dueDate) < today && t.status !== 'Completed');
+                const dueTodayTasks = dayTasks.filter(t => new Date(t.dueDate).getTime() === date.getTime() && t.status !== 'Completed');
+                const completedTasks = dayTasks.filter(t => t.status === 'Completed');
+                const startingTasks = dayTasks.filter(t => t.startDate === dateStr && t.dueDate !== dateStr);
+                
+                if (overdueTasks.length > 0) {
+                    html += '<div style="margin-bottom: 15px;"><h5 style="font-size: 12px; color: var(--danger); margin-bottom: 8px;">⚠️ Overdue</h5>';
+                    overdueTasks.forEach(task => {
+                        html += renderTaskCard(task, 'var(--danger)');
+                    });
+                    html += '</div>';
+                }
+                
+                if (dueTodayTasks.length > 0) {
+                    html += '<div style="margin-bottom: 15px;"><h5 style="font-size: 12px; color: var(--warning); margin-bottom: 8px;">📌 Due Today</h5>';
+                    dueTodayTasks.forEach(task => {
+                        html += renderTaskCard(task, 'var(--warning)');
+                    });
+                    html += '</div>';
+                }
+                
+                if (startingTasks.length > 0) {
+                    html += '<div style="margin-bottom: 15px;"><h5 style="font-size: 12px; color: var(--accent-color); margin-bottom: 8px;">🚀 Starting Today</h5>';
+                    startingTasks.forEach(task => {
+                        html += renderTaskCard(task, 'var(--accent-color)');
+                    });
+                    html += '</div>';
+                }
+                
+                if (completedTasks.length > 0) {
+                    html += '<div style="margin-bottom: 15px;"><h5 style="font-size: 12px; color: var(--success); margin-bottom: 8px;">✅ Completed</h5>';
+                    completedTasks.forEach(task => {
+                        html += renderTaskCard(task, 'var(--success)');
+                    });
+                    html += '</div>';
+                }
+                
+                html += `
+                    <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" 
+                            onclick="closeModal('dayDetailModal'); showTaskModal();">
+                        + Add New Task
+                    </button>
+                `;
+            }
+            
+            document.getElementById('dayDetailBody').innerHTML = html;
+            document.getElementById('dayDetailModal').classList.add('show');
+        }
+        
+        function renderTaskCard(task, borderColor) {
+            const project = data.projects.find(p => p.id === task.projectId);
+            const isCompleted = task.status === 'Completed';
+            
+            return `
+                <div class="task-item" style="border-left-color: ${borderColor}; margin-bottom: 8px; ${isCompleted ? 'opacity: 0.7;' : ''}">
+                    <div style="flex: 1;">
+                        <div style="font-weight: 500; color: var(--text-color); ${isCompleted ? 'text-decoration: line-through;' : ''}">${task.name}</div>
+                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">
+                            📁 ${project ? project.name : 'No Project'} • 
+                            ${task.priority} Priority • 
+                            ${task.status}
+                            ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
+                        </div>
+                        ${task.description ? `
+                            <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px; padding-top: 4px; border-top: 1px solid var(--border-color);">
+                                ${task.description}
+                            </div>
+                        ` : ''}
+                        ${task.startDate && task.dueDate && task.startDate !== task.dueDate ? `
+                            <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">
+                                📅 ${task.startDate} → ${task.dueDate}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 4px;">
+                        <button class="icon-btn" onclick="closeModal('dayDetailModal'); editTask(${task.id});" title="Edit">✏️</button>
+                        ${!isCompleted ? `
+                            <button class="icon-btn" style="background: var(--success);" onclick="completeTask(${task.id}); showDayDetail('${task.dueDate}');" title="Complete">✅</button>
+                        ` : ''}
+                        <button class="icon-btn danger" onclick="if(confirm('Delete this task?')) { deleteTask(${task.id}); closeModal('dayDetailModal'); }" title="Delete">🗑️</button>
+                    </div>
+                </div>
+            `;
+        }
+        
         let draggedTaskId = null;
         
         function dragTask(event, taskId) {
@@ -2512,7 +2506,6 @@
             const task = data.tasks.find(t => t.id === draggedTaskId);
             if (task) {
                 if (status === 'Due') {
-                    // Don't allow manual move to Due column
                     showToast('Tasks are automatically marked as Due based on date');
                     return;
                 }
@@ -2523,7 +2516,6 @@
             }
         }
         
-        // Auto-sync functions
         function initAutoSync() {
             const savedAutoSync = localStorage.getItem('autoSyncEnabled');
             if (savedAutoSync === 'true' && syncApiKey) {
@@ -2552,7 +2544,7 @@
             if (syncApiKey && autoSyncEnabled) {
                 autoSyncInterval = setInterval(() => {
                     smartSync();
-                }, 5 * 60 * 1000); // 5 minutes
+                }, 5 * 60 * 1000);
             }
         }
         
@@ -2575,7 +2567,6 @@
             }
         }
 
-        // Stats
         function updateStats() {
             document.getElementById('totalProjects').textContent = data.projects.length;
             document.getElementById('totalTasks').textContent = data.tasks.length;
@@ -2583,11 +2574,10 @@
             const income = data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
             const expenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
             
-            document.getElementById('totalIncome').textContent = '$' + income.toFixed(0);
-            document.getElementById('totalExpenses').textContent = '$' + expenses.toFixed(0);
+            document.getElementById('totalIncome').textContent = ' + income.toFixed(0);
+            document.getElementById('totalExpenses').textContent = ' + expenses.toFixed(0);
         }
 
-        // CRUD Operations
         function showProfileModal() {
             document.getElementById('profileName').value = data.currentUser;
             document.getElementById('profilePosition').value = data.userPosition;
@@ -2664,7 +2654,6 @@
             closeModal('projectModal');
         }
 
-        // Permanent Delete Functions with Double Confirmation
         function permanentDeleteProject(id) {
             const project = data.projects.find(p => p.id === id);
             if (!project) return;
@@ -2675,7 +2664,6 @@
                 const secondConfirm = confirm(`⛔ FINAL WARNING:\n\nPermanently delete "${project.name}"?\n\nType OK to confirm PERMANENT DELETION.\n\nThis will be deleted from ALL devices after sync.`);
                 
                 if (secondConfirm) {
-                    // Add to permanently deleted list
                     if (!data.permanentlyDeleted) data.permanentlyDeleted = [];
                     data.permanentlyDeleted.push({ 
                         id, 
@@ -2684,7 +2672,6 @@
                         name: project.name 
                     });
                     
-                    // Remove project and all related data
                     data.projects = data.projects.filter(p => p.id !== id);
                     data.tasks = data.tasks.filter(t => t.projectId !== id);
                     data.transactions = data.transactions.filter(t => t.projectId !== id);
@@ -2871,7 +2858,6 @@
             closeModal('transactionModal');
         }
 
-        // Task completion function
         function completeTask(id) {
             const task = data.tasks.find(t => t.id === id);
             if (task) {
@@ -2883,7 +2869,6 @@
             }
         }
         
-        // Smart Sync with Permanent Deletion Support
         async function smartSync() {
             if (!syncApiKey) {
                 showToast('Please set up API key first');
@@ -2897,7 +2882,6 @@
             syncMode.textContent = 'Syncing...';
             
             try {
-                // First, test the API key validity
                 const testResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'GET',
                     mode: 'cors',
@@ -2917,7 +2901,6 @@
                 
                 if (testResponse.status === 404) {
                     showToast('Bin not found - creating new bin...');
-                    // Create initial data structure
                     const initialData = {
                         projects: data.projects || [],
                         tasks: data.tasks || [],
@@ -2936,7 +2919,6 @@
                         lastUpdateDevice: APP_CONFIG.deviceType
                     };
                     
-                    // Try to create/update the bin
                     const createResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                         method: 'PUT',
                         headers: {
@@ -2958,7 +2940,6 @@
                     return;
                 }
                 
-                // Pull from cloud
                 const pullResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
                     method: 'GET',
                     mode: 'cors',
@@ -2973,19 +2954,15 @@
                 if (pullResponse.ok) {
                     const result = await pullResponse.json();
                     cloudData = result.record || result || {};
-                    console.log('Cloud data retrieved:', cloudData);
                 }
                 
-                // Merge permanent deletions first
                 const allPermanentlyDeleted = [
                     ...(cloudData.permanentlyDeleted || []),
                     ...(data.permanentlyDeleted || [])
                 ];
                 
-                // Get unique permanently deleted items
                 const permanentlyDeletedIds = new Set(allPermanentlyDeleted.map(d => d.id));
                 
-                // Merge data excluding permanently deleted items
                 const mergedData = {
                     projects: mergeArrays(cloudData.projects || [], data.projects, 'id')
                         .filter(p => !permanentlyDeletedIds.has(p.id)),
@@ -3007,7 +2984,6 @@
                     lastUpdateDevice: APP_CONFIG.deviceType
                 };
                 
-                // Push merged data back to cloud
                 const pushResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'PUT',
                     mode: 'cors',
@@ -3020,7 +2996,6 @@
                 });
                 
                 if (pushResponse.ok) {
-                    // Update local data
                     data = mergedData;
                     saveData();
                     renderView();
@@ -3043,7 +3018,6 @@
             } catch (error) {
                 console.error('Sync error details:', error);
                 
-                // More specific error messages
                 if (error.message.includes('Failed to fetch')) {
                     showToast('Network error - check internet connection');
                 } else if (error.message.includes('CORS')) {
@@ -3064,7 +3038,6 @@
             localArray.forEach(localItem => {
                 const existingIndex = merged.findIndex(item => item[key] === localItem[key]);
                 if (existingIndex >= 0) {
-                    // Update existing item if local is newer
                     const cloudItem = merged[existingIndex];
                     if (localItem.lastModified > cloudItem.lastModified || 
                         localItem.completedAt > cloudItem.completedAt ||
@@ -3086,13 +3059,11 @@
                 return;
             }
             
-            // Test the API key immediately
             syncApiKey = key;
             localStorage.setItem('builderProSyncApiKey', key);
             document.getElementById('apiKeyInput').value = '';
             document.getElementById('syncMode').textContent = 'Testing...';
             
-            // Test connection with the new key
             testConnection(key);
         }
         
@@ -3126,7 +3097,6 @@
             }
         }
 
-        // Export/Import
         function exportData() {
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
