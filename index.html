@@ -1063,11 +1063,12 @@
         </div>
         
         <div>
-            <button class="btn btn-primary" onclick="exportData()" style="width: 100%;">📤 Export Data</button>
-            <label class="btn btn-success" style="display: block; text-align: center; margin-top: 10px; width: 100%;">
+            <button class="btn btn-primary" onclick="exportData()" style="width: 100%; margin-bottom: 10px;">📤 Export Data</button>
+            <label class="btn btn-success" style="display: block; text-align: center; margin-bottom: 10px; width: 100%;">
                 📥 Import Data
                 <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
             </label>
+            <button class="btn btn-danger" onclick="clearAllProjectsNow()" style="width: 100%;">🗑️ Delete All Projects & Data</button>
         </div>
     </div>
 
@@ -1340,7 +1341,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
-            cleanupUnwantedProjects();
+            aggressiveCleanup(); // Run cleanup EVERY time
             initUI();
             updateStats();
             renderView();
@@ -1360,68 +1361,68 @@
             }
         });
 
-        function cleanupUnwantedProjects() {
-            // Check if cleanup has already been done
-            if (localStorage.getItem('projectsCleanedUp') === 'true') {
-                return;
-            }
-            
-            const projectNamesToRemove = [
+        function aggressiveCleanup() {
+            // List of unwanted project names - runs EVERY time until they're gone
+            const unwantedNames = [
                 'william. mock up 1',
                 'fnn ice cream booth',
-                'Fnn meeting room 1-refreshment',
-                'Fnn add on ac diffuser',
-                'Ms Ng- tmn midah. KL',
-                'Fnn ceo blind',
-                'Fnn. Relocate ac thermostat',
-                'Ss3 winsum',
-                'Usj 11. Nicky',
-                'Dsara damai. James house',
-                'William MockUp 2',
-                'liam. PRODUCTION 50 crackle set',
-                'William. PRODUCTION 50 crackle set',
-                'Elaine BU11/14',
-                "Adrian Home. - D'Clover Residences",
-                'Wong n Carol no 37, ss3'
+                'fnn meeting room 1-refreshment',
+                'fnn add on ac diffuser',
+                'ms ng- tmn midah. kl',
+                'fnn ceo blind',
+                'fnn. relocate ac thermostat',
+                'ss3 winsum',
+                'usj 11. nicky',
+                'dsara damai. james house',
+                'william mockup 2',
+                'liam. production 50 crackle set',
+                'william. production 50 crackle set',
+                'elaine bu11/14',
+                "adrian home. - d'clover residences",
+                'wong n carol no 37, ss3'
             ];
             
-            const initialCount = data.projects.length;
+            const beforeCount = data.projects.length;
             
-            // Remove projects matching the names
+            // Remove ALL projects that match these names (case-insensitive)
             data.projects = data.projects.filter(project => {
-                return !projectNamesToRemove.some(name => 
-                    project.name.toLowerCase() === name.toLowerCase()
+                const projectNameLower = project.name.toLowerCase().trim();
+                const shouldRemove = unwantedNames.some(unwantedName => 
+                    projectNameLower === unwantedName.toLowerCase().trim() ||
+                    projectNameLower.includes(unwantedName.toLowerCase().trim())
                 );
+                return !shouldRemove;
             });
             
-            const removedCount = initialCount - data.projects.length;
+            const removedCount = beforeCount - data.projects.length;
             
             if (removedCount > 0) {
-                // Get IDs of removed projects
-                const removedProjectIds = [];
-                data.projects.forEach(p => removedProjectIds.push(p.id));
+                // Get remaining project IDs
+                const validProjectIds = data.projects.map(p => p.id);
                 
-                // Remove tasks associated with removed projects
-                const initialTaskCount = data.tasks.length;
-                data.tasks = data.tasks.filter(task => 
-                    data.projects.some(p => p.id === task.projectId)
-                );
+                // Remove orphaned tasks
+                data.tasks = data.tasks.filter(task => validProjectIds.includes(task.projectId));
                 
-                // Remove transactions associated with removed projects
-                const initialTransCount = data.transactions.length;
-                data.transactions = data.transactions.filter(trans => 
-                    data.projects.some(p => p.id === trans.projectId)
-                );
+                // Remove orphaned transactions
+                data.transactions = data.transactions.filter(trans => validProjectIds.includes(trans.projectId));
                 
                 saveData();
+                console.log(`✅ CLEANUP: Removed ${removedCount} unwanted projects`);
+            }
+        }
+
+        function clearAllProjectsNow() {
+            if (confirm('⚠️ DELETE ALL PROJECTS?\n\nThis will permanently delete:\n• All projects\n• All tasks\n• All transactions\n\nThis CANNOT be undone!\n\nClick OK to proceed.')) {
+                data.projects = [];
+                data.tasks = [];
+                data.transactions = [];
+                data.permanentlyDeleted = [];
                 
-                // Mark cleanup as done
-                localStorage.setItem('projectsCleanedUp', 'true');
+                saveData();
+                renderView();
+                updateStats();
                 
-                showToast(`🗑️ Cleaned up: ${removedCount} projects, ${initialTaskCount - data.tasks.length} tasks, ${initialTransCount - data.transactions.length} transactions removed`);
-            } else {
-                // Mark cleanup as done even if nothing was removed
-                localStorage.setItem('projectsCleanedUp', 'true');
+                showToast('🗑️ All projects, tasks, and transactions deleted!');
             }
         }
 
