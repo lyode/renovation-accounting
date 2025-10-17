@@ -1340,7 +1340,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
-            initializeProjects();
+            cleanupUnwantedProjects();
             initUI();
             updateStats();
             renderView();
@@ -1352,43 +1352,76 @@
             }
             
             document.getElementById('deviceType').textContent = APP_CONFIG.deviceType;
+            
+            if (data.projects.length === 0 && data.tasks.length === 0) {
+                setTimeout(() => {
+                    showToast('👋 Welcome to Builder Pro! Press + to get started');
+                }, 1000);
+            }
         });
 
-        function initializeProjects() {
-            // Only initialize if there are no projects yet
-            if (data.projects.length === 0) {
-                const projectNames = [
-                    { name: 'william. mock up 1', client: 'William' },
-                    { name: 'fnn ice cream booth', client: 'FNN' },
-                    { name: 'Fnn meeting room 1-refreshment', client: 'FNN' },
-                    { name: 'Fnn add on ac diffuser', client: 'FNN' },
-                    { name: 'Ms Ng- tmn midah. KL', client: 'Ms Ng' },
-                    { name: 'Fnn ceo blind', client: 'FNN' },
-                    { name: 'Fnn. Relocate ac thermostat', client: 'FNN' },
-                    { name: 'Ss3 winsum', client: 'Winsum' },
-                    { name: 'Usj 11. Nicky', client: 'Nicky' },
-                    { name: 'Dsara damai. James house', client: 'James' },
-                    { name: 'William MockUp 2', client: 'William' },
-                    { name: 'liam. PRODUCTION 50 crackle set', client: 'Liam' },
-                    { name: 'Elaine BU11/14', client: 'Elaine' },
-                    { name: "Adrian Home. - D'Clover Residences", client: 'Adrian' },
-                    { name: 'Wong n Carol no 37, ss3', client: 'Wong & Carol' }
-                ];
+        function cleanupUnwantedProjects() {
+            // Check if cleanup has already been done
+            if (localStorage.getItem('projectsCleanedUp') === 'true') {
+                return;
+            }
+            
+            const projectNamesToRemove = [
+                'william. mock up 1',
+                'fnn ice cream booth',
+                'Fnn meeting room 1-refreshment',
+                'Fnn add on ac diffuser',
+                'Ms Ng- tmn midah. KL',
+                'Fnn ceo blind',
+                'Fnn. Relocate ac thermostat',
+                'Ss3 winsum',
+                'Usj 11. Nicky',
+                'Dsara damai. James house',
+                'William MockUp 2',
+                'liam. PRODUCTION 50 crackle set',
+                'William. PRODUCTION 50 crackle set',
+                'Elaine BU11/14',
+                "Adrian Home. - D'Clover Residences",
+                'Wong n Carol no 37, ss3'
+            ];
+            
+            const initialCount = data.projects.length;
+            
+            // Remove projects matching the names
+            data.projects = data.projects.filter(project => {
+                return !projectNamesToRemove.some(name => 
+                    project.name.toLowerCase() === name.toLowerCase()
+                );
+            });
+            
+            const removedCount = initialCount - data.projects.length;
+            
+            if (removedCount > 0) {
+                // Get IDs of removed projects
+                const removedProjectIds = [];
+                data.projects.forEach(p => removedProjectIds.push(p.id));
                 
-                projectNames.forEach((proj, index) => {
-                    data.projects.push({
-                        id: Date.now() + index,
-                        name: proj.name,
-                        client: proj.client,
-                        startDate: '',
-                        endDate: '',
-                        description: '',
-                        locked: false
-                    });
-                });
+                // Remove tasks associated with removed projects
+                const initialTaskCount = data.tasks.length;
+                data.tasks = data.tasks.filter(task => 
+                    data.projects.some(p => p.id === task.projectId)
+                );
+                
+                // Remove transactions associated with removed projects
+                const initialTransCount = data.transactions.length;
+                data.transactions = data.transactions.filter(trans => 
+                    data.projects.some(p => p.id === trans.projectId)
+                );
                 
                 saveData();
-                showToast('✨ 15 projects initialized!');
+                
+                // Mark cleanup as done
+                localStorage.setItem('projectsCleanedUp', 'true');
+                
+                showToast(`🗑️ Cleaned up: ${removedCount} projects, ${initialTaskCount - data.tasks.length} tasks, ${initialTransCount - data.transactions.length} transactions removed`);
+            } else {
+                // Mark cleanup as done even if nothing was removed
+                localStorage.setItem('projectsCleanedUp', 'true');
             }
         }
 
