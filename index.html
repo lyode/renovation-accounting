@@ -953,7 +953,7 @@
                 </div>
                 <div class="sync-status-bar" id="syncStatusBar">
                     <span id="deviceType"></span> • 
-                    <span id="lastSyncTime">Never synced</span> • 
+                    <span id="lastSyncTime" style="cursor: pointer;" onclick="showToast('Click 🔄 to sync now')" title="Click 🔄 to sync">Never synced</span> • 
                     <span id="syncMode">Offline</span>
                 </div>
             </div>
@@ -1017,7 +1017,8 @@
                 <span style="font-weight: 500; color: var(--text-color);">⚡ Auto-Sync (every 5 minutes)</span>
                 <input type="checkbox" id="autoSyncToggle" onchange="toggleAutoSync()" style="width: 44px; height: 24px;">
             </div>
-            <button class="btn btn-primary" onclick="smartSync()" style="width: 100%;">Manual Sync Now</button>
+            <button class="btn btn-primary" onclick="smartSync()" style="width: 100%; margin-bottom: 8px;">🔄 Manual Sync Now</button>
+            <button class="btn btn-secondary" onclick="testSync()" style="width: 100%;">🔍 Test Sync Connection</button>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
@@ -1598,11 +1599,11 @@
             document.getElementById('fabMenu').classList.toggle('show');
         }
 
-        function showToast(message) {
+        function showToast(message, duration = 3000) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 3000);
+            setTimeout(() => toast.classList.remove('show'), duration);
         }
 
         function closeModal(modalId) {
@@ -2616,17 +2617,23 @@
             const lastSyncTime = localStorage.getItem('lastSyncTime');
             if (lastSyncTime) {
                 const date = new Date(parseInt(lastSyncTime));
-                document.getElementById('lastSyncTime').textContent = date.toLocaleTimeString();
+                const timeStr = date.toLocaleTimeString();
+                document.getElementById('lastSyncTime').textContent = `Last: ${timeStr}`;
+            } else {
+                document.getElementById('lastSyncTime').textContent = 'Not synced yet';
             }
             
             if (syncApiKey) {
-                document.getElementById('syncMode').textContent = 'Connected';
+                document.getElementById('syncMode').textContent = 'Ready';
+            } else {
+                document.getElementById('syncMode').textContent = 'No API key';
             }
         }
 
         async function smartSync() {
             if (!syncApiKey) {
-                showToast('Please set up API key first');
+                showToast('⚠️ No API key! Go to Settings → Smart Sync API → Enter key → Save', 6000);
+                document.getElementById('syncMode').textContent = 'No API key';
                 return;
             }
             
@@ -2636,21 +2643,36 @@
             indicator.classList.add('syncing');
             syncMode.textContent = 'Syncing...';
             
+            const startTime = Date.now();
+            
             try {
                 // STEP 1: PULL cloud data
+                console.log('🔄 Step 1: Pulling cloud data...');
+                syncMode.textContent = 'Pulling...';
                 const getResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
                     headers: {
                         'X-Master-Key': syncApiKey
                     }
                 });
                 
+                if (!getResponse.ok) {
+                    throw new Error(`Pull failed: ${getResponse.status} - ${getResponse.statusText}`);
+                }
+                
                 let cloudData = null;
                 if (getResponse.ok) {
                     const result = await getResponse.json();
                     cloudData = result.record || {};
+                    console.log('✅ Cloud data pulled:', {
+                        projects: cloudData.projects?.length || 0,
+                        tasks: cloudData.tasks?.length || 0,
+                        transactions: cloudData.transactions?.length || 0
+                    });
                 }
                 
                 // STEP 2: MERGE local and cloud data
+                console.log('🔄 Step 2: Merging data...');
+                syncMode.textContent = 'Merging...';
                 if (cloudData && cloudData.projects) {
                     const beforeCounts = {
                         projects: data.projects.length,
@@ -2687,7 +2709,6 @@
                             ...(data.permanentlyDeleted || []),
                             ...cloudData.permanentlyDeleted
                         ];
-                        // Remove duplicates based on id
                         data.permanentlyDeleted = Array.from(
                             new Map(data.permanentlyDeleted.map(item => [item.id, item])).values()
                         );
@@ -2711,16 +2732,16 @@
                         changes.push(`${afterCounts.transactions - beforeCounts.transactions > 0 ? '+' : ''}${afterCounts.transactions - beforeCounts.transactions} trans`);
                     }
                     
+                    console.log('✅ Merge complete:', changes.length > 0 ? changes.join(', ') : 'No changes');
+                    
                     saveData();
                     renderView();
                     updateStats();
-                    
-                    if (changes.length > 0) {
-                        console.log('Sync merge changes:', changes.join(', '));
-                    }
                 }
                 
                 // STEP 3: PUSH merged data back to cloud
+                console.log('🔄 Step 3: Pushing merged data to cloud...');
+                syncMode.textContent = 'Pushing...';
                 const putResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'PUT',
                     headers: {
@@ -2730,22 +2751,49 @@
                     body: JSON.stringify(data)
                 });
                 
-                if (putResponse.ok) {
-                    localStorage.setItem('lastSyncTime', Date.now().toString());
-                    document.getElementById('lastSyncTime').textContent = new Date().toLocaleTimeString();
-                    showToast('✅ Smart sync complete!');
-                    indicator.classList.remove('syncing');
-                    syncMode.textContent = 'Connected';
-                } else {
-                    showToast(`Sync failed - ${putResponse.status}`);
-                    indicator.classList.remove('syncing');
-                    syncMode.textContent = 'Error';
+                if (!putResponse.ok) {
+                    throw new Error(`Push failed: ${putResponse.status} - ${putResponse.statusText}`);
                 }
-            } catch (error) {
-                console.error('Sync error:', error);
-                showToast('Sync error - check connection');
+                
+                const syncDuration = ((Date.now() - startTime) / 1000).toFixed(1);
+                console.log(`✅ Sync complete in ${syncDuration}s`);
+                
+                localStorage.setItem('lastSyncTime', Date.now().toString());
+                const nowTime = new Date().toLocaleTimeString();
+                document.getElementById('lastSyncTime').textContent = `Last: ${nowTime}`;
+                showToast(`✅ Synced ${data.projects.length}p ${data.tasks.length}t ${data.transactions.length}tr in ${syncDuration}s!`, 5000);
                 indicator.classList.remove('syncing');
-                syncMode.textContent = 'Offline';
+                syncMode.textContent = 'Connected';
+                
+            } catch (error) {
+                const syncDuration = ((Date.now() - startTime) / 1000).toFixed(1);
+                console.error('❌ Sync error:', error);
+                
+                let errorMsg = error.message;
+                if (error.message.includes('401')) {
+                    errorMsg = 'Invalid API key! Check Settings';
+                } else if (error.message.includes('404')) {
+                    errorMsg = 'Bin not found! Check Bin ID';
+                } else if (error.message.includes('Failed to fetch')) {
+                    errorMsg = 'No internet connection!';
+                }
+                
+                showToast(`❌ ${errorMsg}`, 6000);
+                indicator.classList.remove('syncing');
+                syncMode.textContent = 'Error';
+                
+                // Show detailed error in console
+                console.log('Sync diagnostics:', {
+                    duration: syncDuration + 's',
+                    apiKey: syncApiKey ? 'SET (length: ' + syncApiKey.length + ')' : 'NOT SET',
+                    binId: APP_CONFIG.binId,
+                    online: navigator.onLine,
+                    localData: {
+                        projects: data.projects.length,
+                        tasks: data.tasks.length,
+                        transactions: data.transactions.length
+                    }
+                });
             }
         }
 
@@ -2759,8 +2807,59 @@
             syncApiKey = key;
             localStorage.setItem('builderProSyncApiKey', key);
             document.getElementById('apiKeyInput').value = '';
-            document.getElementById('syncMode').textContent = 'Connected';
-            showToast('API key saved!');
+            document.getElementById('syncMode').textContent = 'Ready';
+            showToast('✅ API key saved! Now click "Test Sync Connection"', 5000);
+        }
+
+        async function testSync() {
+            if (!syncApiKey) {
+                showToast('⚠️ No API key set! Enter your JSONBin API key first.');
+                return;
+            }
+            
+            showToast('🔍 Testing connection...');
+            
+            try {
+                console.log('🔍 Testing sync connection...');
+                console.log('API Key length:', syncApiKey.length);
+                console.log('Bin ID:', APP_CONFIG.binId);
+                console.log('Base URL:', APP_CONFIG.baseUrl);
+                
+                const response = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
+                    headers: {
+                        'X-Master-Key': syncApiKey
+                    }
+                });
+                
+                console.log('Response status:', response.status);
+                console.log('Response OK:', response.ok);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Connection successful!');
+                    console.log('Cloud data:', {
+                        projects: result.record?.projects?.length || 0,
+                        tasks: result.record?.tasks?.length || 0,
+                        transactions: result.record?.transactions?.length || 0
+                    });
+                    
+                    showToast('✅ Connection works! Your API key is valid.');
+                    document.getElementById('syncMode').textContent = 'Connected';
+                } else if (response.status === 401) {
+                    showToast('❌ Invalid API key! Get a new one from jsonbin.io');
+                    document.getElementById('syncMode').textContent = 'Invalid Key';
+                } else if (response.status === 404) {
+                    showToast('❌ Bin not found! Check your Bin ID.');
+                    document.getElementById('syncMode').textContent = 'Invalid Bin';
+                } else {
+                    showToast(`❌ Error ${response.status}: ${response.statusText}`);
+                    document.getElementById('syncMode').textContent = 'Error';
+                }
+            } catch (error) {
+                console.error('❌ Test failed:', error);
+                showToast('❌ Connection failed! Check internet & open browser console (F12)');
+                document.getElementById('syncMode').textContent = 'Offline';
+            }
         }
 
         function exportData() {
