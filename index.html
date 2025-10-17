@@ -1342,6 +1342,7 @@
         let syncApiKey = '';
         let autoSyncInterval = null;
         let autoSyncEnabled = false;
+        let currentProjectDetailId = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
@@ -1471,7 +1472,6 @@
                 }
             });
             
-            // Reapply saturation
             setSaturation(data.saturation || 'normal');
         }
 
@@ -1481,7 +1481,6 @@
             data.saturation = level;
             saveData();
             
-            // Update active button in saturation section
             const saturationSection = document.querySelectorAll('.contrast-controls')[1];
             if (saturationSection) {
                 saturationSection.querySelectorAll('.contrast-btn').forEach(btn => {
@@ -1627,7 +1626,6 @@
                 return html;
             }
             
-            // Calculate date range
             let minDate = null;
             let maxDate = null;
             
@@ -1638,14 +1636,12 @@
                 if (!maxDate || end > maxDate) maxDate = end;
             });
             
-            // Add some padding to the timeline
             const paddingDays = 3;
             minDate.setDate(minDate.getDate() - paddingDays);
             maxDate.setDate(maxDate.getDate() + paddingDays);
             
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
-            // Generate months for header
             const months = [];
             let current = new Date(minDate);
             while (current <= maxDate) {
@@ -1657,7 +1653,6 @@
                 current.setMonth(current.getMonth() + 1);
             }
             
-            // Render timeline header
             html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
             months.forEach(month => {
                 const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
@@ -1667,7 +1662,6 @@
             });
             html += '</div></div>';
             
-            // Add TODAY line if within range
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             if (today >= minDate && today <= maxDate) {
@@ -1676,7 +1670,6 @@
                 html += `<div class="today-line" style="left: calc(150px + ${todayPosition}%);"></div>`;
             }
             
-            // Render project bars
             projectsWithDates.forEach(project => {
                 const start = new Date(project.startDate);
                 const end = new Date(project.endDate);
@@ -1685,7 +1678,6 @@
                 const width = (duration / totalDays) * 100;
                 const left = (startOffset / totalDays) * 100;
                 
-                // Check if project is overdue
                 const isOverdue = end < today && !project.locked;
                 const barColor = isOverdue ? 
                     'linear-gradient(135deg, #ef4444 0%, #f87171 100%)' : 
@@ -1713,7 +1705,6 @@
                 `;
             });
             
-            // Show projects without dates
             if (projectsWithoutDates.length > 0) {
                 html += '<div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color);">';
                 html += '<h4 style="font-size: 12px; margin-bottom: 10px; color: var(--text-secondary);">⚠️ Projects without dates:</h4>';
@@ -1748,12 +1739,14 @@
             data.projects.forEach(project => {
                 const tasks = data.tasks.filter(t => t.projectId === project.id);
                 const transactions = data.transactions.filter(t => t.projectId === project.id);
-                const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-                const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+                const incomeTransactions = transactions.filter(t => t.type === 'income');
+                const expenseTransactions = transactions.filter(t => t.type === 'expense');
+                const income = incomeTransactions.reduce((sum, t) => sum + t.amount, 0);
+                const expenses = expenseTransactions.reduce((sum, t) => sum + t.amount, 0);
                 
                 html += `
                     <div class="project-card">
-                        <div class="project-header" onclick="showProjectDetail(${project.id})" style="cursor: pointer;">
+                        <div class="project-header">
                             <h3>${project.name} ${project.locked ? '🔒' : ''}</h3>
                             <div style="font-size: 11px; opacity: 0.9;">Client: ${project.client}</div>
                             <div class="project-stats">
@@ -1763,16 +1756,16 @@
                                 </div>
                                 <div style="text-align: center;">
                                     <div style="font-size: 9px; opacity: 0.8;">Income</div>
-                                    <div style="font-size: 13px; font-weight: bold; color: #4ade80;">${income.toFixed(0)}</div>
+                                    <div style="font-size: 13px; font-weight: bold; color: #4ade80;">$${income.toFixed(0)}</div>
                                 </div>
                                 <div style="text-align: center;">
                                     <div style="font-size: 9px; opacity: 0.8;">Profit</div>
                                     <div style="font-size: 13px; font-weight: bold; color: ${income - expenses >= 0 ? '#4ade80' : '#f87171'};">
-                                        ${(income - expenses).toFixed(0)}
+                                        $${(income - expenses).toFixed(0)}
                                     </div>
                                 </div>
                             </div>
-                            <div class="project-actions" onclick="event.stopPropagation();">
+                            <div class="project-actions">
                                 <button class="action-btn" onclick="editProject(${project.id})" ${project.locked ? 'disabled' : ''}>
                                     ${project.locked ? 'Locked' : 'Edit'}
                                 </button>
@@ -1780,6 +1773,77 @@
                                     ${project.locked ? 'Unlock' : 'Lock'}
                                 </button>
                                 <button class="action-btn" onclick="permanentDeleteProject(${project.id})">Delete</button>
+                                <button class="action-btn" onclick="showProjectDetail(${project.id})">View Details</button>
+                            </div>
+                        </div>
+                        
+                        <div style="padding: 12px; background: var(--bg-color);">
+                            ${renderMiniGantt(project, tasks)}
+                            
+                            <div style="margin-top: 12px;">
+                                <h4 style="font-size: 12px; margin-bottom: 8px; color: var(--text-color); display: flex; align-items: center; gap: 6px;">
+                                    📋 Tasks (${tasks.length})
+                                    <button class="action-btn" onclick="showTaskModal(); document.getElementById('taskProject').value = ${project.id}">+ Add Task</button>
+                                </h4>
+                                ${tasks.length === 0 ? '<p style="font-size: 11px; color: var(--text-secondary); padding: 8px;">No tasks yet</p>' : ''}
+                                ${tasks.map(task => `
+                                    <div style="padding: 8px; margin-bottom: 6px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid ${task.status === 'Completed' ? 'var(--success)' : task.status === 'In Progress' ? 'var(--warning)' : 'var(--accent-color)'}; display: flex; justify-content: space-between; align-items: center;">
+                                        <div style="flex: 1;">
+                                            <div style="font-size: 11px; font-weight: 500; color: var(--text-color); ${task.status === 'Completed' ? 'text-decoration: line-through; opacity: 0.7;' : ''}">${task.name}</div>
+                                            <div style="font-size: 9px; color: var(--text-secondary); margin-top: 2px;">
+                                                📅 ${task.dueDate} • ${task.priority} • ${task.status}${task.assignee ? ` • 👤 ${task.assignee}` : ''}
+                                            </div>
+                                        </div>
+                                        <div style="display: flex; gap: 4px;">
+                                            <button class="icon-btn" onclick="editTask(${task.id})" style="width: 24px; height: 24px; font-size: 10px;">✏️</button>
+                                            ${task.status !== 'Completed' ? `<button class="icon-btn" style="background: var(--success); width: 24px; height: 24px; font-size: 10px;" onclick="completeTask(${task.id})">✅</button>` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div style="margin-top: 12px;">
+                                <h4 style="font-size: 12px; margin-bottom: 8px; color: var(--income-color); display: flex; align-items: center; gap: 6px;">
+                                    💰 Income ($${income.toFixed(2)}) - ${incomeTransactions.length} entries
+                                    <button class="action-btn" onclick="showTransactionModal('income'); document.getElementById('transProject').value = ${project.id}">+ Add Income</button>
+                                </h4>
+                                ${incomeTransactions.length === 0 ? '<p style="font-size: 11px; color: var(--text-secondary); padding: 8px;">No income entries yet</p>' : ''}
+                                ${incomeTransactions.map(trans => `
+                                    <div style="padding: 8px; margin-bottom: 6px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--income-color); display: flex; justify-content: space-between; align-items: center;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <span style="font-size: 12px; font-weight: bold; color: var(--income-color);">$${trans.amount.toFixed(2)}</span>
+                                                <span style="font-size: 11px; color: var(--text-color);">${trans.category}</span>
+                                            </div>
+                                            <div style="font-size: 9px; color: var(--text-secondary); margin-top: 2px;">
+                                                📅 ${trans.date}${trans.description ? ` • ${trans.description}` : ''}
+                                            </div>
+                                        </div>
+                                        <button class="icon-btn danger" onclick="deleteTransaction(${trans.id})" style="width: 24px; height: 24px; font-size: 10px;">🗑️</button>
+                                    </div>
+                                `).join('')}
+                            </div>
+                            
+                            <div style="margin-top: 12px;">
+                                <h4 style="font-size: 12px; margin-bottom: 8px; color: var(--expense-color); display: flex; align-items: center; gap: 6px;">
+                                    💸 Expenses ($${expenses.toFixed(2)}) - ${expenseTransactions.length} entries
+                                    <button class="action-btn" onclick="showTransactionModal('expense'); document.getElementById('transProject').value = ${project.id}">+ Add Expense</button>
+                                </h4>
+                                ${expenseTransactions.length === 0 ? '<p style="font-size: 11px; color: var(--text-secondary); padding: 8px;">No expense entries yet</p>' : ''}
+                                ${expenseTransactions.map(trans => `
+                                    <div style="padding: 8px; margin-bottom: 6px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--expense-color); display: flex; justify-content: space-between; align-items: center;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 8px;">
+                                                <span style="font-size: 12px; font-weight: bold; color: var(--expense-color);">$${trans.amount.toFixed(2)}</span>
+                                                <span style="font-size: 11px; color: var(--text-color);">${trans.category}</span>
+                                            </div>
+                                            <div style="font-size: 9px; color: var(--text-secondary); margin-top: 2px;">
+                                                📅 ${trans.date}${trans.description ? ` • ${trans.description}` : ''}
+                                            </div>
+                                        </div>
+                                        <button class="icon-btn danger" onclick="deleteTransaction(${trans.id})" style="width: 24px; height: 24px; font-size: 10px;">🗑️</button>
+                                    </div>
+                                `).join('')}
                             </div>
                         </div>
                     </div>
@@ -1787,6 +1851,101 @@
             });
             
             container.innerHTML = html;
+        }
+        
+        function renderMiniGantt(project, tasks) {
+            if (tasks.length === 0) {
+                return '<div style="padding: 8px; background: var(--card-bg); border-radius: 6px; text-align: center; color: var(--text-secondary); font-size: 11px; margin-bottom: 8px;">No tasks to display in timeline</div>';
+            }
+            
+            const tasksWithDates = tasks.filter(t => t.startDate && t.dueDate);
+            
+            if (tasksWithDates.length === 0) {
+                return '<div style="padding: 8px; background: var(--card-bg); border-radius: 6px; text-align: center; color: var(--text-secondary); font-size: 11px; margin-bottom: 8px;">⚠️ Tasks need dates to show in timeline</div>';
+            }
+            
+            let minDate = null;
+            let maxDate = null;
+            
+            tasksWithDates.forEach(t => {
+                const start = new Date(t.startDate);
+                const due = new Date(t.dueDate);
+                if (!minDate || start < minDate) minDate = start;
+                if (!maxDate || due > maxDate) maxDate = due;
+            });
+            
+            minDate.setDate(minDate.getDate() - 1);
+            maxDate.setDate(maxDate.getDate() + 1);
+            
+            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            let html = '<div style="background: var(--card-bg); border-radius: 8px; padding: 10px; margin-bottom: 10px;">';
+            html += '<h4 style="font-size: 11px; margin-bottom: 8px; color: var(--text-color);">📊 Task Timeline</h4>';
+            
+            let todayHtml = '';
+            if (today >= minDate && today <= maxDate) {
+                const todayOffset = Math.ceil((today - minDate) / (1000 * 60 * 60 * 24));
+                const todayPosition = (todayOffset / totalDays) * 100;
+                todayHtml = `<div style="position: absolute; left: ${todayPosition}%; top: -5px; bottom: -5px; width: 2px; background: #ef4444; z-index: 10;"></div>`;
+            }
+            
+            tasksWithDates.forEach(task => {
+                const start = new Date(task.startDate);
+                const due = new Date(task.dueDate);
+                const startOffset = Math.ceil((start - minDate) / (1000 * 60 * 60 * 24));
+                const duration = Math.ceil((due - start) / (1000 * 60 * 60 * 24)) + 1;
+                const width = (duration / totalDays) * 100;
+                const left = (startOffset / totalDays) * 100;
+                
+                let barColor = 'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
+                if (task.status === 'Completed') {
+                    barColor = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
+                } else if (due < today) {
+                    barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)';
+                } else if (task.status === 'In Progress') {
+                    barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)';
+                }
+                
+                html += `
+                    <div style="display: flex; align-items: center; margin-bottom: 6px; min-height: 28px;">
+                        <div style="width: 120px; font-size: 10px; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding-right: 8px;" title="${task.name}">
+                            ${task.name}
+                        </div>
+                        <div style="flex: 1; position: relative; height: 24px; background: var(--bg-color); border-radius: 4px;">
+                            ${todayHtml}
+                            <div style="position: absolute; left: ${left}%; width: ${width}%; height: 100%; background: ${barColor}; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 8px; color: white; font-weight: 600; cursor: pointer;" 
+                                 onclick="editTask(${task.id})" title="Click to edit • ${duration} days">
+                                ${duration}d
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            return html;
+        }
+        
+        function deleteTransaction(id) {
+            if (confirm('Delete this transaction?')) {
+                data.transactions = data.transactions.filter(t => t.id !== id);
+                saveData();
+                renderView();
+                updateStats();
+                showToast('Transaction deleted');
+            }
+        }
+        
+        function toggleProjectLock(id) {
+            const project = data.projects.find(p => p.id === id);
+            if (project) {
+                project.locked = !project.locked;
+                saveData();
+                renderView();
+                showToast(project.locked ? '🔒 Project locked' : '🔓 Project unlocked');
+            }
         }
 
         function renderSchedule(container) {
@@ -1806,10 +1965,8 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            // Filter projects with dates
             let projectsWithDates = data.projects.filter(p => p.startDate && p.endDate);
             
-            // Apply time filter
             if (data.scheduleView !== 'all') {
                 let filterEndDate = new Date(today);
                 
@@ -1825,7 +1982,6 @@
                     const startDate = new Date(project.startDate);
                     const endDate = new Date(project.endDate);
                     
-                    // Show project if it overlaps with the filter period
                     return (startDate <= filterEndDate && endDate >= today);
                 });
             }
@@ -1835,7 +1991,6 @@
             if (projectsWithDates.length === 0) {
                 html += `<p class="empty-state">No projects scheduled for ${data.scheduleView === 'all' ? 'any time' : 'this ' + data.scheduleView}</p>`;
             } else {
-                // Calculate date range
                 let minDate = null;
                 let maxDate = null;
                 
@@ -1846,14 +2001,12 @@
                     if (!maxDate || end > maxDate) maxDate = end;
                 });
                 
-                // Add padding
                 const paddingDays = 3;
                 minDate.setDate(minDate.getDate() - paddingDays);
                 maxDate.setDate(maxDate.getDate() + paddingDays);
                 
                 const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
                 
-                // Generate months for header
                 const months = [];
                 let current = new Date(minDate);
                 while (current <= maxDate) {
@@ -1865,7 +2018,6 @@
                     current.setMonth(current.getMonth() + 1);
                 }
                 
-                // Render timeline header
                 html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
                 months.forEach(month => {
                     const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
@@ -1875,7 +2027,6 @@
                 });
                 html += '</div></div>';
                 
-                // Add TODAY line
                 const todayCheck = new Date();
                 todayCheck.setHours(0, 0, 0, 0);
                 if (todayCheck >= minDate && todayCheck <= maxDate) {
@@ -1884,10 +2035,8 @@
                     html += `<div class="today-line" style="left: calc(150px + ${todayPosition}%);"></div>`;
                 }
                 
-                // Sort projects by start date
                 const sortedProjects = projectsWithDates.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
                 
-                // Render project bars
                 sortedProjects.forEach(project => {
                     const start = new Date(project.startDate);
                     const end = new Date(project.endDate);
@@ -1896,19 +2045,17 @@
                     const width = (duration / totalDays) * 100;
                     const left = (startOffset / totalDays) * 100;
                     
-                    // Determine bar color
                     let barColor = 'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
                     if (project.locked) {
-                        barColor = 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'; // Gray for locked
+                        barColor = 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)';
                     } else if (end < today) {
-                        barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)'; // Red for overdue
+                        barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)';
                     } else if (start <= today && end >= today) {
-                        barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)'; // Orange for in progress
+                        barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)';
                     } else if (start > today) {
-                        barColor = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)'; // Green for upcoming
+                        barColor = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
                     }
                     
-                    // Get project stats
                     const tasks = data.tasks.filter(t => t.projectId === project.id);
                     const completedTasks = tasks.filter(t => t.status === 'Completed').length;
                     const transactions = data.transactions.filter(t => t.projectId === project.id);
@@ -1931,7 +2078,7 @@
                                         ${end.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
                                     </div>
                                     <div style="font-size: 8px; opacity: 0.9; margin-top: 2px;">
-                                        ${completedTasks}/${tasks.length} tasks • ${(income - expenses).toFixed(0)}
+                                        ${completedTasks}/${tasks.length} tasks • $${(income - expenses).toFixed(0)}
                                     </div>
                                 </div>
                             </div>
@@ -1942,7 +2089,6 @@
             
             html += '</div>';
             
-            // Show projects without dates
             const projectsWithoutDates = data.projects.filter(p => !p.startDate || !p.endDate);
             if (projectsWithoutDates.length > 0) {
                 html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-top: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
@@ -2346,16 +2492,16 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
                         <div>
                             <div style="font-size: 10px; color: var(--text-secondary);">Income</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
+                            <div style="font-size: 16px; font-weight: bold; color: var(--income-color);">${income.toFixed(2)}</div>
                         </div>
                         <div>
                             <div style="font-size: 10px; color: var(--text-secondary);">Expenses</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
+                            <div style="font-size: 16px; font-weight: bold; color: var(--expense-color);">${expenses.toFixed(2)}</div>
                         </div>
                         <div>
                             <div style="font-size: 10px; color: var(--text-secondary);">Profit</div>
                             <div style="font-size: 16px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">
-                                $${profit.toFixed(2)}
+                                ${profit.toFixed(2)}
                             </div>
                         </div>
                     </div>
@@ -2386,6 +2532,20 @@
             
             document.getElementById('projectDetailBody').innerHTML = html;
             document.getElementById('projectDetailModal').classList.add('show');
+        }
+
+        function editProjectFromModal() {
+            if (currentProjectDetailId) {
+                closeModal('projectDetailModal');
+                editProject(currentProjectDetailId);
+            }
+        }
+
+        function deleteProjectFromModal() {
+            if (currentProjectDetailId) {
+                closeModal('projectDetailModal');
+                permanentDeleteProject(currentProjectDetailId);
+            }
         }
 
         function showTaskModal() {
@@ -2611,7 +2771,6 @@
             syncMode.textContent = 'Syncing...';
             
             try {
-                // STEP 1: PULL data from cloud
                 const pullResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
                     method: 'GET',
                     headers: { 
@@ -2633,12 +2792,10 @@
                     console.log('📥 Pulled from cloud:', cloudData);
                 }
                 
-                // STEP 2: MERGE with intelligent timestamp-based resolution
                 const mergedData = intelligentMerge(cloudData, data);
                 
                 console.log('🔄 Merged data:', mergedData);
                 
-                // STEP 3: PUSH merged data back to cloud
                 const pushResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'PUT',
                     headers: {
@@ -2650,7 +2807,6 @@
                 });
                 
                 if (pushResponse.ok) {
-                    // Update local data with merged result
                     data = mergedData;
                     saveData();
                     renderView();
@@ -2677,12 +2833,9 @@
             }
         }
         
-        // INTELLIGENT MERGE: Handles all scenarios with timestamp-based resolution
         function intelligentMerge(cloudData, localData) {
-            // Combine all deletion records with timestamps
             const allDeletions = {};
             
-            // Process cloud deletions
             (cloudData.permanentlyDeleted || []).forEach(del => {
                 const key = `${del.type}_${del.id}`;
                 allDeletions[key] = {
@@ -2693,7 +2846,6 @@
                 };
             });
             
-            // Process local deletions (keep newest)
             (localData.permanentlyDeleted || []).forEach(del => {
                 const key = `${del.type}_${del.id}`;
                 if (!allDeletions[key] || new Date(del.deletedAt) > new Date(allDeletions[key].deletedAt)) {
@@ -2718,7 +2870,6 @@
                 }
             });
             
-            // Merge each data type with timestamp checking and deletion filtering
             const mergedProjects = mergeWithTimestamp(
                 cloudData.projects || [], 
                 localData.projects || [], 
@@ -2760,39 +2911,31 @@
             };
         }
         
-        // MERGE WITH TIMESTAMP: Keeps latest version based on timestamp
         function mergeWithTimestamp(cloudArray, localArray, key, deletedIds) {
             const merged = {};
             
-            // Add all cloud items (if not deleted)
             cloudArray.forEach(item => {
                 if (!deletedIds.has(item[key])) {
                     merged[item[key]] = { ...item };
                 }
             });
             
-            // Process local items
             localArray.forEach(item => {
                 const itemId = item[key];
                 
-                // Skip if deleted
                 if (deletedIds.has(itemId)) {
                     return;
                 }
                 
                 if (!merged[itemId]) {
-                    // New item only in local
                     merged[itemId] = { ...item };
                 } else {
-                    // Item exists in both - compare timestamps
                     const cloudItem = merged[itemId];
                     const localItem = item;
                     
-                    // Get all possible timestamp fields
                     const cloudTime = getLatestTimestamp(cloudItem);
                     const localTime = getLatestTimestamp(localItem);
                     
-                    // Keep the version with the latest timestamp
                     if (localTime > cloudTime) {
                         merged[itemId] = { ...localItem };
                         console.log(`✅ Keeping LOCAL version of ${itemId} (${new Date(localTime).toLocaleString()} > ${new Date(cloudTime).toLocaleString()})`);
@@ -2805,7 +2948,6 @@
             return Object.values(merged);
         }
         
-        // GET LATEST TIMESTAMP: Find the most recent timestamp from an item
         function getLatestTimestamp(item) {
             const timestamps = [
                 item.lastModified,
