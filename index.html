@@ -1806,63 +1806,54 @@
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            let filteredTasks = [...data.tasks];
-            let minDate = new Date();
-            let maxDate = new Date();
+            // Filter projects with dates
+            let projectsWithDates = data.projects.filter(p => p.startDate && p.endDate);
             
-            if (data.scheduleView === 'day') {
-                filteredTasks = filteredTasks.filter(task => {
-                    const taskDate = new Date(task.dueDate);
-                    taskDate.setHours(0, 0, 0, 0);
-                    return taskDate.getTime() === today.getTime();
-                });
-                minDate = today;
-                maxDate = today;
-            } else if (data.scheduleView === 'week') {
-                const weekEnd = new Date(today);
-                weekEnd.setDate(today.getDate() + 7);
-                filteredTasks = filteredTasks.filter(task => {
-                    const taskDate = new Date(task.dueDate);
-                    return taskDate >= today && taskDate <= weekEnd;
-                });
-                minDate = today;
-                maxDate = weekEnd;
-            } else if (data.scheduleView === 'month') {
-                const monthEnd = new Date(today);
-                monthEnd.setMonth(today.getMonth() + 1);
-                filteredTasks = filteredTasks.filter(task => {
-                    const taskDate = new Date(task.dueDate);
-                    return taskDate >= today && taskDate <= monthEnd;
-                });
-                minDate = today;
-                maxDate = monthEnd;
-            } else {
-                filteredTasks.forEach(task => {
-                    if (task.startDate) {
-                        const start = new Date(task.startDate);
-                        if (start < minDate) minDate = start;
-                    }
-                    if (task.dueDate) {
-                        const due = new Date(task.dueDate);
-                        if (due > maxDate) maxDate = due;
-                    }
-                });
-            }
-            
-            if (maxDate - minDate < 1000 * 60 * 60 * 24) {
-                maxDate = new Date(minDate);
-                maxDate.setDate(maxDate.getDate() + 7);
-            }
-            
-            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
-            
-            html += '<div class="gantt-container" style="position: relative;"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📊 Task Schedule Gantt Chart</h3>';
-            
-            if (filteredTasks.length === 0) {
-                html += `<p class="empty-state">No tasks scheduled for ${data.scheduleView === 'all' ? 'any time' : 'this ' + data.scheduleView}</p>`;
-            } else {
-                html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
+            // Apply time filter
+            if (data.scheduleView !== 'all') {
+                let filterEndDate = new Date(today);
                 
+                if (data.scheduleView === 'day') {
+                    filterEndDate = new Date(today);
+                } else if (data.scheduleView === 'week') {
+                    filterEndDate.setDate(today.getDate() + 7);
+                } else if (data.scheduleView === 'month') {
+                    filterEndDate.setMonth(today.getMonth() + 1);
+                }
+                
+                projectsWithDates = projectsWithDates.filter(project => {
+                    const startDate = new Date(project.startDate);
+                    const endDate = new Date(project.endDate);
+                    
+                    // Show project if it overlaps with the filter period
+                    return (startDate <= filterEndDate && endDate >= today);
+                });
+            }
+            
+            html += '<div class="gantt-container" style="position: relative;"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📊 Project Schedule Timeline</h3>';
+            
+            if (projectsWithDates.length === 0) {
+                html += `<p class="empty-state">No projects scheduled for ${data.scheduleView === 'all' ? 'any time' : 'this ' + data.scheduleView}</p>`;
+            } else {
+                // Calculate date range
+                let minDate = null;
+                let maxDate = null;
+                
+                projectsWithDates.forEach(p => {
+                    const start = new Date(p.startDate);
+                    const end = new Date(p.endDate);
+                    if (!minDate || start < minDate) minDate = start;
+                    if (!maxDate || end > maxDate) maxDate = end;
+                });
+                
+                // Add padding
+                const paddingDays = 3;
+                minDate.setDate(minDate.getDate() - paddingDays);
+                maxDate.setDate(maxDate.getDate() + paddingDays);
+                
+                const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
+                
+                // Generate months for header
                 const months = [];
                 let current = new Date(minDate);
                 while (current <= maxDate) {
@@ -1874,15 +1865,17 @@
                     current.setMonth(current.getMonth() + 1);
                 }
                 
+                // Render timeline header
+                html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
                 months.forEach(month => {
                     const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
                     const monthEnd = Math.min(totalDays, Math.ceil((month.end - minDate) / (1000 * 60 * 60 * 24)) + 1);
                     const width = ((monthEnd - monthStart) / totalDays) * 100;
                     html += `<div class="gantt-month" style="width: ${width}%;">${month.label}</div>`;
                 });
-                
                 html += '</div></div>';
                 
+                // Add TODAY line
                 const todayCheck = new Date();
                 todayCheck.setHours(0, 0, 0, 0);
                 if (todayCheck >= minDate && todayCheck <= maxDate) {
@@ -1891,33 +1884,54 @@
                     html += `<div class="today-line" style="left: calc(150px + ${todayPosition}%);"></div>`;
                 }
                 
-                const sortedTasks = filteredTasks.sort((a, b) => new Date(a.dueDate || a.startDate) - new Date(b.dueDate || b.startDate));
+                // Sort projects by start date
+                const sortedProjects = projectsWithDates.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
                 
-                sortedTasks.forEach(task => {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    const startDate = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
-                    const dueDate = new Date(task.dueDate);
-                    
-                    const startOffset = Math.max(0, Math.ceil((startDate - minDate) / (1000 * 60 * 60 * 24)));
-                    const duration = Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-                    const width = Math.max((duration / totalDays) * 100, 2);
+                // Render project bars
+                sortedProjects.forEach(project => {
+                    const start = new Date(project.startDate);
+                    const end = new Date(project.endDate);
+                    const startOffset = Math.ceil((start - minDate) / (1000 * 60 * 60 * 24));
+                    const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+                    const width = (duration / totalDays) * 100;
                     const left = (startOffset / totalDays) * 100;
                     
+                    // Determine bar color
                     let barColor = 'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
-                    if (task.status === 'Completed') barColor = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
-                    else if (task.status === 'In Progress') barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)';
-                    else if (dueDate < today) barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)';
+                    if (project.locked) {
+                        barColor = 'linear-gradient(135deg, #9ca3af 0%, #6b7280 100%)'; // Gray for locked
+                    } else if (end < today) {
+                        barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)'; // Red for overdue
+                    } else if (start <= today && end >= today) {
+                        barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)'; // Orange for in progress
+                    } else if (start > today) {
+                        barColor = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)'; // Green for upcoming
+                    }
+                    
+                    // Get project stats
+                    const tasks = data.tasks.filter(t => t.projectId === project.id);
+                    const completedTasks = tasks.filter(t => t.status === 'Completed').length;
+                    const transactions = data.transactions.filter(t => t.projectId === project.id);
+                    const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+                    const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
                     
                     html += `
                         <div class="gantt-row">
-                            <div class="gantt-label" title="${task.name} - ${project ? project.name : 'No Project'}">${task.name}</div>
+                            <div class="gantt-label" style="display: flex; align-items: center; gap: 8px;">
+                                <span title="${project.name} - ${project.client}">${project.name} ${project.locked ? '🔒' : ''}</span>
+                                <button class="icon-btn" onclick="showProjectDetail(${project.id})" 
+                                        style="width: 24px; height: 24px;" title="View details">👁️</button>
+                            </div>
                             <div class="gantt-timeline">
                                 <div class="gantt-bar" style="left: ${left}%; width: ${width}%; background: ${barColor};" 
-                                     onclick="editTask(${task.id})" title="${task.priority} Priority - ${task.status}">
-                                    <div style="font-size: 9px;">${duration}d</div>
+                                     onclick="showProjectDetail(${project.id})" title="Click for details">
+                                    <div style="font-weight: 600; font-size: 10px;">${duration} days</div>
                                     <div class="gantt-bar-dates" style="font-size: 8px;">
-                                        ${startDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })} - 
-                                        ${dueDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
+                                        ${start.toLocaleDateString('en', { month: 'short', day: 'numeric' })} - 
+                                        ${end.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
+                                    </div>
+                                    <div style="font-size: 8px; opacity: 0.9; margin-top: 2px;">
+                                        ${completedTasks}/${tasks.length} tasks • ${(income - expenses).toFixed(0)}
                                     </div>
                                 </div>
                             </div>
@@ -1927,6 +1941,35 @@
             }
             
             html += '</div>';
+            
+            // Show projects without dates
+            const projectsWithoutDates = data.projects.filter(p => !p.startDate || !p.endDate);
+            if (projectsWithoutDates.length > 0) {
+                html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-top: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
+                html += '<h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-color);">⚠️ Projects Without Dates</h3>';
+                html += '<p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 10px;">These projects need start and end dates to appear on the timeline:</p>';
+                
+                projectsWithoutDates.forEach(project => {
+                    const tasks = data.tasks.filter(t => t.projectId === project.id);
+                    html += `
+                        <div style="padding: 10px; margin-bottom: 8px; background: var(--bg-color); border-radius: 8px; border-left: 3px solid var(--warning); display: flex; justify-content: space-between; align-items: center;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500; font-size: 12px; color: var(--text-color);">${project.name} ${project.locked ? '🔒' : ''}</div>
+                                <div style="font-size: 10px; color: var(--text-secondary);">
+                                    Client: ${project.client} • ${tasks.length} task(s)
+                                </div>
+                            </div>
+                            <div style="display: flex; gap: 4px;">
+                                <button class="icon-btn" onclick="editProject(${project.id})" ${project.locked ? 'disabled style="opacity: 0.5;"' : ''} title="Edit to add dates">✏️</button>
+                                <button class="icon-btn" onclick="showProjectDetail(${project.id})" title="View details">👁️</button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += '</div>';
+            }
+            
             container.innerHTML = html;
         }
 
