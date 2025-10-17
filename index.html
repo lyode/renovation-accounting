@@ -2,45 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="theme-color" content="#E8A9B3">
-    <title>Builder Pro - Complete Project Manager</title>
-    
-    <!-- Favicon and App Icons -->
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <link rel="shortcut icon" href="favicon.ico">
-    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="96x96" href="favicon-96x96.png">
-    <link rel="icon" type="image/svg+xml" href="favicon.svg">
-    <link rel="manifest" href="site.webmanifest">
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- PWA Icons for Home Screen -->
-    <link rel="apple-touch-icon" href="web-app-manifest-192x192.png">
-    <link rel="apple-touch-icon" sizes="512x512" href="web-app-manifest-512x512.png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <!-- PWA Meta Tags -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Builder Pro">
     <meta name="apple-mobile-web-app-title" content="Builder Pro">
-    <meta name="description" content="Complete Project Management App by REFIT Interior">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="theme-color" content="#E8A9B3">
+    <meta name="msapplication-navbutton-color" content="#E8A9B3">
+    <meta name="msapplication-starturl" content="/">
+    <meta name="format-detection" content="telephone=no">
     
-    <!-- Microsoft Tiles -->
-    <meta name="msapplication-TileColor" content="#E8A9B3">
-    <meta name="msapplication-TileImage" content="favicon/ms-icon-144x144.png">
+    <title>Builder Pro - Complete Project Manager</title>
     
     <style>
         :root {
-            /* Default Rose Blush Theme */
+            --safe-area-inset-top: env(safe-area-inset-top, 0px);
+            --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+            --safe-area-inset-left: env(safe-area-inset-left, 0px);
+            --safe-area-inset-right: env(safe-area-inset-right, 0px);
+            
             --bg-color: #F4EDEB;
             --accent-color: #E8A9B3;
             --highlight-color: #D47C90;
             --text-color: #1C1C1C;
             
-            /* UI Elements */
             --card-bg: #ffffff;
             --text-secondary: #5a5a5a;
             --border-color: #e8e8e8;
@@ -51,31 +39,32 @@
             --income-color: #10b981;
             --expense-color: #ef4444;
             
-            /* Deep Brown for buttons */
             --button-primary: #4B2B1A;
             --button-primary-hover: #6B4332;
             
-            /* Accessibility */
             --contrast: 1;
             --brightness: 1;
             --font-scale: 1;
         }
         
-        /* Contrast levels */
         body.low-contrast { --contrast: 0.85; --brightness: 1.1; }
         body.normal-contrast { --contrast: 1; --brightness: 1; }
         body.high-contrast { --contrast: 1.25; --brightness: 0.95; }
         body.extra-contrast { --contrast: 1.5; --brightness: 0.9; }
         body { filter: contrast(var(--contrast)) brightness(var(--brightness)); }
         
-        /* Font sizes */
         body.font-s { --font-scale: 0.85; }
         body.font-m { --font-scale: 1; }
         body.font-l { --font-scale: 1.15; }
         body.font-xl { --font-scale: 1.3; }
         body.font-xxl { --font-scale: 1.5; }
 
-        /* Night mode */
+        /* Saturation levels */
+        body.sat-low { filter: saturate(0.7) contrast(var(--contrast)) brightness(var(--brightness)); }
+        body.sat-normal { filter: saturate(1) contrast(var(--contrast)) brightness(var(--brightness)); }
+        body.sat-high { filter: saturate(1.3) contrast(var(--contrast)) brightness(var(--brightness)); }
+        body.sat-vibrant { filter: saturate(1.6) contrast(var(--contrast)) brightness(var(--brightness)); }
+
         .night-mode { 
             --bg-color: #1a1618 !important; 
             --card-bg: #2d2729 !important; 
@@ -107,9 +96,30 @@
             min-height: 100vh; 
             display: flex; 
             flex-direction: column;
+            padding-left: env(safe-area-inset-left);
+            padding-right: env(safe-area-inset-right);
         }
         
-        /* Fixed header */
+        @media (display-mode: standalone) {
+            .fixed-header-section {
+                padding-top: max(20px, env(safe-area-inset-top));
+            }
+            
+            .main-content-wrapper {
+                margin-top: calc(220px + max(20px, env(safe-area-inset-top)));
+            }
+        }
+        
+        @supports (padding-top: max(0px)) {
+            .fixed-header-section {
+                padding-top: max(20px, env(safe-area-inset-top));
+            }
+            
+            .header {
+                padding-top: 12px;
+            }
+        }
+        
         .fixed-header-section {
             position: fixed;
             top: 0;
@@ -117,6 +127,7 @@
             right: 0;
             z-index: 100;
             background: var(--bg-color);
+            padding-top: var(--safe-area-inset-top);
         }
         
         .header { 
@@ -244,7 +255,6 @@
             background: var(--bg-color); 
         }
         
-        /* Content with spacing for fixed header */
         .main-content-wrapper {
             margin-top: 200px;
             flex: 1;
@@ -263,7 +273,6 @@
             padding-bottom: 80px; 
         }
         
-        /* Cards and components */
         .stat-card { 
             background: var(--card-bg); 
             padding: 10px; 
@@ -334,7 +343,6 @@
             background: rgba(255,255,255,0.3);
         }
         
-        /* Gantt Chart */
         .gantt-container { 
             background: var(--card-bg); 
             border-radius: 10px; 
@@ -342,6 +350,7 @@
             box-shadow: 0 2px 10px var(--shadow-color); 
             overflow-x: auto; 
             margin-bottom: 15px; 
+            position: relative;
         }
         
         .gantt-timeline-header {
@@ -416,7 +425,34 @@
             opacity: 0.9;
         }
         
-        /* Modals */
+        /* TODAY LINE IN GANTT - ENHANCED */
+        .today-line {
+            position: absolute;
+            top: -10px;
+            bottom: -10px;
+            width: 4px;
+            background: #ef4444;
+            z-index: 10;
+            pointer-events: none;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+        }
+        
+        .today-line::before {
+            content: 'TODAY';
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ef4444;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+        }
+        
         .modal { 
             display: none; 
             position: fixed; 
@@ -442,7 +478,6 @@
             overflow-y: auto; 
         }
         
-        /* Forms */
         .form-group input, .form-group select, .form-group textarea { 
             width: 100%; 
             padding: 8px 10px; 
@@ -487,7 +522,6 @@
             color: white; 
         }
         
-        /* Settings Panel */
         .settings-panel { 
             position: fixed; 
             top: 0; 
@@ -501,11 +535,57 @@
             z-index: 1001; 
             overflow-y: auto; 
             padding: 20px; 
+            padding-top: calc(20px + var(--safe-area-inset-top));
+            padding-bottom: calc(20px + var(--safe-area-inset-bottom));
         }
         
         .settings-panel.show { right: 0; }
         
-        /* Color Theme Grid */
+        .settings-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            transition: opacity 0.3s;
+        }
+        
+        .settings-backdrop.show {
+            display: block;
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border-color);
+            padding-top: 10px;
+        }
+        
+        .settings-close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: background 0.2s;
+        }
+        
+        .settings-close-btn:active {
+            background: var(--bg-color);
+        }
+        
         .theme-grid { 
             display: grid;
             grid-template-columns: repeat(2, 1fr);
@@ -559,7 +639,6 @@
             font-weight: 500;
         }
         
-        /* Contrast Controls */
         .contrast-controls {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -584,10 +663,9 @@
             border-color: var(--button-primary);
         }
         
-        /* FAB */
         .fab-container { 
             position: fixed; 
-            bottom: 20px; 
+            bottom: calc(20px + var(--safe-area-inset-bottom)); 
             right: 20px; 
             z-index: 99; 
         }
@@ -659,7 +737,6 @@
             color: var(--text-secondary); 
         }
         
-        /* Task items */
         .task-item { 
             padding: 10px; 
             margin-bottom: 8px; 
@@ -694,7 +771,7 @@
             background: var(--danger); 
         }
         
-        /* Calendar Styles */
+        /* ENHANCED CALENDAR STYLES WITH RED TODAY */
         .calendar-container {
             background: var(--card-bg);
             border-radius: 10px;
@@ -728,16 +805,51 @@
             font-size: calc(10px * var(--font-scale));
             position: relative;
             overflow: hidden;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calendar-day:hover {
+            background: var(--card-bg);
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px var(--shadow-color);
+            z-index: 10;
         }
         
         .calendar-day.other-month {
             opacity: 0.3;
         }
         
+        /* ENHANCED TODAY STYLING WITH RED THEME */
         .calendar-day.today {
-            background: var(--accent-color);
-            color: white;
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+            color: white !important;
             font-weight: bold;
+            border: 3px solid #dc2626 !important;
+            box-shadow: 0 0 25px rgba(239, 68, 68, 0.7) !important;
+            animation: todayPulse 2s infinite;
+            transform: scale(1.05);
+            z-index: 20;
+        }
+        
+        @keyframes todayPulse {
+            0%, 100% { 
+                box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);
+            }
+            50% { 
+                box-shadow: 0 0 35px rgba(239, 68, 68, 1);
+            }
+        }
+        
+        .calendar-day.today:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%) !important;
+            transform: scale(1.08) !important;
+        }
+        
+        .calendar-day.today .calendar-event {
+            background: rgba(255, 255, 255, 0.95) !important;
+            color: #ef4444 !important;
+            font-weight: 700;
         }
         
         .calendar-day.has-event {
@@ -770,39 +882,6 @@
             margin: 15px 0;
         }
         
-        /* Delete Confirmation Modal */
-        .confirm-delete-modal {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 350px;
-            text-align: center;
-        }
-        
-        .confirm-delete-modal h3 {
-            color: var(--danger);
-            margin-bottom: 15px;
-        }
-        
-        .confirm-delete-modal p {
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            font-size: calc(12px * var(--font-scale));
-        }
-        
-        .confirm-delete-modal .warning-box {
-            background: rgba(239, 68, 68, 0.1);
-            border: 2px solid var(--danger);
-            border-radius: 8px;
-            padding: 10px;
-            margin: 15px 0;
-        }
-        
-        .confirm-delete-modal .btn-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
         @media (max-width: 768px) {
             .main-content-wrapper {
                 margin-top: 210px;
@@ -859,7 +938,6 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Fixed Header Section -->
         <div class="fixed-header-section">
             <div class="header">
                 <div class="header-content">
@@ -912,17 +990,17 @@
             </div>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content-wrapper">
             <div class="container" id="mainContent"></div>
         </div>
     </div>
 
-    <!-- Settings Panel -->
+    <div class="settings-backdrop" id="settingsBackdrop" onclick="toggleSettings()"></div>
+    
     <div class="settings-panel" id="settingsPanel">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color);">
-            <span style="font-size: 1.25rem; font-weight: bold; color: var(--text-color);">Settings</span>
-            <button onclick="toggleSettings()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--text-color);">✕</button>
+        <div class="settings-header">
+            <span style="font-size: 1.25rem; font-weight: bold; color: var(--text-color);">⚙️ Settings</span>
+            <button class="settings-close-btn" onclick="toggleSettings()">✕</button>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
@@ -943,9 +1021,7 @@
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
             <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🎨 Theme Colors (18 Premium Themes)</label>
-            <div class="theme-grid" id="themeGrid">
-                <!-- Themes will be populated here by JavaScript -->
-            </div>
+            <div class="theme-grid" id="themeGrid"></div>
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
@@ -955,6 +1031,16 @@
                 <button class="contrast-btn active" onclick="setContrast('normal')">Normal</button>
                 <button class="contrast-btn" onclick="setContrast('high')">High</button>
                 <button class="contrast-btn" onclick="setContrast('extra')">Extra</button>
+            </div>
+        </div>
+        
+        <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
+            <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🎨 Color Saturation</label>
+            <div class="contrast-controls">
+                <button class="contrast-btn" onclick="setSaturation('low')">Low</button>
+                <button class="contrast-btn active" onclick="setSaturation('normal')">Normal</button>
+                <button class="contrast-btn" onclick="setSaturation('high')">High</button>
+                <button class="contrast-btn" onclick="setSaturation('vibrant')">Vibrant</button>
             </div>
         </div>
         
@@ -977,15 +1063,15 @@
         </div>
         
         <div>
-            <button class="btn btn-primary" onclick="exportData()" style="width: 100%;">📤 Export Data</button>
-            <label class="btn btn-success" style="display: block; text-align: center; margin-top: 10px; width: 100%;">
+            <button class="btn btn-primary" onclick="exportData()" style="width: 100%; margin-bottom: 10px;">📤 Export Data</button>
+            <label class="btn btn-success" style="display: block; text-align: center; margin-bottom: 10px; width: 100%;">
                 📥 Import Data
                 <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
             </label>
+            <button class="btn btn-danger" onclick="clearAllProjectsNow()" style="width: 100%;">🗑️ Delete All Projects & Data</button>
         </div>
     </div>
 
-    <!-- FAB Menu -->
     <div class="fab-container">
         <div class="fab-menu" id="fabMenu">
             <div class="fab-option" onclick="showProjectModal()">
@@ -1004,7 +1090,7 @@
         <button class="fab" onclick="toggleFabMenu()">+</button>
     </div>
 
-    <!-- Modals -->
+    <!-- Modals (Profile, Project, Task, Transaction, etc.) -->
     <div class="modal" id="profileModal">
         <div class="modal-content">
             <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
@@ -1177,11 +1263,22 @@
                 <h2 id="projectDetailTitle" style="color: var(--text-color);">Project Details</h2>
                 <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('projectDetailModal')">×</span>
             </div>
-            <div id="projectDetailBody" style="padding: 15px; max-height: 60vh; overflow-y: auto;">
-                <!-- Dynamic content -->
-            </div>
+            <div id="projectDetailBody" style="padding: 15px; max-height: 60vh; overflow-y: auto;"></div>
             <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
                 <button class="btn btn-secondary" onclick="closeModal('projectDetailModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="dayDetailModal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                <h2 id="dayDetailTitle" style="color: var(--text-color);">📅 Day Details</h2>
+                <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('dayDetailModal')">×</span>
+            </div>
+            <div id="dayDetailBody" style="padding: 15px; max-height: 60vh; overflow-y: auto;"></div>
+            <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="closeModal('dayDetailModal')">Close</button>
             </div>
         </div>
     </div>
@@ -1189,14 +1286,12 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // Configuration
         const APP_CONFIG = {
             binId: '68e121b8ae596e708f05df17',
             baseUrl: 'https://api.jsonbin.io/v3',
             deviceType: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 'Mobile' : 'Laptop'
         };
 
-        // 18 Premium Theme Colors
         const themeColors = [
             { name: 'Rose Blush', bg: '#F4EDEB', accent: '#E8A9B3', highlight: '#D47C90', text: '#1C1C1C' },
             { name: 'Mocha Cream', bg: '#FFF6F1', accent: '#C9A48F', highlight: '#8A5C4E', text: '#1C1C1C' },
@@ -1218,7 +1313,6 @@
             { name: 'Neutral Blush', bg: '#F5F3F2', accent: '#D0B8AD', highlight: '#8C6A5A', text: '#1C1C1C' }
         ];
 
-        // App State
         let data = {
             currentUser: 'Builder Pro',
             userPosition: 'by REFIT Interior',
@@ -1226,11 +1320,14 @@
             projects: [],
             tasks: [],
             transactions: [],
-            permanentlyDeleted: [], // Track permanently deleted items
+            permanentlyDeleted: [],
+            archivedProjects: [],
+            showArchived: false,
             nightMode: false,
-            themeColor: 0, // Default to Rose Blush
+            themeColor: 0,
             fontSize: 'm',
             contrast: 'normal',
+            saturation: 'normal',
             timelineFilter: 'all',
             scheduleView: 'month',
             calendarEvents: []
@@ -1242,7 +1339,6 @@
         let autoSyncInterval = null;
         let autoSyncEnabled = false;
 
-        // Initialize App
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
             initUI();
@@ -1251,15 +1347,12 @@
             initAutoSync();
             initializeLastSync();
             
-            // Check online status
             if (!navigator.onLine) {
                 document.getElementById('syncMode').textContent = 'Offline';
             }
             
-            // Set initial device type
             document.getElementById('deviceType').textContent = APP_CONFIG.deviceType;
             
-            // Show welcome message for new users
             if (data.projects.length === 0 && data.tasks.length === 0) {
                 setTimeout(() => {
                     showToast('👋 Welcome to Builder Pro! Press + to get started');
@@ -1267,7 +1360,21 @@
             }
         });
 
-        // Data Management
+        function clearAllProjectsNow() {
+            if (confirm('⚠️ DELETE ALL PROJECTS?\n\nThis will permanently delete:\n• All projects\n• All tasks\n• All transactions\n\nThis CANNOT be undone!\n\nClick OK to proceed.')) {
+                data.projects = [];
+                data.tasks = [];
+                data.transactions = [];
+                data.permanentlyDeleted = [];
+                
+                saveData();
+                renderView();
+                updateStats();
+                
+                showToast('🗑️ All projects, tasks, and transactions deleted!');
+            }
+        }
+
         function loadData() {
             const saved = localStorage.getItem('builderProData');
             if (saved) {
@@ -1290,10 +1397,10 @@
             applyThemeColor(data.themeColor || 0);
             setFontSize(data.fontSize || 'm');
             setContrast(data.contrast || 'normal');
+            setSaturation(data.saturation || 'normal');
             updateHeader();
         }
 
-        // UI Functions
         function initUI() {
             initThemePicker();
             document.getElementById('deviceType').textContent = APP_CONFIG.deviceType;
@@ -1301,10 +1408,7 @@
 
         function initThemePicker() {
             const grid = document.getElementById('themeGrid');
-            if (!grid) {
-                console.error('Theme grid element not found');
-                return;
-            }
+            if (!grid) return;
             grid.innerHTML = '';
             
             themeColors.forEach((theme, index) => {
@@ -1347,7 +1451,6 @@
             document.documentElement.style.setProperty('--accent-color', theme.accent);
             document.documentElement.style.setProperty('--highlight-color', theme.highlight);
             
-            // Update meta theme color for mobile
             document.querySelector('meta[name="theme-color"]').content = theme.accent;
         }
 
@@ -1357,13 +1460,33 @@
             data.contrast = level;
             saveData();
             
-            // Update button states
             document.querySelectorAll('.contrast-btn').forEach(btn => {
                 btn.classList.remove('active');
                 if (btn.textContent.toLowerCase() === level) {
                     btn.classList.add('active');
                 }
             });
+            
+            // Reapply saturation
+            setSaturation(data.saturation || 'normal');
+        }
+
+        function setSaturation(level) {
+            document.body.classList.remove('sat-low', 'sat-normal', 'sat-high', 'sat-vibrant');
+            document.body.classList.add('sat-' + level);
+            data.saturation = level;
+            saveData();
+            
+            // Update active button in saturation section
+            const saturationSection = document.querySelectorAll('.contrast-controls')[1];
+            if (saturationSection) {
+                saturationSection.querySelectorAll('.contrast-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.textContent.toLowerCase() === level) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
         }
 
         function setFontSize(size) {
@@ -1391,10 +1514,17 @@
 
         function toggleSettings() {
             const panel = document.getElementById('settingsPanel');
-            panel.classList.toggle('show');
+            const backdrop = document.getElementById('settingsBackdrop');
             
-            // Reinitialize theme picker when opening settings
             if (panel.classList.contains('show')) {
+                panel.classList.remove('show');
+                backdrop.classList.remove('show');
+                document.body.style.overflow = '';
+            } else {
+                panel.classList.add('show');
+                backdrop.classList.add('show');
+                document.body.style.overflow = 'hidden';
+                
                 setTimeout(() => {
                     initThemePicker();
                 }, 100);
@@ -1416,7 +1546,6 @@
             document.getElementById(modalId).classList.remove('show');
         }
 
-        // View Management
         function switchView(view) {
             data.currentView = view;
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
@@ -1461,93 +1590,18 @@
                 </div>
             `;
             
-            // Timeline filters
-            html += `
-                <div style="display: flex; gap: 8px; margin-bottom: 12px; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color);">
-                    <button class="btn btn-secondary ${data.timelineFilter === 'all' ? 'active' : ''}" 
-                        onclick="setTimelineFilter('all')" style="flex: 1;">All</button>
-                    <button class="btn btn-secondary ${data.timelineFilter === 'day' ? 'active' : ''}" 
-                        onclick="setTimelineFilter('day')" style="flex: 1;">Today</button>
-                    <button class="btn btn-secondary ${data.timelineFilter === 'week' ? 'active' : ''}" 
-                        onclick="setTimelineFilter('week')" style="flex: 1;">Week</button>
-                    <button class="btn btn-secondary ${data.timelineFilter === 'month' ? 'active' : ''}" 
-                        onclick="setTimelineFilter('month')" style="flex: 1;">Month</button>
-                </div>
-            `;
-            
-            // Due tasks with timeline filter
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            let dueTasks = data.tasks.filter(t => {
-                const due = new Date(t.dueDate);
-                due.setHours(0, 0, 0, 0);
-                return due <= today && t.status !== 'Completed';
-            });
-            
-            // Apply timeline filter
-            if (data.timelineFilter === 'day') {
-                dueTasks = dueTasks.filter(t => {
-                    const due = new Date(t.dueDate);
-                    due.setHours(0, 0, 0, 0);
-                    return due.getTime() === today.getTime();
-                });
-            } else if (data.timelineFilter === 'week') {
-                const weekEnd = new Date(today);
-                weekEnd.setDate(today.getDate() + 7);
-                dueTasks = dueTasks.filter(t => {
-                    const due = new Date(t.dueDate);
-                    return due <= weekEnd;
-                });
-            } else if (data.timelineFilter === 'month') {
-                const monthEnd = new Date(today);
-                monthEnd.setMonth(today.getMonth() + 1);
-                dueTasks = dueTasks.filter(t => {
-                    const due = new Date(t.dueDate);
-                    return due <= monthEnd;
-                });
-            }
-            
-            if (dueTasks.length > 0) {
-                html += `<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
-                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--danger);">🎯 Priority Tasks (${dueTasks.length})</h3>`;
-                
-                dueTasks.forEach(task => {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    html += `
-                        <div class="task-item" style="border-left-color: var(--danger);">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 500; margin-bottom: 5px; color: var(--text-color);">${task.name}</div>
-                                <div style="font-size: 11px; color: var(--text-secondary);">
-                                    ${project ? project.name : 'No Project'} • Due: ${task.dueDate}
-                                    ${task.assignee ? ` • Assigned to: ${task.assignee}` : ''}
-                                </div>
-                            </div>
-                            <button class="icon-btn" onclick="editTask(${task.id})">✏️</button>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-            }
-            
             if (data.projects.length > 0) {
                 html += renderProjectTimeline();
             }
             
             container.innerHTML = html || '<div class="empty-state">No data yet. Click + to get started!</div>';
         }
-        
-        function setTimelineFilter(filter) {
-            data.timelineFilter = filter;
-            saveData();
-            renderView();
-        }
 
         function renderProjectTimeline() {
+            if (data.projects.length === 0) return '';
+            
             const projectsWithDates = data.projects.filter(p => p.startDate && p.endDate);
             const projectsWithoutDates = data.projects.filter(p => !p.startDate || !p.endDate);
-            
-            if (data.projects.length === 0) return '';
             
             let html = '<div class="gantt-container"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📅 Project Timeline</h3>';
             
@@ -1556,9 +1610,12 @@
                 html += '<p style="color: var(--text-secondary); margin-bottom: 10px;">No project dates set. Projects list:</p>';
                 data.projects.forEach(project => {
                     html += `
-                        <div style="padding: 8px; margin-bottom: 5px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--accent-color);">
-                            <strong style="color: var(--text-color);">${project.name}</strong> - <span style="color: var(--text-secondary);">${project.client}</span>
-                            ${project.locked ? ' 🔒' : ''}
+                        <div style="padding: 8px; margin-bottom: 5px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--accent-color); display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <strong style="color: var(--text-color);">${project.name}</strong> - <span style="color: var(--text-secondary);">${project.client}</span>
+                                ${project.locked ? ' 🔒' : ''}
+                            </div>
+                            <button class="icon-btn" onclick="editProject(${project.id})" ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>✏️</button>
                         </div>
                     `;
                 });
@@ -1566,6 +1623,7 @@
                 return html;
             }
             
+            // Calculate date range
             let minDate = null;
             let maxDate = null;
             
@@ -1576,8 +1634,14 @@
                 if (!maxDate || end > maxDate) maxDate = end;
             });
             
+            // Add some padding to the timeline
+            const paddingDays = 3;
+            minDate.setDate(minDate.getDate() - paddingDays);
+            maxDate.setDate(maxDate.getDate() + paddingDays);
+            
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
+            // Generate months for header
             const months = [];
             let current = new Date(minDate);
             while (current <= maxDate) {
@@ -1589,6 +1653,7 @@
                 current.setMonth(current.getMonth() + 1);
             }
             
+            // Render timeline header
             html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
             months.forEach(month => {
                 const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
@@ -1598,6 +1663,16 @@
             });
             html += '</div></div>';
             
+            // Add TODAY line if within range
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (today >= minDate && today <= maxDate) {
+                const todayOffset = Math.ceil((today - minDate) / (1000 * 60 * 60 * 24));
+                const todayPosition = (todayOffset / totalDays) * 100;
+                html += `<div class="today-line" style="left: calc(150px + ${todayPosition}%);"></div>`;
+            }
+            
+            // Render project bars
             projectsWithDates.forEach(project => {
                 const start = new Date(project.startDate);
                 const end = new Date(project.endDate);
@@ -1606,12 +1681,24 @@
                 const width = (duration / totalDays) * 100;
                 const left = (startOffset / totalDays) * 100;
                 
+                // Check if project is overdue
+                const isOverdue = end < today && !project.locked;
+                const barColor = isOverdue ? 
+                    'linear-gradient(135deg, #ef4444 0%, #f87171 100%)' : 
+                    'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
+                
                 html += `
                     <div class="gantt-row">
-                        <div class="gantt-label">${project.name} ${project.locked ? '🔒' : ''}</div>
+                        <div class="gantt-label" style="display: flex; align-items: center; gap: 8px;">
+                            <span title="${project.name}">${project.name} ${project.locked ? '🔒' : ''}</span>
+                            <button class="icon-btn" onclick="editProject(${project.id})" 
+                                    ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed; width: 24px; height: 24px;"' : 'style="width: 24px; height: 24px;"'}
+                                    title="${project.locked ? 'Project is locked' : 'Edit project'}">✏️</button>
+                        </div>
                         <div class="gantt-timeline">
-                            <div class="gantt-bar" style="left: ${left}%; width: ${width}%;" onclick="showProjectDetail(${project.id})">
-                                <div>${duration} days</div>
+                            <div class="gantt-bar" style="left: ${left}%; width: ${width}%; background: ${barColor};" 
+                                 onclick="showProjectDetail(${project.id})" title="Click for details">
+                                <div style="font-weight: 600;">${duration} days</div>
                                 <div class="gantt-bar-dates">
                                     ${start.toLocaleDateString('en', { month: 'short', day: 'numeric' })} - 
                                     ${end.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
@@ -1622,13 +1709,18 @@
                 `;
             });
             
+            // Show projects without dates
             if (projectsWithoutDates.length > 0) {
                 html += '<div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color);">';
-                html += '<h4 style="font-size: 12px; margin-bottom: 10px; color: var(--text-secondary);">Projects without dates:</h4>';
+                html += '<h4 style="font-size: 12px; margin-bottom: 10px; color: var(--text-secondary);">⚠️ Projects without dates:</h4>';
                 projectsWithoutDates.forEach(project => {
                     html += `
                         <div class="gantt-row">
-                            <div class="gantt-label">${project.name} ${project.locked ? '🔒' : ''}</div>
+                            <div class="gantt-label" style="display: flex; align-items: center; gap: 8px;">
+                                <span>${project.name} ${project.locked ? '🔒' : ''}</span>
+                                <button class="icon-btn" onclick="editProject(${project.id})" 
+                                        ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed; width: 24px; height: 24px;"' : 'style="width: 24px; height: 24px;"'}>✏️</button>
+                            </div>
                             <div class="gantt-timeline" style="display: flex; align-items: center; padding-left: 10px;">
                                 <span style="font-size: 11px; color: var(--text-secondary);">No dates set - ${project.client}</span>
                             </div>
@@ -1649,23 +1741,17 @@
             }
             
             let html = '';
-            // Fixed: Ensure all projects are accessible, not just first 15
-            data.projects.forEach((project, index) => {
+            data.projects.forEach(project => {
                 const tasks = data.tasks.filter(t => t.projectId === project.id);
                 const transactions = data.transactions.filter(t => t.projectId === project.id);
                 const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
                 const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
                 
                 html += `
-                    <div class="project-card" data-project-index="${index}">
+                    <div class="project-card">
                         <div class="project-header" onclick="showProjectDetail(${project.id})" style="cursor: pointer;">
                             <h3>${project.name} ${project.locked ? '🔒' : ''}</h3>
                             <div style="font-size: 11px; opacity: 0.9;">Client: ${project.client}</div>
-                            ${project.startDate && project.endDate ? 
-                                `<div style="font-size: 11px; opacity: 0.9; margin-top: 4px;">
-                                    ${new Date(project.startDate).toLocaleDateString()} - 
-                                    ${new Date(project.endDate).toLocaleDateString()}
-                                </div>` : ''}
                             <div class="project-stats">
                                 <div style="text-align: center;">
                                     <div style="font-size: 9px; opacity: 0.8;">Tasks</div>
@@ -1697,122 +1783,6 @@
             });
             
             container.innerHTML = html;
-        }
-        
-        function showProjectDetail(projectId) {
-            const project = data.projects.find(p => p.id === projectId);
-            if (!project) return;
-            
-            const tasks = data.tasks.filter(t => t.projectId === projectId);
-            const transactions = data.transactions.filter(t => t.projectId === projectId);
-            const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-            const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-            const profit = income - expenses;
-            
-            document.getElementById('projectDetailTitle').textContent = project.name + (project.locked ? ' 🔒' : '');
-            
-            let html = `
-                <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Project Info</h4>
-                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
-                        <div><strong>Client:</strong> ${project.client}</div>
-                        ${project.startDate ? `<div><strong>Duration:</strong> ${project.startDate} to ${project.endDate || 'Ongoing'}</div>` : ''}
-                        ${project.description ? `<div style="margin-top: 8px;"><strong>Description:</strong><br>${project.description}</div>` : ''}
-                    </div>
-                </div>
-                
-                <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">💰 Finance Summary</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                        <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Income</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Expenses</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Profit</div>
-                            <div style="font-size: 16px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">
-                                $${profit.toFixed(2)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 15px;">
-                    <button class="btn btn-success" onclick="closeModal('projectDetailModal'); showTransactionModalForProject('income', ${projectId})">
-                        + Add Income
-                    </button>
-                    <button class="btn btn-danger" onclick="closeModal('projectDetailModal'); showTransactionModalForProject('expense', ${projectId})">
-                        + Add Expense
-                    </button>
-                </div>
-                
-                <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Tasks (${tasks.length})</h4>
-            `;
-            
-            if (tasks.length === 0) {
-                html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No tasks yet</p>';
-            } else {
-                tasks.forEach(task => {
-                    const isCompleted = task.status === 'Completed';
-                    html += `
-                        <div class="task-item ${isCompleted ? 'completed' : ''}" style="margin-bottom: 8px;">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 500; color: var(--text-color);">${task.name}</div>
-                                <div style="font-size: 10px; color: var(--text-secondary);">
-                                    ${task.dueDate} • ${task.priority} • ${task.status}
-                                    ${task.assignee ? ` • ${task.assignee}` : ''}
-                                </div>
-                            </div>
-                            <button class="icon-btn" onclick="closeModal('projectDetailModal'); editTask(${task.id});">✏️</button>
-                        </div>
-                    `;
-                });
-            }
-            
-            html += `<h4 style="font-size: 13px; margin: 15px 0 10px; color: var(--text-color);">💳 Transactions (${transactions.length})</h4>`;
-            
-            if (transactions.length === 0) {
-                html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No transactions yet</p>';
-            } else {
-                transactions.forEach(trans => {
-                    html += `
-                        <div style="display: flex; justify-content: space-between; padding: 10px; background: var(--bg-color); border-radius: 8px; margin-bottom: 8px;">
-                            <div>
-                                <div style="font-weight: 500; font-size: 12px; color: var(--text-color);">${trans.category}</div>
-                                <div style="font-size: 10px; color: var(--text-secondary);">
-                                    ${trans.date}
-                                    ${trans.description ? ` • ${trans.description}` : ''}
-                                </div>
-                            </div>
-                            <div style="font-weight: bold; color: ${trans.type === 'income' ? 'var(--income-color)' : 'var(--expense-color)'};">
-                                ${trans.type === 'income' ? '+' : '-'}$${trans.amount.toFixed(2)}
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            document.getElementById('projectDetailBody').innerHTML = html;
-            document.getElementById('projectDetailModal').classList.add('show');
-        }
-        
-        function toggleProjectLock(id) {
-            const project = data.projects.find(p => p.id === id);
-            if (project) {
-                project.locked = !project.locked;
-                saveData();
-                renderView();
-                showToast(project.locked ? 'Project locked' : 'Project unlocked');
-            }
-        }
-        
-        function showTransactionModalForProject(type, projectId) {
-            showTransactionModal(type);
-            document.getElementById('transProject').value = projectId;
         }
 
         function renderSchedule(container) {
@@ -1882,46 +1852,40 @@
             
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
-            const months = [];
-            let current = new Date(minDate);
-            while (current <= maxDate) {
-                months.push({
-                    label: current.toLocaleDateString('en', { month: 'short', year: 'numeric' }),
-                    start: new Date(current),
-                    end: new Date(current.getFullYear(), current.getMonth() + 1, 0)
-                });
-                current.setMonth(current.getMonth() + 1);
-            }
-            
-            html += '<div class="gantt-container"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📊 Task Schedule Gantt Chart</h3>';
+            html += '<div class="gantt-container" style="position: relative;"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📊 Task Schedule Gantt Chart</h3>';
             
             if (filteredTasks.length === 0) {
                 html += `<p class="empty-state">No tasks scheduled for ${data.scheduleView === 'all' ? 'any time' : 'this ' + data.scheduleView}</p>`;
             } else {
                 html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
                 
-                if (data.scheduleView === 'day') {
-                    for (let hour = 0; hour < 24; hour += 3) {
-                        html += `<div class="gantt-month" style="flex: 1; font-size: 9px;">${hour}:00</div>`;
-                    }
-                } else if (data.scheduleView === 'week') {
-                    for (let d = 0; d <= 7; d++) {
-                        const day = new Date(today);
-                        day.setDate(today.getDate() + d);
-                        html += `<div class="gantt-month" style="flex: 1; font-size: 9px;">
-                            ${day.toLocaleDateString('en', { weekday: 'short', day: 'numeric' })}
-                        </div>`;
-                    }
-                } else {
-                    months.forEach(month => {
-                        const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
-                        const monthEnd = Math.min(totalDays, Math.ceil((month.end - minDate) / (1000 * 60 * 60 * 24)) + 1);
-                        const width = ((monthEnd - monthStart) / totalDays) * 100;
-                        html += `<div class="gantt-month" style="width: ${width}%;">${month.label}</div>`;
+                const months = [];
+                let current = new Date(minDate);
+                while (current <= maxDate) {
+                    months.push({
+                        label: current.toLocaleDateString('en', { month: 'short', year: 'numeric' }),
+                        start: new Date(current),
+                        end: new Date(current.getFullYear(), current.getMonth() + 1, 0)
                     });
+                    current.setMonth(current.getMonth() + 1);
                 }
                 
+                months.forEach(month => {
+                    const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
+                    const monthEnd = Math.min(totalDays, Math.ceil((month.end - minDate) / (1000 * 60 * 60 * 24)) + 1);
+                    const width = ((monthEnd - monthStart) / totalDays) * 100;
+                    html += `<div class="gantt-month" style="width: ${width}%;">${month.label}</div>`;
+                });
+                
                 html += '</div></div>';
+                
+                const todayCheck = new Date();
+                todayCheck.setHours(0, 0, 0, 0);
+                if (todayCheck >= minDate && todayCheck <= maxDate) {
+                    const todayOffset = Math.ceil((todayCheck - minDate) / (1000 * 60 * 60 * 24));
+                    const todayPosition = (todayOffset / totalDays) * 100;
+                    html += `<div class="today-line" style="left: calc(150px + ${todayPosition}%);"></div>`;
+                }
                 
                 const sortedTasks = filteredTasks.sort((a, b) => new Date(a.dueDate || a.startDate) - new Date(b.dueDate || b.startDate));
                 
@@ -1959,48 +1923,9 @@
             }
             
             html += '</div>';
-            
-            html += '<div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-top: 15px; box-shadow: 0 2px 10px var(--shadow-color);">';
-            html += '<h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-color);">📋 Task List</h3>';
-            
-            if (filteredTasks.length === 0) {
-                html += '<p class="empty-state">No tasks for this period</p>';
-            } else {
-                filteredTasks.forEach(task => {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    const isCompleted = task.status === 'Completed';
-                    const isOverdue = new Date(task.dueDate) < today && !isCompleted;
-                    
-                    html += `
-                        <div class="task-item ${isCompleted ? 'completed' : ''} ${isOverdue ? 'overdue' : ''}">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 500; color: var(--text-color);">${task.name}</div>
-                                <div style="font-size: 10px; color: var(--text-secondary);">
-                                    ${project ? project.name : 'No Project'} • 
-                                    ${task.startDate ? `${task.startDate} to ` : ''}${task.dueDate} • 
-                                    ${task.status} • 
-                                    ${task.priority} Priority
-                                    ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
-                                </div>
-                                ${task.description ? `
-                                    <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">
-                                        ${task.description}
-                                    </div>
-                                ` : ''}
-                            </div>
-                            <div style="display: flex; gap: 4px;">
-                                <button class="icon-btn" onclick="editTask(${task.id})">✏️</button>
-                                <button class="icon-btn danger" onclick="deleteTask(${task.id})">🗑️</button>
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            html += '</div>';
             container.innerHTML = html;
         }
-        
+
         function setScheduleView(view) {
             data.scheduleView = view;
             saveData();
@@ -2035,18 +1960,14 @@
                         <h3 style="font-size: 14px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid ${column.color}; color: ${column.color};">
                             ${column.title} (${column.tasks.length})
                         </h3>
-                        <div ondrop="dropTask(event, '${column.status}')" ondragover="allowDrop(event)" style="min-height: 100px;">
+                        <div style="min-height: 100px;">
                 `;
                 
                 column.tasks.forEach(task => {
                     const project = data.projects.find(p => p.id === task.projectId);
-                    const today = new Date();
-                    const dueDate = new Date(task.dueDate);
-                    const isOverdue = dueDate < today && task.status !== 'Completed';
                     
                     html += `
-                        <div draggable="true" ondragstart="dragTask(event, ${task.id})" 
-                             style="background: var(--bg-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; cursor: move; 
+                        <div style="background: var(--bg-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; 
                                     border-left: 3px solid ${column.color};">
                             <div style="font-weight: 500; margin-bottom: 5px; color: var(--text-color);">${task.name}</div>
                             <div style="font-size: 11px; color: var(--text-secondary);">
@@ -2056,19 +1977,11 @@
                                 📅 ${task.dueDate} • ${task.priority} Priority
                                 ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
                             </div>
-                            ${task.description ? `
-                                <div style="font-size: 10px; color: var(--text-secondary); margin-top: 5px; 
-                                            padding-top: 5px; border-top: 1px solid var(--border-color);">
-                                    ${task.description.substring(0, 50)}${task.description.length > 50 ? '...' : ''}
-                                </div>
-                            ` : ''}
                             <div style="display: flex; gap: 4px; margin-top: 8px;">
-                                <button class="btn btn-secondary" onclick="editTask(${task.id}); event.stopPropagation();" 
+                                <button class="btn btn-secondary" onclick="editTask(${task.id});" 
                                         style="padding: 4px 8px; font-size: 11px;">✏️ Edit</button>
-                                <button class="btn btn-secondary" onclick="completeTask(${task.id}); event.stopPropagation();" 
+                                <button class="btn btn-secondary" onclick="completeTask(${task.id});" 
                                         style="padding: 4px 8px; font-size: 11px;">✅</button>
-                                <button class="btn btn-secondary" onclick="deleteTask(${task.id}); event.stopPropagation();" 
-                                        style="padding: 4px 8px; font-size: 11px;">🗑️</button>
                             </div>
                         </div>
                     `;
@@ -2080,8 +1993,7 @@
             
             container.innerHTML = html;
         }
-        
-        // Calendar Functions
+
         function renderCalendar(container) {
             const today = new Date();
             const currentMonth = today.getMonth();
@@ -2098,18 +2010,6 @@
                         </button>
                     </div>
                     
-                    <div style="padding: 10px; background: var(--bg-color); border-radius: 8px; margin-bottom: 15px;">
-                        <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">
-                            📅 Calendar Sync Instructions:
-                        </p>
-                        <ol style="font-size: 11px; color: var(--text-secondary); padding-left: 20px;">
-                            <li>Click "Sync to iPhone Calendar" to generate calendar file</li>
-                            <li>Open the downloaded .ics file on your iPhone</li>
-                            <li>Choose "Add All" to sync events to your calendar</li>
-                            <li>Updates will maintain latest changes only</li>
-                        </ol>
-                    </div>
-                    
                     <div class="calendar-grid">
                         <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Sun</div>
                         <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Mon</div>
@@ -2120,27 +2020,24 @@
                         <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Sat</div>
             `;
             
-            // Calculate calendar days
             const firstDay = new Date(currentYear, currentMonth, 1).getDay();
             const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
             
-            // Add empty cells for days before month starts
             for (let i = 0; i < firstDay; i++) {
                 html += '<div class="calendar-day other-month"></div>';
             }
             
-            // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
                 const date = new Date(currentYear, currentMonth, day);
                 const dateStr = date.toISOString().split('T')[0];
                 const isToday = date.toDateString() === today.toDateString();
                 
-                // Get tasks for this day
                 const dayTasks = data.tasks.filter(t => {
                     return t.dueDate === dateStr || t.startDate === dateStr;
                 });
                 
-                html += `<div class="calendar-day ${isToday ? 'today' : ''} ${dayTasks.length > 0 ? 'has-event' : ''}">
+                html += `<div class="calendar-day ${isToday ? 'today' : ''} ${dayTasks.length > 0 ? 'has-event' : ''}" 
+                             onclick="showDayDetail('${dateStr}')" title="Click to view details">
                     <div style="font-weight: bold;">${day}</div>`;
                 
                 if (dayTasks.length > 0) {
@@ -2148,7 +2045,7 @@
                         html += `<div class="calendar-event" title="${task.name}">${task.name.substring(0, 10)}</div>`;
                     });
                     if (dayTasks.length > 2) {
-                        html += `<div style="font-size: 9px; color: var(--text-secondary);">+${dayTasks.length - 2} more</div>`;
+                        html += `<div style="font-size: 9px; color: ${isToday ? 'rgba(255,255,255,0.9)' : 'var(--text-secondary)'};">+${dayTasks.length - 2} more</div>`;
                     }
                 }
                 
@@ -2156,59 +2053,22 @@
             }
             
             html += '</div></div>';
-            
-            // Upcoming tasks
-            const upcomingTasks = data.tasks
-                .filter(t => t.dueDate && new Date(t.dueDate) >= today)
-                .sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate))
-                .slice(0, 10);
-            
-            if (upcomingTasks.length > 0) {
-                html += `
-                    <div style="background: var(--card-bg); border-radius: 10px; padding: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
-                        <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-color);">📋 Upcoming Tasks</h3>`;
-                
-                upcomingTasks.forEach(task => {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    const dueDate = new Date(task.dueDate);
-                    const daysUntil = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-                    
-                    html += `
-                        <div class="task-item">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 500; color: var(--text-color);">${task.name}</div>
-                                <div style="font-size: 10px; color: var(--text-secondary);">
-                                    ${project ? project.name : 'No Project'} • 
-                                    ${task.dueDate} • 
-                                    ${daysUntil === 0 ? 'Today' : daysUntil === 1 ? 'Tomorrow' : `In ${daysUntil} days`}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                html += '</div>';
-            }
-            
             container.innerHTML = html;
         }
-        
+
         function syncToiPhoneCalendar() {
-            // Generate iCalendar (.ics) file
             let icsContent = 'BEGIN:VCALENDAR\n';
             icsContent += 'VERSION:2.0\n';
             icsContent += 'PRODID:-//Builder Pro//REFIT Interior//EN\n';
             icsContent += 'CALSCALE:GREGORIAN\n';
             icsContent += 'METHOD:PUBLISH\n';
             
-            // Add tasks as events
             data.tasks.forEach(task => {
                 if (task.dueDate) {
                     const project = data.projects.find(p => p.id === task.projectId);
                     const startDate = task.startDate || task.dueDate;
                     const dueDate = task.dueDate;
                     
-                    // Convert dates to iCalendar format (YYYYMMDD)
                     const formatDate = (dateStr) => dateStr.replace(/-/g, '');
                     
                     icsContent += 'BEGIN:VEVENT\n';
@@ -2227,7 +2087,6 @@
             
             icsContent += 'END:VCALENDAR';
             
-            // Download the file
             const blob = new Blob([icsContent], { type: 'text/calendar' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -2238,87 +2097,68 @@
             
             showToast('📱 Calendar file created! Open it on your iPhone to sync.');
         }
-        
-        // Drag and Drop for Kanban
-        let draggedTaskId = null;
-        
-        function dragTask(event, taskId) {
-            draggedTaskId = taskId;
-        }
-        
-        function allowDrop(event) {
-            event.preventDefault();
-        }
-        
-        function dropTask(event, status) {
-            event.preventDefault();
-            const task = data.tasks.find(t => t.id === draggedTaskId);
-            if (task) {
-                if (status === 'Due') {
-                    // Don't allow manual move to Due column
-                    showToast('Tasks are automatically marked as Due based on date');
-                    return;
-                }
-                task.status = status;
-                saveData();
-                renderView();
-                showToast('Task moved');
-            }
-        }
-        
-        // Auto-sync functions
-        function initAutoSync() {
-            const savedAutoSync = localStorage.getItem('autoSyncEnabled');
-            if (savedAutoSync === 'true' && syncApiKey) {
-                autoSyncEnabled = true;
-                document.getElementById('autoSyncToggle').checked = true;
-                startAutoSync();
-                setTimeout(() => smartSync(), 1000);
-            }
-        }
-        
-        function toggleAutoSync() {
-            autoSyncEnabled = document.getElementById('autoSyncToggle').checked;
-            localStorage.setItem('autoSyncEnabled', autoSyncEnabled.toString());
+
+        function showDayDetail(dateStr) {
+            const date = new Date(dateStr);
+            const formattedDate = date.toLocaleDateString('en', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
             
-            if (autoSyncEnabled) {
-                startAutoSync();
-                showToast('Auto-sync enabled');
+            document.getElementById('dayDetailTitle').textContent = formattedDate;
+            
+            const dayTasks = data.tasks.filter(t => {
+                return t.dueDate === dateStr || t.startDate === dateStr;
+            });
+            
+            let html = '';
+            
+            if (dayTasks.length === 0) {
+                html = `
+                    <div class="empty-state" style="padding: 40px 20px;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📅</div>
+                        <p>No tasks scheduled for this day</p>
+                        <button class="btn btn-primary" style="margin-top: 15px;" onclick="closeModal('dayDetailModal'); showTaskModal();">
+                            + Add Task
+                        </button>
+                    </div>
+                `;
             } else {
-                stopAutoSync();
-                showToast('Auto-sync disabled');
-            }
-        }
-        
-        function startAutoSync() {
-            stopAutoSync();
-            if (syncApiKey && autoSyncEnabled) {
-                autoSyncInterval = setInterval(() => {
-                    smartSync();
-                }, 5 * 60 * 1000); // 5 minutes
-            }
-        }
-        
-        function stopAutoSync() {
-            if (autoSyncInterval) {
-                clearInterval(autoSyncInterval);
-                autoSyncInterval = null;
-            }
-        }
-        
-        function initializeLastSync() {
-            const lastSyncTime = localStorage.getItem('lastSyncTime');
-            if (lastSyncTime) {
-                const date = new Date(parseInt(lastSyncTime));
-                document.getElementById('lastSyncTime').textContent = date.toLocaleTimeString();
+                html += '<div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">';
+                html += `<h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Tasks for this day (${dayTasks.length})</h4></div>`;
+                
+                dayTasks.forEach(task => {
+                    const project = data.projects.find(p => p.id === task.projectId);
+                    const isCompleted = task.status === 'Completed';
+                    
+                    html += `
+                        <div class="task-item" style="margin-bottom: 8px; ${isCompleted ? 'opacity: 0.7;' : ''}">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500; color: var(--text-color); ${isCompleted ? 'text-decoration: line-through;' : ''}">${task.name}</div>
+                                <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">
+                                    📁 ${project ? project.name : 'No Project'} • 
+                                    ${task.priority} Priority • 
+                                    ${task.status}
+                                    ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
+                                </div>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                                <button class="icon-btn" onclick="closeModal('dayDetailModal'); editTask(${task.id});">✏️</button>
+                                ${!isCompleted ? `
+                                    <button class="icon-btn" style="background: var(--success);" onclick="completeTask(${task.id}); showDayDetail('${dateStr}');">✅</button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
             }
             
-            if (syncApiKey) {
-                document.getElementById('syncMode').textContent = 'Connected';
-            }
+            document.getElementById('dayDetailBody').innerHTML = html;
+            document.getElementById('dayDetailModal').classList.add('show');
         }
 
-        // Stats
         function updateStats() {
             document.getElementById('totalProjects').textContent = data.projects.length;
             document.getElementById('totalTasks').textContent = data.tasks.length;
@@ -2330,7 +2170,6 @@
             document.getElementById('totalExpenses').textContent = '$' + expenses.toFixed(0);
         }
 
-        // CRUD Operations
         function showProfileModal() {
             document.getElementById('profileName').value = data.currentUser;
             document.getElementById('profilePosition').value = data.userPosition;
@@ -2407,73 +2246,106 @@
             closeModal('projectModal');
         }
 
-        // Permanent Delete Functions with Double Confirmation
         function permanentDeleteProject(id) {
             const project = data.projects.find(p => p.id === id);
             if (!project) return;
             
-            const firstConfirm = confirm(`⚠️ First Confirmation:\n\nDelete project "${project.name}"?\n\nThis will also delete:\n• All associated tasks\n• All associated transactions\n\nThis action CANNOT be undone.`);
-            
-            if (firstConfirm) {
-                const secondConfirm = confirm(`⛔ FINAL WARNING:\n\nPermanently delete "${project.name}"?\n\nType OK to confirm PERMANENT DELETION.\n\nThis will be deleted from ALL devices after sync.`);
+            if (confirm(`⚠️ Permanently delete project "${project.name}"?\n\nThis will delete all associated tasks and transactions.\n\nThis action CANNOT be undone.`)) {
+                if (!data.permanentlyDeleted) data.permanentlyDeleted = [];
+                data.permanentlyDeleted.push({ 
+                    id, 
+                    type: 'project', 
+                    deletedAt: new Date().toISOString(),
+                    name: project.name 
+                });
                 
-                if (secondConfirm) {
-                    // Add to permanently deleted list
-                    if (!data.permanentlyDeleted) data.permanentlyDeleted = [];
-                    data.permanentlyDeleted.push({ 
-                        id, 
-                        type: 'project', 
-                        deletedAt: new Date().toISOString(),
-                        name: project.name 
-                    });
-                    
-                    // Remove project and all related data
-                    data.projects = data.projects.filter(p => p.id !== id);
-                    data.tasks = data.tasks.filter(t => t.projectId !== id);
-                    data.transactions = data.transactions.filter(t => t.projectId !== id);
-                    
-                    saveData();
-                    renderView();
-                    updateStats();
-                    showToast(`Project "${project.name}" permanently deleted`);
-                }
+                data.projects = data.projects.filter(p => p.id !== id);
+                data.tasks = data.tasks.filter(t => t.projectId !== id);
+                data.transactions = data.transactions.filter(t => t.projectId !== id);
+                
+                saveData();
+                renderView();
+                updateStats();
+                showToast(`Project "${project.name}" permanently deleted`);
             }
         }
-        
-        function permanentDeleteTask(id) {
-            const task = data.tasks.find(t => t.id === id);
-            if (!task) return;
-            
-            const firstConfirm = confirm(`⚠️ First Confirmation:\n\nDelete task "${task.name}"?\n\nThis action CANNOT be undone.`);
-            
-            if (firstConfirm) {
-                const secondConfirm = confirm(`⛔ FINAL WARNING:\n\nPermanently delete "${task.name}"?\n\nType OK to confirm PERMANENT DELETION.`);
-                
-                if (secondConfirm) {
-                    if (!data.permanentlyDeleted) data.permanentlyDeleted = [];
-                    data.permanentlyDeleted.push({ 
-                        id, 
-                        type: 'task', 
-                        deletedAt: new Date().toISOString(),
-                        name: task.name 
-                    });
-                    
-                    data.tasks = data.tasks.filter(t => t.id !== id);
-                    
-                    saveData();
-                    renderView();
-                    updateStats();
-                    showToast(`Task "${task.name}" permanently deleted`);
-                }
+
+        function toggleProjectLock(id) {
+            const project = data.projects.find(p => p.id === id);
+            if (project) {
+                project.locked = !project.locked;
+                saveData();
+                renderView();
+                showToast(project.locked ? 'Project locked' : 'Project unlocked');
             }
         }
-        
-        function deleteProject(id) {
-            permanentDeleteProject(id);
-        }
-        
-        function deleteTask(id) {
-            permanentDeleteTask(id);
+
+        function showProjectDetail(projectId) {
+            const project = data.projects.find(p => p.id === projectId);
+            if (!project) return;
+            
+            const tasks = data.tasks.filter(t => t.projectId === projectId);
+            const transactions = data.transactions.filter(t => t.projectId === projectId);
+            const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+            const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+            const profit = income - expenses;
+            
+            document.getElementById('projectDetailTitle').textContent = project.name + (project.locked ? ' 🔒' : '');
+            
+            let html = `
+                <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Project Info</h4>
+                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
+                        <div><strong>Client:</strong> ${project.client}</div>
+                        ${project.description ? `<div style="margin-top: 8px;"><strong>Description:</strong><br>${project.description}</div>` : ''}
+                    </div>
+                </div>
+                
+                <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
+                    <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">💰 Finance Summary</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Income</div>
+                            <div style="font-size: 16px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Expenses</div>
+                            <div style="font-size: 16px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
+                        </div>
+                        <div>
+                            <div style="font-size: 10px; color: var(--text-secondary);">Profit</div>
+                            <div style="font-size: 16px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">
+                                $${profit.toFixed(2)}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Tasks (${tasks.length})</h4>
+            `;
+            
+            if (tasks.length === 0) {
+                html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No tasks yet</p>';
+            } else {
+                tasks.forEach(task => {
+                    const isCompleted = task.status === 'Completed';
+                    html += `
+                        <div class="task-item ${isCompleted ? 'completed' : ''}" style="margin-bottom: 8px;">
+                            <div style="flex: 1;">
+                                <div style="font-weight: 500; color: var(--text-color);">${task.name}</div>
+                                <div style="font-size: 10px; color: var(--text-secondary);">
+                                    ${task.dueDate} • ${task.priority} • ${task.status}
+                                    ${task.assignee ? ` • ${task.assignee}` : ''}
+                                </div>
+                            </div>
+                            <button class="icon-btn" onclick="closeModal('projectDetailModal'); editTask(${task.id});">✏️</button>
+                        </div>
+                    `;
+                });
+            }
+            
+            document.getElementById('projectDetailBody').innerHTML = html;
+            document.getElementById('projectDetailModal').classList.add('show');
         }
 
         function showTaskModal() {
@@ -2556,6 +2428,17 @@
             closeModal('taskModal');
         }
 
+        function completeTask(id) {
+            const task = data.tasks.find(t => t.id === id);
+            if (task) {
+                task.status = 'Completed';
+                task.completedAt = new Date().toISOString();
+                saveData();
+                renderView();
+                showToast('✅ Task completed');
+            }
+        }
+
         function showTransactionModal(type) {
             editingId = null;
             editingType = 'transaction';
@@ -2614,19 +2497,56 @@
             closeModal('transactionModal');
         }
 
-        // Task completion function
-        function completeTask(id) {
-            const task = data.tasks.find(t => t.id === id);
-            if (task) {
-                task.status = 'Completed';
-                task.completedAt = new Date().toISOString();
-                saveData();
-                renderView();
-                showToast('✅ Task completed');
+        function initAutoSync() {
+            const savedAutoSync = localStorage.getItem('autoSyncEnabled');
+            if (savedAutoSync === 'true' && syncApiKey) {
+                autoSyncEnabled = true;
+                document.getElementById('autoSyncToggle').checked = true;
+                startAutoSync();
             }
         }
-        
-        // Smart Sync with Permanent Deletion Support
+
+        function toggleAutoSync() {
+            autoSyncEnabled = document.getElementById('autoSyncToggle').checked;
+            localStorage.setItem('autoSyncEnabled', autoSyncEnabled.toString());
+            
+            if (autoSyncEnabled) {
+                startAutoSync();
+                showToast('Auto-sync enabled');
+            } else {
+                stopAutoSync();
+                showToast('Auto-sync disabled');
+            }
+        }
+
+        function startAutoSync() {
+            stopAutoSync();
+            if (syncApiKey && autoSyncEnabled) {
+                autoSyncInterval = setInterval(() => {
+                    smartSync();
+                }, 5 * 60 * 1000);
+            }
+        }
+
+        function stopAutoSync() {
+            if (autoSyncInterval) {
+                clearInterval(autoSyncInterval);
+                autoSyncInterval = null;
+            }
+        }
+
+        function initializeLastSync() {
+            const lastSyncTime = localStorage.getItem('lastSyncTime');
+            if (lastSyncTime) {
+                const date = new Date(parseInt(lastSyncTime));
+                document.getElementById('lastSyncTime').textContent = date.toLocaleTimeString();
+            }
+            
+            if (syncApiKey) {
+                document.getElementById('syncMode').textContent = 'Connected';
+            }
+        }
+
         async function smartSync() {
             if (!syncApiKey) {
                 showToast('Please set up API key first');
@@ -2640,186 +2560,31 @@
             syncMode.textContent = 'Syncing...';
             
             try {
-                // First, test the API key validity
-                const testResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: { 
-                        'X-Master-Key': syncApiKey,
-                        'X-Bin-Meta': 'false',
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                if (testResponse.status === 401) {
-                    showToast('Invalid API key - please check and try again');
-                    indicator.classList.remove('syncing');
-                    syncMode.textContent = 'Invalid Key';
-                    return;
-                }
-                
-                if (testResponse.status === 404) {
-                    showToast('Bin not found - creating new bin...');
-                    // Create initial data structure
-                    const initialData = {
-                        projects: data.projects || [],
-                        tasks: data.tasks || [],
-                        transactions: data.transactions || [],
-                        permanentlyDeleted: data.permanentlyDeleted || [],
-                        currentUser: data.currentUser,
-                        userPosition: data.userPosition,
-                        themeColor: data.themeColor,
-                        fontSize: data.fontSize,
-                        contrast: data.contrast,
-                        nightMode: data.nightMode,
-                        timelineFilter: data.timelineFilter,
-                        scheduleView: data.scheduleView,
-                        calendarEvents: data.calendarEvents || [],
-                        lastUpdated: new Date().toISOString(),
-                        lastUpdateDevice: APP_CONFIG.deviceType
-                    };
-                    
-                    // Try to create/update the bin
-                    const createResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
-                        method: 'PUT',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-Master-Key': syncApiKey,
-                            'X-Bin-Versioning': 'false'
-                        },
-                        body: JSON.stringify(initialData)
-                    });
-                    
-                    if (createResponse.ok) {
-                        showToast('Initial sync successful!');
-                        localStorage.setItem('lastSyncTime', Date.now().toString());
-                        document.getElementById('lastSyncTime').textContent = new Date().toLocaleTimeString();
-                    }
-                    
-                    indicator.classList.remove('syncing');
-                    syncMode.textContent = 'Connected';
-                    return;
-                }
-                
-                // Pull from cloud
-                const pullResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: { 
-                        'X-Master-Key': syncApiKey,
-                        'X-Bin-Meta': 'false',
-                        'Content-Type': 'application/json'
-                    }
-                });
-                
-                let cloudData = {};
-                if (pullResponse.ok) {
-                    const result = await pullResponse.json();
-                    cloudData = result.record || result || {};
-                    console.log('Cloud data retrieved:', cloudData);
-                }
-                
-                // Merge permanent deletions first
-                const allPermanentlyDeleted = [
-                    ...(cloudData.permanentlyDeleted || []),
-                    ...(data.permanentlyDeleted || [])
-                ];
-                
-                // Get unique permanently deleted items
-                const permanentlyDeletedIds = new Set(allPermanentlyDeleted.map(d => d.id));
-                
-                // Merge data excluding permanently deleted items
-                const mergedData = {
-                    projects: mergeArrays(cloudData.projects || [], data.projects, 'id')
-                        .filter(p => !permanentlyDeletedIds.has(p.id)),
-                    tasks: mergeArrays(cloudData.tasks || [], data.tasks, 'id')
-                        .filter(t => !permanentlyDeletedIds.has(t.id)),
-                    transactions: mergeArrays(cloudData.transactions || [], data.transactions, 'id')
-                        .filter(t => !permanentlyDeletedIds.has(t.id)),
-                    permanentlyDeleted: allPermanentlyDeleted,
-                    currentUser: data.currentUser,
-                    userPosition: data.userPosition,
-                    themeColor: data.themeColor,
-                    fontSize: data.fontSize,
-                    contrast: data.contrast,
-                    nightMode: data.nightMode,
-                    timelineFilter: data.timelineFilter,
-                    scheduleView: data.scheduleView,
-                    calendarEvents: mergeArrays(cloudData.calendarEvents || [], data.calendarEvents || [], 'id'),
-                    lastUpdated: new Date().toISOString(),
-                    lastUpdateDevice: APP_CONFIG.deviceType
-                };
-                
-                // Push merged data back to cloud
-                const pushResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
+                const response = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'PUT',
-                    mode: 'cors',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Master-Key': syncApiKey,
-                        'X-Bin-Versioning': 'false'
+                        'X-Master-Key': syncApiKey
                     },
-                    body: JSON.stringify(mergedData)
+                    body: JSON.stringify(data)
                 });
                 
-                if (pushResponse.ok) {
-                    // Update local data
-                    data = mergedData;
-                    saveData();
-                    renderView();
-                    updateStats();
-                    applySettings();
-                    
+                if (response.ok) {
                     localStorage.setItem('lastSyncTime', Date.now().toString());
                     document.getElementById('lastSyncTime').textContent = new Date().toLocaleTimeString();
-                    
-                    showToast('Smart sync complete!');
+                    showToast('Sync complete!');
                     indicator.classList.remove('syncing');
                     syncMode.textContent = 'Connected';
                 } else {
-                    const errorText = await pushResponse.text();
-                    console.error('Push failed:', pushResponse.status, errorText);
-                    showToast(`Sync failed - ${pushResponse.status}`);
+                    showToast(`Sync failed - ${response.status}`);
                     indicator.classList.remove('syncing');
                     syncMode.textContent = 'Error';
                 }
             } catch (error) {
-                console.error('Sync error details:', error);
-                
-                // More specific error messages
-                if (error.message.includes('Failed to fetch')) {
-                    showToast('Network error - check internet connection');
-                } else if (error.message.includes('CORS')) {
-                    showToast('CORS error - try opening in a new tab');
-                } else {
-                    showToast(`Sync error: ${error.message}`);
-                }
-                
+                showToast('Sync error - check connection');
                 indicator.classList.remove('syncing');
                 syncMode.textContent = 'Offline';
             }
-        }
-        
-        function mergeArrays(cloudArray, localArray, key) {
-            const merged = [...cloudArray];
-            const cloudIds = new Set(cloudArray.map(item => item[key]));
-            
-            localArray.forEach(localItem => {
-                const existingIndex = merged.findIndex(item => item[key] === localItem[key]);
-                if (existingIndex >= 0) {
-                    // Update existing item if local is newer
-                    const cloudItem = merged[existingIndex];
-                    if (localItem.lastModified > cloudItem.lastModified || 
-                        localItem.completedAt > cloudItem.completedAt ||
-                        !cloudItem.lastModified) {
-                        merged[existingIndex] = localItem;
-                    }
-                } else {
-                    merged.push(localItem);
-                }
-            });
-            
-            return merged;
         }
 
         function saveApiKey() {
@@ -2829,47 +2594,13 @@
                 return;
             }
             
-            // Test the API key immediately
             syncApiKey = key;
             localStorage.setItem('builderProSyncApiKey', key);
             document.getElementById('apiKeyInput').value = '';
-            document.getElementById('syncMode').textContent = 'Testing...';
-            
-            // Test connection with the new key
-            testConnection(key);
-        }
-        
-        async function testConnection(apiKey) {
-            try {
-                const response = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
-                    method: 'GET',
-                    headers: { 
-                        'X-Master-Key': apiKey,
-                        'X-Bin-Meta': 'false'
-                    }
-                });
-                
-                if (response.status === 401) {
-                    showToast('Invalid API key - please check and try again');
-                    document.getElementById('syncMode').textContent = 'Invalid Key';
-                } else if (response.status === 404) {
-                    showToast('API key valid! Bin will be created on first sync');
-                    document.getElementById('syncMode').textContent = 'Ready';
-                } else if (response.ok) {
-                    showToast('API key saved - Connected to existing data!');
-                    document.getElementById('syncMode').textContent = 'Connected';
-                } else {
-                    showToast(`Connection test failed: ${response.status}`);
-                    document.getElementById('syncMode').textContent = 'Error';
-                }
-            } catch (error) {
-                console.error('Connection test error:', error);
-                showToast('Connection test failed - check console for details');
-                document.getElementById('syncMode').textContent = 'Offline';
-            }
+            document.getElementById('syncMode').textContent = 'Connected';
+            showToast('API key saved!');
         }
 
-        // Export/Import
         function exportData() {
             const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
