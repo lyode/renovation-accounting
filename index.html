@@ -1340,6 +1340,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
+            initializeProjects();
             initUI();
             updateStats();
             renderView();
@@ -1351,13 +1352,45 @@
             }
             
             document.getElementById('deviceType').textContent = APP_CONFIG.deviceType;
-            
-            if (data.projects.length === 0 && data.tasks.length === 0) {
-                setTimeout(() => {
-                    showToast('👋 Welcome to Builder Pro! Press + to get started');
-                }, 1000);
-            }
         });
+
+        function initializeProjects() {
+            // Only initialize if there are no projects yet
+            if (data.projects.length === 0) {
+                const projectNames = [
+                    { name: 'william. mock up 1', client: 'William' },
+                    { name: 'fnn ice cream booth', client: 'FNN' },
+                    { name: 'Fnn meeting room 1-refreshment', client: 'FNN' },
+                    { name: 'Fnn add on ac diffuser', client: 'FNN' },
+                    { name: 'Ms Ng- tmn midah. KL', client: 'Ms Ng' },
+                    { name: 'Fnn ceo blind', client: 'FNN' },
+                    { name: 'Fnn. Relocate ac thermostat', client: 'FNN' },
+                    { name: 'Ss3 winsum', client: 'Winsum' },
+                    { name: 'Usj 11. Nicky', client: 'Nicky' },
+                    { name: 'Dsara damai. James house', client: 'James' },
+                    { name: 'William MockUp 2', client: 'William' },
+                    { name: 'liam. PRODUCTION 50 crackle set', client: 'Liam' },
+                    { name: 'Elaine BU11/14', client: 'Elaine' },
+                    { name: "Adrian Home. - D'Clover Residences", client: 'Adrian' },
+                    { name: 'Wong n Carol no 37, ss3', client: 'Wong & Carol' }
+                ];
+                
+                projectNames.forEach((proj, index) => {
+                    data.projects.push({
+                        id: Date.now() + index,
+                        name: proj.name,
+                        client: proj.client,
+                        startDate: '',
+                        endDate: '',
+                        description: '',
+                        locked: false
+                    });
+                });
+                
+                saveData();
+                showToast('✨ 15 projects initialized!');
+            }
+        }
 
         function loadData() {
             const saved = localStorage.getItem('builderProData');
