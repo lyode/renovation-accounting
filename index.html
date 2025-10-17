@@ -2376,7 +2376,353 @@
             }
             
             html += '</div></div>';
+            
+            // Add Smart Analytics below calendar
+            html += renderCalendarAnalytics();
+            
             container.innerHTML = html;
+        }
+
+        function renderCalendarAnalytics() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const analytics = analyzeSchedule();
+            
+            let html = `
+                <div style="margin-top: 20px;">
+                    <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--text-color);">🧠 Smart Schedule Analytics</h3>
+                    
+                    <!-- Available Time -->
+                    <div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 24px;">📅</span>
+                            <h4 style="font-size: 14px; margin: 0; color: var(--text-color);">Available Time (Next 30 Days)</h4>
+                        </div>
+                        ${renderAvailableDates(analytics.availableDates)}
+                    </div>
+                    
+                    <!-- Overwhelming Dates -->
+                    <div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 24px;">🔥</span>
+                            <h4 style="font-size: 14px; margin: 0; color: var(--text-color);">Overwhelming Dates (Multiple Projects Overlapping)</h4>
+                        </div>
+                        ${renderOverwhelmingDates(analytics.overwhelmingDates)}
+                    </div>
+                    
+                    <!-- Suggested Breaks -->
+                    <div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 24px;">🏖️</span>
+                            <h4 style="font-size: 14px; margin: 0; color: var(--text-color);">Suggested Break Days</h4>
+                        </div>
+                        ${renderSuggestedBreaks(analytics.suggestedBreaks)}
+                    </div>
+                    
+                    <!-- Fun Insights -->
+                    <div style="background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color); color: white;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                            <span style="font-size: 24px;">🎉</span>
+                            <h4 style="font-size: 14px; margin: 0;">Fun Stats & Insights</h4>
+                        </div>
+                        ${renderFunInsights(analytics)}
+                    </div>
+                </div>
+            `;
+            
+            return html;
+        }
+
+        function analyzeSchedule() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            const next30Days = new Date(today);
+            next30Days.setDate(today.getDate() + 30);
+            
+            const next90Days = new Date(today);
+            next90Days.setDate(today.getDate() + 90);
+            
+            // Analyze each day
+            const dailyLoad = {};
+            const availableDates = [];
+            const overwhelmingDates = [];
+            
+            // Get active projects
+            const activeProjects = data.projects.filter(p => {
+                if (!p.startDate || !p.endDate) return false;
+                const start = new Date(p.startDate);
+                const end = new Date(p.endDate);
+                return end >= today;
+            });
+            
+            // Analyze next 90 days
+            for (let d = new Date(today); d <= next90Days; d.setDate(d.getDate() + 1)) {
+                const dateStr = d.toISOString().split('T')[0];
+                const currentDate = new Date(d);
+                
+                // Count overlapping projects
+                const overlappingProjects = activeProjects.filter(p => {
+                    const start = new Date(p.startDate);
+                    const end = new Date(p.endDate);
+                    return currentDate >= start && currentDate <= end;
+                });
+                
+                // Count tasks due
+                const tasksDue = data.tasks.filter(t => t.dueDate === dateStr && t.status !== 'Completed');
+                
+                const load = {
+                    date: new Date(currentDate),
+                    dateStr: dateStr,
+                    projects: overlappingProjects.length,
+                    tasks: tasksDue.length,
+                    totalLoad: overlappingProjects.length + tasksDue.length,
+                    projectNames: overlappingProjects.map(p => p.name)
+                };
+                
+                dailyLoad[dateStr] = load;
+                
+                // Available dates (within next 30 days, no projects, no tasks)
+                if (currentDate <= next30Days && load.totalLoad === 0) {
+                    availableDates.push(load);
+                }
+                
+                // Overwhelming dates (3+ projects overlapping)
+                if (load.projects >= 3) {
+                    overwhelmingDates.push(load);
+                }
+            }
+            
+            // Suggest breaks (find consecutive available dates)
+            const suggestedBreaks = findBreakPeriods(availableDates, dailyLoad);
+            
+            return {
+                availableDates: availableDates.slice(0, 10),
+                overwhelmingDates: overwhelmingDates.slice(0, 10),
+                suggestedBreaks: suggestedBreaks,
+                dailyLoad: dailyLoad,
+                stats: {
+                    totalProjects: activeProjects.length,
+                    avgDailyLoad: Object.values(dailyLoad).reduce((sum, d) => sum + d.totalLoad, 0) / Object.keys(dailyLoad).length,
+                    busiestDay: Object.values(dailyLoad).sort((a, b) => b.totalLoad - a.totalLoad)[0],
+                    quietestDay: Object.values(dailyLoad).filter(d => d.totalLoad > 0).sort((a, b) => a.totalLoad - b.totalLoad)[0]
+                }
+            };
+        }
+
+        function findBreakPeriods(availableDates, dailyLoad) {
+            const breaks = [];
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            // Find periods of 2-3 consecutive available days
+            for (let i = 0; i < availableDates.length - 1; i++) {
+                const current = availableDates[i];
+                const next = availableDates[i + 1];
+                
+                const dayDiff = Math.ceil((next.date - current.date) / (1000 * 60 * 60 * 24));
+                
+                if (dayDiff === 1) {
+                    // Consecutive days found
+                    const breakStart = new Date(current.date);
+                    let breakEnd = new Date(next.date);
+                    let consecutiveDays = 2;
+                    
+                    // Check if more consecutive days
+                    for (let j = i + 2; j < availableDates.length; j++) {
+                        const nextDay = availableDates[j];
+                        const nextDiff = Math.ceil((nextDay.date - breakEnd) / (1000 * 60 * 60 * 24));
+                        if (nextDiff === 1) {
+                            breakEnd = new Date(nextDay.date);
+                            consecutiveDays++;
+                            if (consecutiveDays >= 3) break; // Max 3 days
+                        } else {
+                            break;
+                        }
+                    }
+                    
+                    if (consecutiveDays >= 2 && breakStart > today) {
+                        breaks.push({
+                            start: breakStart,
+                            end: breakEnd,
+                            days: consecutiveDays,
+                            activities: generateActivitySuggestions(breakStart, consecutiveDays)
+                        });
+                        
+                        if (breaks.length >= 3) break; // Only suggest 3 break periods
+                    }
+                }
+            }
+            
+            return breaks;
+        }
+
+        function generateActivitySuggestions(date, days) {
+            const activities = [
+                {
+                    type: 'Beach Getaway 🏖️',
+                    locations: ['Langkawi', 'Penang', 'Port Dickson'],
+                    description: 'Relax by the sea, enjoy water sports, and fresh seafood'
+                },
+                {
+                    type: 'Mountain Retreat 🏔️',
+                    locations: ['Cameron Highlands', 'Genting Highlands', 'Fraser\'s Hill'],
+                    description: 'Cool weather, tea plantations, and hiking trails'
+                },
+                {
+                    type: 'City Exploration 🏙️',
+                    locations: ['Georgetown Penang', 'Melaka', 'Ipoh'],
+                    description: 'Heritage sites, street food, and cultural experiences'
+                },
+                {
+                    type: 'Nature Adventure 🌲',
+                    locations: ['Taman Negara', 'Kinabalu Park', 'Endau-Rompin'],
+                    description: 'Jungle trekking, wildlife spotting, and camping'
+                },
+                {
+                    type: 'Spa & Wellness 🧘',
+                    locations: ['The Banjaran Ipoh', 'Gaya Island Resort', 'Pangkor Laut'],
+                    description: 'Massage, yoga, meditation, and healthy dining'
+                },
+                {
+                    type: 'Food Paradise 🍜',
+                    locations: ['Jalan Alor KL', 'Gurney Drive Penang', 'Jonker Street Melaka'],
+                    description: 'Street food tours, local delicacies, and night markets'
+                },
+                {
+                    type: 'Shopping Spree 🛍️',
+                    locations: ['Pavilion KL', 'Mid Valley', 'Johor Premium Outlets'],
+                    description: 'Retail therapy, luxury brands, and great deals'
+                },
+                {
+                    type: 'Theme Park Fun 🎢',
+                    locations: ['Sunway Lagoon', 'Legoland Johor', 'Lost World Tambun'],
+                    description: 'Roller coasters, water slides, and family fun'
+                }
+            ];
+            
+            // Randomly select 3 activities
+            const shuffled = activities.sort(() => 0.5 - Math.random());
+            return shuffled.slice(0, 3);
+        }
+
+        function renderAvailableDates(dates) {
+            if (dates.length === 0) {
+                return '<p style="font-size: 12px; color: var(--text-secondary); text-align: center;">No completely free days in the next 30 days. You\'re fully booked! 💪</p>';
+            }
+            
+            let html = '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
+            dates.forEach(day => {
+                const dayName = day.date.toLocaleDateString('en', { weekday: 'short' });
+                const dateStr = day.date.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                html += `
+                    <div style="padding: 8px 12px; background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white; border-radius: 6px; font-size: 11px; text-align: center;">
+                        <div style="font-weight: bold;">${dayName}</div>
+                        <div style="font-size: 10px; opacity: 0.9;">${dateStr}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function renderOverwhelmingDates(dates) {
+            if (dates.length === 0) {
+                return '<p style="font-size: 12px; color: var(--text-secondary); text-align: center;">No overwhelming dates detected. Your workload looks manageable! 👍</p>';
+            }
+            
+            let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
+            dates.forEach(day => {
+                const dateStr = day.date.toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' });
+                html += `
+                    <div style="padding: 10px; background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); color: white; border-radius: 6px;">
+                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">⚠️ ${dateStr}</div>
+                        <div style="font-size: 11px; opacity: 0.9;">${day.projects} projects overlapping${day.tasks > 0 ? ` + ${day.tasks} tasks due` : ''}</div>
+                        <div style="font-size: 10px; margin-top: 5px; opacity: 0.8;">Projects: ${day.projectNames.join(', ')}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function renderSuggestedBreaks(breaks) {
+            if (breaks.length === 0) {
+                return '<p style="font-size: 12px; color: var(--text-secondary); text-align: center;">No consecutive free days found. Consider scheduling some downtime! 🙏</p>';
+            }
+            
+            let html = '<div style="display: flex; flex-direction: column; gap: 15px;">';
+            breaks.forEach((breakPeriod, index) => {
+                const startStr = breakPeriod.start.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                const endStr = breakPeriod.end.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+                
+                html += `
+                    <div style="padding: 12px; background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); color: white; border-radius: 8px;">
+                        <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">
+                            🏖️ Break Period ${index + 1}: ${startStr} - ${endStr} (${breakPeriod.days} days)
+                        </div>
+                        <div style="font-size: 11px; margin-bottom: 10px; opacity: 0.9;">
+                            Perfect time for a short getaway! Here are some suggestions:
+                        </div>
+                        ${breakPeriod.activities.map((activity, i) => `
+                            <div style="padding: 8px; background: rgba(255,255,255,0.2); border-radius: 6px; margin-bottom: ${i < breakPeriod.activities.length - 1 ? '8px' : '0'};">
+                                <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">${activity.type}</div>
+                                <div style="font-size: 10px; margin-bottom: 4px;">📍 ${activity.locations.join(' • ')}</div>
+                                <div style="font-size: 10px; opacity: 0.8;">${activity.description}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            });
+            html += '</div>';
+            return html;
+        }
+
+        function renderFunInsights(analytics) {
+            const stats = analytics.stats;
+            const motivationalQuotes = [
+                '"Success is the sum of small efforts repeated day in and day out." - Robert Collier',
+                '"The key is not to prioritize your schedule, but to schedule your priorities." - Stephen Covey',
+                '"Time is what we want most, but what we use worst." - William Penn',
+                '"Don\'t watch the clock; do what it does. Keep going." - Sam Levenson',
+                '"The bad news is time flies. The good news is you\'re the pilot." - Michael Altshuler'
+            ];
+            
+            const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
+            
+            let html = `
+                <div style="font-size: 12px; line-height: 1.6;">
+                    <div style="margin-bottom: 10px;">
+                        <strong>📊 Your Work Stats:</strong><br>
+                        • Active Projects: ${stats.totalProjects}<br>
+                        • Average Daily Load: ${stats.avgDailyLoad.toFixed(1)} projects/tasks per day<br>
+                        ${stats.busiestDay ? `• Busiest Day: ${stats.busiestDay.date.toLocaleDateString('en', { month: 'short', day: 'numeric' })} (${stats.busiestDay.totalLoad} items)<br>` : ''}
+                        ${stats.quietestDay ? `• Quietest Work Day: ${stats.quietestDay.date.toLocaleDateString('en', { month: 'short', day: 'numeric' })} (${stats.quietestDay.totalLoad} items)` : ''}
+                    </div>
+                    
+                    <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 6px;">
+                        <strong>💪 Productivity Tip:</strong><br>
+                        ${getProductivityTip(stats)}
+                    </div>
+                    
+                    <div style="padding: 10px; background: rgba(255,255,255,0.2); border-radius: 6px; font-style: italic; font-size: 11px;">
+                        ${randomQuote}
+                    </div>
+                </div>
+            `;
+            
+            return html;
+        }
+
+        function getProductivityTip(stats) {
+            if (stats.avgDailyLoad > 5) {
+                return 'Your schedule is quite packed! Consider delegating some tasks or extending project timelines to avoid burnout.';
+            } else if (stats.avgDailyLoad < 2) {
+                return 'You have capacity for more projects! This is a great time to take on new opportunities or focus on business growth.';
+            } else {
+                return 'Your workload looks balanced! Keep up the great time management. Remember to schedule regular breaks.';
+            }
         }
 
         function syncToiPhoneCalendar() {
