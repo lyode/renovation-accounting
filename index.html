@@ -1264,8 +1264,12 @@
                 <span style="font-size: 24px; color: var(--text-secondary); cursor: pointer;" onclick="closeModal('projectDetailModal')">×</span>
             </div>
             <div id="projectDetailBody" style="padding: 15px; max-height: 60vh; overflow-y: auto;"></div>
-            <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
-                <button class="btn btn-secondary" onclick="closeModal('projectDetailModal')">Close</button>
+            <div style="padding: 12px 15px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; gap: 8px;">
+                <button class="btn btn-danger" onclick="deleteProjectFromModal()">🗑️ Delete Project</button>
+                <div style="display: flex; gap: 8px;">
+                    <button class="btn btn-secondary" onclick="closeModal('projectDetailModal')">Close</button>
+                    <button class="btn btn-primary" onclick="editProjectFromModal()">✏️ Edit Project</button>
+                </div>
             </div>
         </div>
     </div>
@@ -2222,7 +2226,8 @@
                 startDate: document.getElementById('projectStart').value,
                 endDate: document.getElementById('projectEnd').value,
                 description: document.getElementById('projectDescription').value.trim(),
-                locked: document.getElementById('projectLocked').checked
+                locked: document.getElementById('projectLocked').checked,
+                lastModified: new Date().toISOString()
             };
             
             if (!projectData.name || !projectData.client) {
@@ -2236,6 +2241,7 @@
                 showToast('Project updated');
             } else {
                 projectData.id = Date.now();
+                projectData.createdAt = new Date().toISOString();
                 data.projects.push(projectData);
                 showToast('Project created');
             }
@@ -2270,17 +2276,8 @@
             }
         }
 
-        function toggleProjectLock(id) {
-            const project = data.projects.find(p => p.id === id);
-            if (project) {
-                project.locked = !project.locked;
-                saveData();
-                renderView();
-                showToast(project.locked ? 'Project locked' : 'Project unlocked');
-            }
-        }
-
         function showProjectDetail(projectId) {
+            currentProjectDetailId = projectId;
             const project = data.projects.find(p => p.id === projectId);
             if (!project) return;
             
@@ -2404,7 +2401,8 @@
                 startDate: document.getElementById('taskStart').value,
                 dueDate: document.getElementById('taskDue').value,
                 assignee: document.getElementById('taskAssignee').value.trim(),
-                description: document.getElementById('taskDescription').value.trim()
+                description: document.getElementById('taskDescription').value.trim(),
+                lastModified: new Date().toISOString()
             };
             
             if (!taskData.name || !taskData.projectId || !taskData.dueDate) {
@@ -2418,6 +2416,7 @@
                 showToast('Task updated');
             } else {
                 taskData.id = Date.now();
+                taskData.createdAt = new Date().toISOString();
                 data.tasks.push(taskData);
                 showToast('Task created');
             }
@@ -2433,6 +2432,7 @@
             if (task) {
                 task.status = 'Completed';
                 task.completedAt = new Date().toISOString();
+                task.lastModified = new Date().toISOString();
                 saveData();
                 renderView();
                 showToast('✅ Task completed');
@@ -2479,7 +2479,8 @@
                 category: document.getElementById('transCategory').value,
                 amount: parseFloat(document.getElementById('transAmount').value),
                 date: document.getElementById('transDate').value,
-                description: document.getElementById('transDescription').value.trim()
+                description: document.getElementById('transDescription').value.trim(),
+                lastModified: new Date().toISOString()
             };
             
             if (!transData.projectId || !transData.category || !transData.amount || isNaN(transData.amount)) {
@@ -2487,9 +2488,16 @@
                 return;
             }
             
-            transData.id = Date.now();
-            data.transactions.push(transData);
-            showToast('Transaction added');
+            if (editingId) {
+                const index = data.transactions.findIndex(t => t.id === editingId);
+                data.transactions[index] = { ...data.transactions[index], ...transData };
+                showToast('Transaction updated');
+            } else {
+                transData.id = Date.now();
+                transData.createdAt = new Date().toISOString();
+                data.transactions.push(transData);
+                showToast('Transaction added');
+            }
             
             saveData();
             renderView();
@@ -2582,25 +2590,8 @@
                     console.log('📥 Pulled from cloud:', cloudData);
                 }
                 
-                // STEP 2: MERGE cloud data with local data
-                const mergedData = {
-                    projects: mergeArraysByKey(cloudData.projects || [], data.projects || [], 'id'),
-                    tasks: mergeArraysByKey(cloudData.tasks || [], data.tasks || [], 'id'),
-                    transactions: mergeArraysByKey(cloudData.transactions || [], data.transactions || [], 'id'),
-                    permanentlyDeleted: [...new Set([...(cloudData.permanentlyDeleted || []), ...(data.permanentlyDeleted || [])])],
-                    currentUser: data.currentUser,
-                    userPosition: data.userPosition,
-                    themeColor: data.themeColor,
-                    fontSize: data.fontSize,
-                    contrast: data.contrast,
-                    saturation: data.saturation,
-                    nightMode: data.nightMode,
-                    timelineFilter: data.timelineFilter,
-                    scheduleView: data.scheduleView,
-                    calendarEvents: mergeArraysByKey(cloudData.calendarEvents || [], data.calendarEvents || [], 'id'),
-                    lastUpdated: new Date().toISOString(),
-                    lastUpdateDevice: APP_CONFIG.deviceType
-                };
+                // STEP 2: MERGE with intelligent timestamp-based resolution
+                const mergedData = intelligentMerge(cloudData, data);
                 
                 console.log('🔄 Merged data:', mergedData);
                 
@@ -2643,38 +2634,145 @@
             }
         }
         
-        // Helper function to merge two arrays by unique key
-        function mergeArraysByKey(cloudArray, localArray, key) {
-            const merged = {};
+        // INTELLIGENT MERGE: Handles all scenarios with timestamp-based resolution
+        function intelligentMerge(cloudData, localData) {
+            // Combine all deletion records with timestamps
+            const allDeletions = {};
             
-            // Add all cloud items
-            cloudArray.forEach(item => {
-                merged[item[key]] = item;
+            // Process cloud deletions
+            (cloudData.permanentlyDeleted || []).forEach(del => {
+                const key = `${del.type}_${del.id}`;
+                allDeletions[key] = {
+                    id: del.id,
+                    type: del.type,
+                    deletedAt: del.deletedAt,
+                    name: del.name
+                };
             });
             
-            // Add/update with local items
-            localArray.forEach(item => {
-                if (!merged[item[key]]) {
-                    // New item from local
-                    merged[item[key]] = item;
-                } else {
-                    // Item exists in both - keep the one with latest modification
-                    const cloudItem = merged[item[key]];
-                    const localItem = item;
-                    
-                    // Compare timestamps if available
-                    const cloudTime = cloudItem.lastModified || cloudItem.completedAt || cloudItem.lastUpdated || 0;
-                    const localTime = localItem.lastModified || localItem.completedAt || localItem.lastUpdated || 0;
-                    
-                    if (localTime > cloudTime) {
-                        merged[item[key]] = localItem;
-                    }
-                    // Otherwise keep cloud version
+            // Process local deletions (keep newest)
+            (localData.permanentlyDeleted || []).forEach(del => {
+                const key = `${del.type}_${del.id}`;
+                if (!allDeletions[key] || new Date(del.deletedAt) > new Date(allDeletions[key].deletedAt)) {
+                    allDeletions[key] = {
+                        id: del.id,
+                        type: del.type,
+                        deletedAt: del.deletedAt,
+                        name: del.name
+                    };
                 }
             });
             
-            // Convert back to array
+            const deletedIds = {
+                project: new Set(),
+                task: new Set(),
+                transaction: new Set()
+            };
+            
+            Object.values(allDeletions).forEach(del => {
+                if (deletedIds[del.type]) {
+                    deletedIds[del.type].add(del.id);
+                }
+            });
+            
+            // Merge each data type with timestamp checking and deletion filtering
+            const mergedProjects = mergeWithTimestamp(
+                cloudData.projects || [], 
+                localData.projects || [], 
+                'id',
+                deletedIds.project
+            );
+            
+            const mergedTasks = mergeWithTimestamp(
+                cloudData.tasks || [], 
+                localData.tasks || [], 
+                'id',
+                deletedIds.task
+            );
+            
+            const mergedTransactions = mergeWithTimestamp(
+                cloudData.transactions || [], 
+                localData.transactions || [], 
+                'id',
+                deletedIds.transaction
+            );
+            
+            return {
+                projects: mergedProjects,
+                tasks: mergedTasks,
+                transactions: mergedTransactions,
+                permanentlyDeleted: Object.values(allDeletions),
+                currentUser: localData.currentUser,
+                userPosition: localData.userPosition,
+                themeColor: localData.themeColor,
+                fontSize: localData.fontSize,
+                contrast: localData.contrast,
+                saturation: localData.saturation,
+                nightMode: localData.nightMode,
+                timelineFilter: localData.timelineFilter,
+                scheduleView: localData.scheduleView,
+                calendarEvents: mergeWithTimestamp(cloudData.calendarEvents || [], localData.calendarEvents || [], 'id', new Set()),
+                lastUpdated: new Date().toISOString(),
+                lastUpdateDevice: APP_CONFIG.deviceType
+            };
+        }
+        
+        // MERGE WITH TIMESTAMP: Keeps latest version based on timestamp
+        function mergeWithTimestamp(cloudArray, localArray, key, deletedIds) {
+            const merged = {};
+            
+            // Add all cloud items (if not deleted)
+            cloudArray.forEach(item => {
+                if (!deletedIds.has(item[key])) {
+                    merged[item[key]] = { ...item };
+                }
+            });
+            
+            // Process local items
+            localArray.forEach(item => {
+                const itemId = item[key];
+                
+                // Skip if deleted
+                if (deletedIds.has(itemId)) {
+                    return;
+                }
+                
+                if (!merged[itemId]) {
+                    // New item only in local
+                    merged[itemId] = { ...item };
+                } else {
+                    // Item exists in both - compare timestamps
+                    const cloudItem = merged[itemId];
+                    const localItem = item;
+                    
+                    // Get all possible timestamp fields
+                    const cloudTime = getLatestTimestamp(cloudItem);
+                    const localTime = getLatestTimestamp(localItem);
+                    
+                    // Keep the version with the latest timestamp
+                    if (localTime > cloudTime) {
+                        merged[itemId] = { ...localItem };
+                        console.log(`✅ Keeping LOCAL version of ${itemId} (${new Date(localTime).toLocaleString()} > ${new Date(cloudTime).toLocaleString()})`);
+                    } else {
+                        console.log(`☁️ Keeping CLOUD version of ${itemId} (${new Date(cloudTime).toLocaleString()} >= ${new Date(localTime).toLocaleString()})`);
+                    }
+                }
+            });
+            
             return Object.values(merged);
+        }
+        
+        // GET LATEST TIMESTAMP: Find the most recent timestamp from an item
+        function getLatestTimestamp(item) {
+            const timestamps = [
+                item.lastModified,
+                item.completedAt,
+                item.deletedAt,
+                item.lastUpdated,
+                item.createdAt
+            ].filter(t => t).map(t => new Date(t).getTime());
+            
+            return timestamps.length > 0 ? Math.max(...timestamps) : 0;
         }
 
         function saveApiKey() {
