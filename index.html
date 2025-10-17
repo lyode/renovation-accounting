@@ -2560,31 +2560,121 @@
             syncMode.textContent = 'Syncing...';
             
             try {
-                const response = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
+                // STEP 1: PULL data from cloud
+                const pullResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
+                    method: 'GET',
+                    headers: { 
+                        'X-Master-Key': syncApiKey,
+                        'X-Bin-Meta': 'false'
+                    }
+                });
+                
+                let cloudData = {
+                    projects: [],
+                    tasks: [],
+                    transactions: [],
+                    permanentlyDeleted: []
+                };
+                
+                if (pullResponse.ok) {
+                    const result = await pullResponse.json();
+                    cloudData = result.record || result || cloudData;
+                    console.log('📥 Pulled from cloud:', cloudData);
+                }
+                
+                // STEP 2: MERGE cloud data with local data
+                const mergedData = {
+                    projects: mergeArraysByKey(cloudData.projects || [], data.projects || [], 'id'),
+                    tasks: mergeArraysByKey(cloudData.tasks || [], data.tasks || [], 'id'),
+                    transactions: mergeArraysByKey(cloudData.transactions || [], data.transactions || [], 'id'),
+                    permanentlyDeleted: [...new Set([...(cloudData.permanentlyDeleted || []), ...(data.permanentlyDeleted || [])])],
+                    currentUser: data.currentUser,
+                    userPosition: data.userPosition,
+                    themeColor: data.themeColor,
+                    fontSize: data.fontSize,
+                    contrast: data.contrast,
+                    saturation: data.saturation,
+                    nightMode: data.nightMode,
+                    timelineFilter: data.timelineFilter,
+                    scheduleView: data.scheduleView,
+                    calendarEvents: mergeArraysByKey(cloudData.calendarEvents || [], data.calendarEvents || [], 'id'),
+                    lastUpdated: new Date().toISOString(),
+                    lastUpdateDevice: APP_CONFIG.deviceType
+                };
+                
+                console.log('🔄 Merged data:', mergedData);
+                
+                // STEP 3: PUSH merged data back to cloud
+                const pushResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Master-Key': syncApiKey
+                        'X-Master-Key': syncApiKey,
+                        'X-Bin-Versioning': 'false'
                     },
-                    body: JSON.stringify(data)
+                    body: JSON.stringify(mergedData)
                 });
                 
-                if (response.ok) {
+                if (pushResponse.ok) {
+                    // Update local data with merged result
+                    data = mergedData;
+                    saveData();
+                    renderView();
+                    updateStats();
+                    
                     localStorage.setItem('lastSyncTime', Date.now().toString());
                     document.getElementById('lastSyncTime').textContent = new Date().toLocaleTimeString();
-                    showToast('Sync complete!');
+                    
+                    showToast('✅ Smart sync complete!');
                     indicator.classList.remove('syncing');
                     syncMode.textContent = 'Connected';
                 } else {
-                    showToast(`Sync failed - ${response.status}`);
+                    const errorText = await pushResponse.text();
+                    console.error('Push failed:', pushResponse.status, errorText);
+                    showToast(`Sync failed - ${pushResponse.status}`);
                     indicator.classList.remove('syncing');
                     syncMode.textContent = 'Error';
                 }
             } catch (error) {
+                console.error('Sync error:', error);
                 showToast('Sync error - check connection');
                 indicator.classList.remove('syncing');
                 syncMode.textContent = 'Offline';
             }
+        }
+        
+        // Helper function to merge two arrays by unique key
+        function mergeArraysByKey(cloudArray, localArray, key) {
+            const merged = {};
+            
+            // Add all cloud items
+            cloudArray.forEach(item => {
+                merged[item[key]] = item;
+            });
+            
+            // Add/update with local items
+            localArray.forEach(item => {
+                if (!merged[item[key]]) {
+                    // New item from local
+                    merged[item[key]] = item;
+                } else {
+                    // Item exists in both - keep the one with latest modification
+                    const cloudItem = merged[item[key]];
+                    const localItem = item;
+                    
+                    // Compare timestamps if available
+                    const cloudTime = cloudItem.lastModified || cloudItem.completedAt || cloudItem.lastUpdated || 0;
+                    const localTime = localItem.lastModified || localItem.completedAt || localItem.lastUpdated || 0;
+                    
+                    if (localTime > cloudTime) {
+                        merged[item[key]] = localItem;
+                    }
+                    // Otherwise keep cloud version
+                }
+            });
+            
+            // Convert back to array
+            return Object.values(merged);
         }
 
         function saveApiKey() {
