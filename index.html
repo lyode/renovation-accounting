@@ -105,7 +105,7 @@
             }
             
             .main-content-wrapper {
-                margin-top: calc(220px + max(20px, env(safe-area-inset-top)));
+                margin-top: calc(260px + max(20px, env(safe-area-inset-top)));
             }
         }
         
@@ -744,6 +744,20 @@
             display: flex; 
             justify-content: space-between; 
             align-items: start; 
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .task-item {
+                padding: 8px;
+                gap: 8px;
+            }
+            
+            .icon-btn {
+                width: 32px;
+                height: 32px;
+                font-size: calc(14px * var(--font-scale));
+            }
         }
         
         .icon-btn { 
@@ -759,14 +773,24 @@
             align-items: center; 
             justify-content: center; 
             transition: all 0.2s;
+            flex-shrink: 0;
         }
         
         .icon-btn:hover {
             transform: scale(1.05);
         }
         
+        .icon-btn:active {
+            transform: scale(0.95);
+        }
+        
         .icon-btn.danger { 
             background: var(--danger); 
+        }
+        
+        .icon-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
         
         .calendar-container {
@@ -880,7 +904,7 @@
         
         @media (max-width: 768px) {
             .main-content-wrapper {
-                margin-top: 210px;
+                margin-top: 250px;
             }
             
             .tabs {
@@ -919,15 +943,49 @@
             .stat-card p {
                 font-size: calc(10px * var(--font-scale));
             }
+            
+            .task-item {
+                padding: 8px;
+                gap: 8px;
+            }
+            
+            .icon-btn {
+                width: 32px;
+                height: 32px;
+                font-size: calc(14px * var(--font-scale));
+            }
+            
+            .project-card {
+                margin-bottom: 16px;
+            }
+            
+            .btn {
+                padding: 6px 12px;
+                font-size: calc(12px * var(--font-scale));
+            }
         }
         
         @media (max-width: 400px) {
             .main-content-wrapper {
-                margin-top: 220px;
+                margin-top: 260px;
             }
             
             .theme-grid {
                 grid-template-columns: 1fr;
+            }
+            
+            .gantt-label {
+                width: 100px;
+                font-size: calc(10px * var(--font-scale));
+            }
+            
+            .project-header h3 {
+                font-size: calc(14px * var(--font-scale));
+            }
+            
+            .action-btn {
+                font-size: calc(9px * var(--font-scale));
+                padding: 3px 6px;
             }
         }
     </style>
@@ -1322,6 +1380,7 @@
             transactions: [],
             permanentlyDeleted: [],
             archivedProjects: [],
+            expandedProjects: [],
             showArchived: false,
             nightMode: false,
             themeColor: 0,
@@ -1802,12 +1861,28 @@
                 const transactions = data.transactions.filter(t => t.projectId === project.id);
                 const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
                 const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+                const incomeList = transactions.filter(t => t.type === 'income');
+                const expenseList = transactions.filter(t => t.type === 'expense');
                 
                 html += `
                     <div class="project-card">
-                        <div class="project-header" onclick="showProjectDetail(${project.id})" style="cursor: pointer;">
-                            <h3>${project.name} ${project.locked ? '🔒' : ''}</h3>
-                            <div style="font-size: 11px; opacity: 0.9;">Client: ${project.client}</div>
+                        <div class="project-header" style="cursor: default;">
+                            <div style="display: flex; justify-content: space-between; align-items: start;">
+                                <div style="flex: 1;">
+                                    <h3 style="margin-bottom: 5px;">${project.name} ${project.locked ? '🔒' : ''}</h3>
+                                    <div style="font-size: 11px; opacity: 0.9;">Client: ${project.client}</div>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <button class="action-btn" onclick="editProject(${project.id})" ${project.locked ? 'disabled' : ''}>
+                                        ${project.locked ? 'Locked' : 'Edit'}
+                                    </button>
+                                    <button class="action-btn" onclick="toggleProjectLock(${project.id})">
+                                        ${project.locked ? 'Unlock' : 'Lock'}
+                                    </button>
+                                    <button class="action-btn" onclick="permanentDeleteProject(${project.id})">Delete</button>
+                                </div>
+                            </div>
+                            
                             <div class="project-stats">
                                 <div style="text-align: center;">
                                     <div style="font-size: 9px; opacity: 0.8;">Tasks</div>
@@ -1824,21 +1899,123 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="project-actions" onclick="event.stopPropagation();">
-                                <button class="action-btn" onclick="editProject(${project.id})" ${project.locked ? 'disabled' : ''}>
-                                    ${project.locked ? 'Locked' : 'Edit'}
-                                </button>
-                                <button class="action-btn" onclick="toggleProjectLock(${project.id})">
-                                    ${project.locked ? 'Unlock' : 'Lock'}
-                                </button>
-                                <button class="action-btn" onclick="permanentDeleteProject(${project.id})">Delete</button>
+                        </div>
+                        
+                        <!-- Tasks Section -->
+                        <div style="padding: 12px; background: var(--bg-color);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h4 style="font-size: 13px; color: var(--text-color); margin: 0;">📋 Tasks (${tasks.length})</h4>
+                                <button class="btn btn-primary" onclick="showTaskModal(); document.getElementById('taskProject').value = ${project.id};" style="padding: 4px 10px; font-size: 11px;">+ Add Task</button>
                             </div>
+                            ${tasks.length === 0 ? '<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 12px;">No tasks yet</div>' : ''}
+                            ${tasks.map(task => `
+                                <div class="task-item" style="margin-bottom: 6px;">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 500; color: var(--text-color); font-size: 12px;">${task.name}</div>
+                                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">
+                                            📅 ${task.dueDate} • ${task.priority} • ${task.status}
+                                            ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 4px;">
+                                        <button class="icon-btn" onclick="editTask(${task.id})" style="width: 26px; height: 26px; font-size: 11px;">✏️</button>
+                                        <button class="icon-btn danger" onclick="deleteTask(${task.id})" style="width: 26px; height: 26px; font-size: 11px;">🗑️</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- Income Section -->
+                        <div style="padding: 12px; background: var(--card-bg); border-top: 1px solid var(--border-color);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h4 style="font-size: 13px; color: var(--income-color); margin: 0;">💰 Income (${incomeList.length}) - ${income.toFixed(2)}</h4>
+                                <button class="btn btn-success" onclick="showTransactionModal('income'); document.getElementById('transProject').value = ${project.id};" style="padding: 4px 10px; font-size: 11px;">+ Add Income</button>
+                            </div>
+                            ${incomeList.length === 0 ? '<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 12px;">No income yet</div>' : ''}
+                            ${incomeList.map(trans => `
+                                <div style="padding: 8px; margin-bottom: 6px; background: var(--bg-color); border-radius: 6px; border-left: 3px solid var(--income-color); display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 500; color: var(--text-color); font-size: 12px;">${trans.amount.toFixed(2)} - ${trans.category}</div>
+                                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">
+                                            📅 ${trans.date}${trans.description ? ` • ${trans.description}` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 4px;">
+                                        <button class="icon-btn" onclick="editTransaction(${trans.id})" style="width: 26px; height: 26px; font-size: 11px;">✏️</button>
+                                        <button class="icon-btn danger" onclick="deleteTransaction(${trans.id})" style="width: 26px; height: 26px; font-size: 11px;">🗑️</button>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <!-- Expenses Section -->
+                        <div style="padding: 12px; background: var(--bg-color); border-top: 1px solid var(--border-color);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h4 style="font-size: 13px; color: var(--expense-color); margin: 0;">💸 Expenses (${expenseList.length}) - ${expenses.toFixed(2)}</h4>
+                                <button class="btn btn-danger" onclick="showTransactionModal('expense'); document.getElementById('transProject').value = ${project.id};" style="padding: 4px 10px; font-size: 11px;">+ Add Expense</button>
+                            </div>
+                            ${expenseList.length === 0 ? '<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 12px;">No expenses yet</div>' : ''}
+                            ${expenseList.map(trans => `
+                                <div style="padding: 8px; margin-bottom: 6px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--expense-color); display: flex; justify-content: space-between; align-items: center;">
+                                    <div style="flex: 1;">
+                                        <div style="font-weight: 500; color: var(--text-color); font-size: 12px;">${trans.amount.toFixed(2)} - ${trans.category}</div>
+                                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">
+                                            📅 ${trans.date}${trans.description ? ` • ${trans.description}` : ''}
+                                        </div>
+                                    </div>
+                                    <div style="display: flex; gap: 4px;">
+                                        <button class="icon-btn" onclick="editTransaction(${trans.id})" style="width: 26px; height: 26px; font-size: 11px;">✏️</button>
+                                        <button class="icon-btn danger" onclick="deleteTransaction(${trans.id})" style="width: 26px; height: 26px; font-size: 11px;">🗑️</button>
+                                    </div>
+                                </div>
+                            `).join('')}
                         </div>
                     </div>
                 `;
             });
             
             container.innerHTML = html;
+        }
+
+        function editTransaction(id) {
+            const trans = data.transactions.find(t => t.id === id);
+            if (!trans) return;
+            
+            editingId = id;
+            editingType = 'transaction';
+            document.getElementById('transactionModalTitle').textContent = `Edit ${trans.type === 'income' ? 'Income' : 'Expense'}`;
+            document.getElementById('transType').value = trans.type;
+            document.getElementById('transAmount').value = trans.amount;
+            document.getElementById('transDate').value = trans.date;
+            document.getElementById('transDescription').value = trans.description || '';
+            
+            const select = document.getElementById('transProject');
+            select.innerHTML = '<option value="">Select Project</option>';
+            data.projects.forEach(p => {
+                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
+            });
+            select.value = trans.projectId;
+            
+            updateCategories();
+            document.getElementById('transCategory').value = trans.category;
+            
+            document.getElementById('transactionModal').classList.add('show');
+        }
+
+        function deleteTransaction(id) {
+            const trans = data.transactions.find(t => t.id === id);
+            if (!trans) return;
+            
+            if (confirm(`⚠️ Delete ${trans.type} of ${trans.amount.toFixed(2)}?`)) {
+                const now = new Date().toISOString();
+                trans.deleted_at = now;
+                data.transactions = data.transactions.filter(t => t.id !== id);
+                
+                saveData();
+                renderView();
+                updateStats();
+                showToast('Transaction deleted');
+            }
         }
 
         function renderSchedule(container) {
@@ -1855,131 +2032,197 @@
                 </div>
             `;
             
+            // Show Projects with their tasks
+            if (data.projects.length === 0) {
+                html += '<div class="empty-state">No projects yet. Click + to create one!</div>';
+            } else {
+                html += '<h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📊 Project & Task Timelines</h3>';
+                
+                data.projects.forEach(project => {
+                    const tasks = data.tasks.filter(t => t.projectId === project.id);
+                    const hasProjectDates = project.startDate && project.endDate;
+                    const expandId = `expand-${project.id}`;
+                    const isExpanded = data.expandedProjects?.includes(project.id);
+                    
+                    html += `
+                        <div class="gantt-container" style="margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <button onclick="toggleProjectExpand(${project.id})" 
+                                            style="background: var(--accent-color); color: white; border: none; width: 32px; height: 32px; border-radius: 6px; cursor: pointer; font-size: 16px;">
+                                        ${isExpanded ? '▼' : '▶'}
+                                    </button>
+                                    <h4 style="font-size: 14px; color: var(--text-color); margin: 0;">
+                                        📁 ${project.name} ${project.locked ? '🔒' : ''}
+                                        <span style="font-size: 11px; color: var(--text-secondary); margin-left: 8px;">
+                                            ${tasks.length} tasks
+                                        </span>
+                                    </h4>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <button class="icon-btn" onclick="editProject(${project.id})" 
+                                            ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''} title="Edit Project">✏️</button>
+                                    <button class="icon-btn" onclick="showTaskModal(); document.getElementById('taskProject').value = ${project.id};" title="Add Task">➕</button>
+                                    <button class="icon-btn danger" onclick="permanentDeleteProject(${project.id})" title="Delete Project">🗑️</button>
+                                </div>
+                            </div>
+                    `;
+                    
+                    if (hasProjectDates) {
+                        html += renderProjectGanttBar(project);
+                    } else {
+                        html += '<div style="padding: 10px; background: var(--bg-color); border-radius: 6px; font-size: 12px; color: var(--text-secondary);">No project dates set</div>';
+                    }
+                    
+                    if (isExpanded && tasks.length > 0) {
+                        html += '<div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color);">';
+                        html += '<h5 style="font-size: 12px; margin-bottom: 10px; color: var(--text-secondary);">📋 Tasks:</h5>';
+                        html += renderTasksGantt(tasks, project);
+                        html += '</div>';
+                    } else if (isExpanded && tasks.length === 0) {
+                        html += '<div style="margin-top: 15px; padding: 15px; background: var(--bg-color); border-radius: 6px; text-align: center; color: var(--text-secondary);">No tasks yet</div>';
+                    }
+                    
+                    html += '</div>';
+                });
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function renderProjectGanttBar(project) {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             
-            let filteredTasks = [...data.tasks];
-            let minDate = new Date();
-            let maxDate = new Date();
+            const start = new Date(project.startDate);
+            const end = new Date(project.endDate);
             
-            if (data.scheduleView === 'day') {
-                filteredTasks = filteredTasks.filter(task => {
-                    const taskDate = new Date(task.dueDate);
-                    taskDate.setHours(0, 0, 0, 0);
-                    return taskDate.getTime() === today.getTime();
-                });
-                minDate = today;
-                maxDate = today;
-            } else if (data.scheduleView === 'week') {
-                const weekEnd = new Date(today);
-                weekEnd.setDate(today.getDate() + 7);
-                filteredTasks = filteredTasks.filter(task => {
-                    const taskDate = new Date(task.dueDate);
-                    return taskDate >= today && taskDate <= weekEnd;
-                });
-                minDate = today;
-                maxDate = weekEnd;
-            } else if (data.scheduleView === 'month') {
-                const monthEnd = new Date(today);
-                monthEnd.setMonth(today.getMonth() + 1);
-                filteredTasks = filteredTasks.filter(task => {
-                    const taskDate = new Date(task.dueDate);
-                    return taskDate >= today && taskDate <= monthEnd;
-                });
-                minDate = today;
-                maxDate = monthEnd;
-            } else {
-                filteredTasks.forEach(task => {
-                    if (task.startDate) {
-                        const start = new Date(task.startDate);
-                        if (start < minDate) minDate = start;
-                    }
-                    if (task.dueDate) {
-                        const due = new Date(task.dueDate);
-                        if (due > maxDate) maxDate = due;
-                    }
-                });
+            const minDate = new Date(Math.min(start, today));
+            minDate.setDate(minDate.getDate() - 3);
+            const maxDate = new Date(Math.max(end, today));
+            maxDate.setDate(maxDate.getDate() + 3);
+            
+            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
+            const startOffset = Math.ceil((start - minDate) / (1000 * 60 * 60 * 24));
+            const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
+            const width = (duration / totalDays) * 100;
+            const left = (startOffset / totalDays) * 100;
+            
+            const isOverdue = end < today && !project.locked;
+            const barColor = isOverdue ? 
+                'linear-gradient(135deg, #ef4444 0%, #f87171 100%)' : 
+                'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
+            
+            let html = '<div style="position: relative; height: 50px; background: var(--bg-color); border-radius: 6px; margin-top: 10px;">';
+            
+            if (today >= minDate && today <= maxDate) {
+                const todayOffset = Math.ceil((today - minDate) / (1000 * 60 * 60 * 24));
+                const todayPosition = (todayOffset / totalDays) * 100;
+                html += `<div style="position: absolute; top: -5px; bottom: -5px; left: ${todayPosition}%; width: 3px; background: #ef4444; z-index: 5;"></div>`;
             }
             
-            if (maxDate - minDate < 1000 * 60 * 60 * 24) {
-                maxDate = new Date(minDate);
-                maxDate.setDate(maxDate.getDate() + 7);
-            }
+            html += `
+                <div style="position: absolute; left: ${left}%; width: ${width}%; height: 100%; background: ${barColor}; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 8px; color: white; font-weight: 600; cursor: pointer;" onclick="showProjectDetail(${project.id})">
+                    <div style="font-size: 11px;">${duration} days</div>
+                    <div style="font-size: 9px; opacity: 0.9;">
+                        ${start.toLocaleDateString('en', { month: 'short', day: 'numeric' })} - 
+                        ${end.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
+                    </div>
+                </div>
+            </div>`;
+            
+            return html;
+        }
+
+        function renderTasksGantt(tasks, project) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (tasks.length === 0) return '';
+            
+            let minDate = today;
+            let maxDate = today;
+            
+            tasks.forEach(task => {
+                if (task.startDate) {
+                    const start = new Date(task.startDate);
+                    if (start < minDate) minDate = start;
+                }
+                if (task.dueDate) {
+                    const due = new Date(task.dueDate);
+                    if (due > maxDate) maxDate = due;
+                }
+            });
+            
+            minDate.setDate(minDate.getDate() - 2);
+            maxDate.setDate(maxDate.getDate() + 2);
             
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
-            html += '<div class="gantt-container" style="position: relative;"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📊 Task Schedule Gantt Chart</h3>';
-            
-            if (filteredTasks.length === 0) {
-                html += `<p class="empty-state">No tasks scheduled for ${data.scheduleView === 'all' ? 'any time' : 'this ' + data.scheduleView}</p>`;
-            } else {
-                html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
+            let html = '';
+            tasks.forEach(task => {
+                const startDate = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
+                const dueDate = new Date(task.dueDate);
                 
-                const months = [];
-                let current = new Date(minDate);
-                while (current <= maxDate) {
-                    months.push({
-                        label: current.toLocaleDateString('en', { month: 'short', year: 'numeric' }),
-                        start: new Date(current),
-                        end: new Date(current.getFullYear(), current.getMonth() + 1, 0)
-                    });
-                    current.setMonth(current.getMonth() + 1);
-                }
+                const startOffset = Math.max(0, Math.ceil((startDate - minDate) / (1000 * 60 * 60 * 24)));
+                const duration = Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
+                const width = Math.max((duration / totalDays) * 100, 3);
+                const left = (startOffset / totalDays) * 100;
                 
-                months.forEach(month => {
-                    const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
-                    const monthEnd = Math.min(totalDays, Math.ceil((month.end - minDate) / (1000 * 60 * 60 * 24)) + 1);
-                    const width = ((monthEnd - monthStart) / totalDays) * 100;
-                    html += `<div class="gantt-month" style="width: ${width}%;">${month.label}</div>`;
-                });
+                let barColor = 'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
+                if (task.status === 'Completed') barColor = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
+                else if (task.status === 'In Progress') barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)';
+                else if (dueDate < today) barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)';
                 
-                html += '</div></div>';
-                
-                const todayCheck = new Date();
-                todayCheck.setHours(0, 0, 0, 0);
-                if (todayCheck >= minDate && todayCheck <= maxDate) {
-                    const todayOffset = Math.ceil((todayCheck - minDate) / (1000 * 60 * 60 * 24));
-                    const todayPosition = (todayOffset / totalDays) * 100;
-                    html += `<div class="today-line" style="left: calc(150px + ${todayPosition}%);"></div>`;
-                }
-                
-                const sortedTasks = filteredTasks.sort((a, b) => new Date(a.dueDate || a.startDate) - new Date(b.dueDate || b.startDate));
-                
-                sortedTasks.forEach(task => {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    const startDate = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
-                    const dueDate = new Date(task.dueDate);
-                    
-                    const startOffset = Math.max(0, Math.ceil((startDate - minDate) / (1000 * 60 * 60 * 24)));
-                    const duration = Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-                    const width = Math.max((duration / totalDays) * 100, 2);
-                    const left = (startOffset / totalDays) * 100;
-                    
-                    let barColor = 'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
-                    if (task.status === 'Completed') barColor = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
-                    else if (task.status === 'In Progress') barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)';
-                    else if (dueDate < today) barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)';
-                    
-                    html += `
-                        <div class="gantt-row">
-                            <div class="gantt-label" title="${task.name} - ${project ? project.name : 'No Project'}">${task.name}</div>
-                            <div class="gantt-timeline">
-                                <div class="gantt-bar" style="left: ${left}%; width: ${width}%; background: ${barColor};" 
-                                     onclick="editTask(${task.id})" title="${task.priority} Priority - ${task.status}">
-                                    <div style="font-size: 9px;">${duration}d</div>
-                                    <div class="gantt-bar-dates" style="font-size: 8px;">
-                                        ${startDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })} - 
-                                        ${dueDate.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
-                                    </div>
-                                </div>
+                html += `
+                    <div style="display: flex; align-items: center; margin-bottom: 8px; gap: 10px;">
+                        <div style="min-width: 120px; font-size: 11px; color: var(--text-color);">${task.name}</div>
+                        <div style="flex: 1; position: relative; height: 35px; background: var(--bg-color); border-radius: 4px;">
+                            <div style="position: absolute; left: ${left}%; width: ${width}%; height: 100%; background: ${barColor}; border-radius: 4px; display: flex; align-items: center; justify-content: center; padding: 0 6px; color: white; font-size: 9px; font-weight: 500; cursor: pointer;" onclick="editTask(${task.id})" title="${task.priority} - ${task.status}">
+                                ${duration}d
                             </div>
                         </div>
-                    `;
-                });
+                        <div style="display: flex; gap: 3px;">
+                            <button class="icon-btn" onclick="editTask(${task.id})" style="width: 24px; height: 24px; font-size: 10px;" title="Edit">✏️</button>
+                            <button class="icon-btn danger" onclick="deleteTask(${task.id})" style="width: 24px; height: 24px; font-size: 10px;" title="Delete">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            return html;
+        }
+
+        function toggleProjectExpand(projectId) {
+            if (!data.expandedProjects) {
+                data.expandedProjects = [];
             }
             
-            html += '</div>';
-            container.innerHTML = html;
+            const index = data.expandedProjects.indexOf(projectId);
+            if (index > -1) {
+                data.expandedProjects.splice(index, 1);
+            } else {
+                data.expandedProjects.push(projectId);
+            }
+            
+            saveData();
+            renderView();
+        }
+
+        function deleteTask(id) {
+            const task = data.tasks.find(t => t.id === id);
+            if (!task) return;
+            
+            if (confirm(`⚠️ Delete task "${task.name}"?`)) {
+                const now = new Date().toISOString();
+                task.deleted_at = now;
+                data.tasks = data.tasks.filter(t => t.id !== id);
+                
+                saveData();
+                renderView();
+                updateStats();
+                showToast('Task deleted');
+            }
         }
 
         function setScheduleView(view) {
@@ -2441,7 +2684,12 @@
             });
             
             document.getElementById('taskModal').classList.add('show');
-            toggleFabMenu();
+            
+            // Don't toggle fab menu if we're on Projects or Schedule page
+            const currentView = data.currentView;
+            if (currentView !== 'projects' && currentView !== 'schedule') {
+                toggleFabMenu();
+            }
         }
 
         function editTask(id) {
@@ -2534,7 +2782,12 @@
             
             updateCategories();
             document.getElementById('transactionModal').classList.add('show');
-            toggleFabMenu();
+            
+            // Don't toggle fab menu if we're on Projects page
+            const currentView = data.currentView;
+            if (currentView !== 'projects') {
+                toggleFabMenu();
+            }
         }
 
         function updateCategories() {
@@ -2565,9 +2818,18 @@
                 return;
             }
             
-            transData.id = Date.now();
-            data.transactions.push(addTimestamps(transData, true));
-            showToast('Transaction added');
+            if (editingId && editingType === 'transaction') {
+                const index = data.transactions.findIndex(t => t.id === editingId);
+                data.transactions[index] = addTimestamps({ 
+                    ...data.transactions[index], 
+                    ...transData 
+                }, false);
+                showToast('Transaction updated');
+            } else {
+                transData.id = Date.now();
+                data.transactions.push(addTimestamps(transData, true));
+                showToast('Transaction added');
+            }
             
             saveData();
             renderView();
