@@ -59,7 +59,6 @@
         body.font-xl { --font-scale: 1.3; }
         body.font-xxl { --font-scale: 1.5; }
 
-        /* Saturation levels */
         body.sat-low { filter: saturate(0.7) contrast(var(--contrast)) brightness(var(--brightness)); }
         body.sat-normal { filter: saturate(1) contrast(var(--contrast)) brightness(var(--brightness)); }
         body.sat-high { filter: saturate(1.3) contrast(var(--contrast)) brightness(var(--brightness)); }
@@ -425,7 +424,6 @@
             opacity: 0.9;
         }
         
-        /* TODAY LINE IN GANTT - ENHANCED */
         .today-line {
             position: absolute;
             top: -10px;
@@ -771,7 +769,6 @@
             background: var(--danger); 
         }
         
-        /* ENHANCED CALENDAR STYLES WITH RED TODAY */
         .calendar-container {
             background: var(--card-bg);
             border-radius: 10px;
@@ -820,7 +817,6 @@
             opacity: 0.3;
         }
         
-        /* ENHANCED TODAY STYLING WITH RED THEME */
         .calendar-day.today {
             background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
             color: white !important;
@@ -1010,7 +1006,12 @@
                 <button class="btn btn-primary" onclick="saveApiKey()">Save</button>
             </div>
             <div style="padding: 8px; background: var(--bg-color); border-radius: 6px; font-size: 11px; color: var(--text-secondary); margin-bottom: 10px;">
-                Smart Sync: Pulls cloud data → Merges with local → Pushes complete dataset
+                <strong style="color: var(--text-color);">🧠 Smart Sync Logic:</strong><br>
+                1️⃣ Pull cloud data<br>
+                2️⃣ Compare timestamps (created_at, updated_at)<br>
+                3️⃣ Keep most recent version<br>
+                4️⃣ Push merged data to cloud<br>
+                <span style="color: var(--accent-color); font-weight: bold;">✓ Latest edits always win!</span>
             </div>
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
                 <span style="font-weight: 500; color: var(--text-color);">⚡ Auto-Sync (every 5 minutes)</span>
@@ -1089,7 +1090,6 @@
         <button class="fab" onclick="toggleFabMenu()">+</button>
     </div>
 
-    <!-- Modals (Profile, Project, Task, Transaction, etc.) -->
     <div class="modal" id="profileModal">
         <div class="modal-content">
             <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
@@ -1329,7 +1329,8 @@
             saturation: 'normal',
             timelineFilter: 'all',
             scheduleView: 'month',
-            calendarEvents: []
+            calendarEvents: [],
+            lastUpdated: null
         };
 
         let editingId = null;
@@ -1340,7 +1341,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
-            aggressiveCleanup(); // Run cleanup EVERY time
+            aggressiveCleanup();
             initUI();
             updateStats();
             renderView();
@@ -1361,7 +1362,6 @@
         });
 
         function aggressiveCleanup() {
-            // List of unwanted project names - runs EVERY time until they're gone
             const unwantedNames = [
                 'william. mock up 1',
                 'fnn ice cream booth',
@@ -1383,7 +1383,6 @@
             
             const beforeCount = data.projects.length;
             
-            // Remove ALL projects that match these names (case-insensitive)
             data.projects = data.projects.filter(project => {
                 const projectNameLower = project.name.toLowerCase().trim();
                 const shouldRemove = unwantedNames.some(unwantedName => 
@@ -1396,32 +1395,11 @@
             const removedCount = beforeCount - data.projects.length;
             
             if (removedCount > 0) {
-                // Get remaining project IDs
                 const validProjectIds = data.projects.map(p => p.id);
-                
-                // Remove orphaned tasks
                 data.tasks = data.tasks.filter(task => validProjectIds.includes(task.projectId));
-                
-                // Remove orphaned transactions
                 data.transactions = data.transactions.filter(trans => validProjectIds.includes(trans.projectId));
-                
                 saveData();
                 console.log(`✅ CLEANUP: Removed ${removedCount} unwanted projects`);
-            }
-        }
-
-        function clearAllProjectsNow() {
-            if (confirm('⚠️ DELETE ALL PROJECTS?\n\nThis will permanently delete:\n• All projects\n• All tasks\n• All transactions\n\nThis CANNOT be undone!\n\nClick OK to proceed.')) {
-                data.projects = [];
-                data.tasks = [];
-                data.transactions = [];
-                data.permanentlyDeleted = [];
-                
-                saveData();
-                renderView();
-                updateStats();
-                
-                showToast('🗑️ All projects, tasks, and transactions deleted!');
             }
         }
 
@@ -1437,6 +1415,43 @@
         function saveData() {
             data.lastUpdated = new Date().toISOString();
             localStorage.setItem('builderProData', JSON.stringify(data));
+        }
+
+        function addTimestamps(item, isNew = false) {
+            const now = new Date().toISOString();
+            if (isNew) {
+                item.created_at = now;
+            }
+            item.updated_at = now;
+            return item;
+        }
+
+        function mergeByTimestamp(localItems, cloudItems, type) {
+            const merged = new Map();
+            
+            localItems.forEach(item => {
+                merged.set(item.id, { ...item, _source: 'local' });
+            });
+            
+            cloudItems.forEach(cloudItem => {
+                const localItem = merged.get(cloudItem.id);
+                
+                if (!localItem) {
+                    merged.set(cloudItem.id, { ...cloudItem, _source: 'cloud' });
+                } else {
+                    const localTime = new Date(localItem.updated_at || localItem.created_at || 0);
+                    const cloudTime = new Date(cloudItem.updated_at || cloudItem.created_at || 0);
+                    
+                    if (cloudTime > localTime) {
+                        merged.set(cloudItem.id, { ...cloudItem, _source: 'cloud' });
+                    }
+                }
+            });
+            
+            const result = Array.from(merged.values()).filter(item => !item.deleted_at);
+            result.forEach(item => delete item._source);
+            
+            return result;
         }
 
         function applySettings() {
@@ -1517,7 +1532,6 @@
                 }
             });
             
-            // Reapply saturation
             setSaturation(data.saturation || 'normal');
         }
 
@@ -1527,7 +1541,6 @@
             data.saturation = level;
             saveData();
             
-            // Update active button in saturation section
             const saturationSection = document.querySelectorAll('.contrast-controls')[1];
             if (saturationSection) {
                 saturationSection.querySelectorAll('.contrast-btn').forEach(btn => {
@@ -1673,7 +1686,6 @@
                 return html;
             }
             
-            // Calculate date range
             let minDate = null;
             let maxDate = null;
             
@@ -1684,14 +1696,12 @@
                 if (!maxDate || end > maxDate) maxDate = end;
             });
             
-            // Add some padding to the timeline
             const paddingDays = 3;
             minDate.setDate(minDate.getDate() - paddingDays);
             maxDate.setDate(maxDate.getDate() + paddingDays);
             
             const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
             
-            // Generate months for header
             const months = [];
             let current = new Date(minDate);
             while (current <= maxDate) {
@@ -1703,7 +1713,6 @@
                 current.setMonth(current.getMonth() + 1);
             }
             
-            // Render timeline header
             html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
             months.forEach(month => {
                 const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
@@ -1713,7 +1722,6 @@
             });
             html += '</div></div>';
             
-            // Add TODAY line if within range
             const today = new Date();
             today.setHours(0, 0, 0, 0);
             if (today >= minDate && today <= maxDate) {
@@ -1722,7 +1730,6 @@
                 html += `<div class="today-line" style="left: calc(150px + ${todayPosition}%);"></div>`;
             }
             
-            // Render project bars
             projectsWithDates.forEach(project => {
                 const start = new Date(project.startDate);
                 const end = new Date(project.endDate);
@@ -1731,7 +1738,6 @@
                 const width = (duration / totalDays) * 100;
                 const left = (startOffset / totalDays) * 100;
                 
-                // Check if project is overdue
                 const isOverdue = end < today && !project.locked;
                 const barColor = isOverdue ? 
                     'linear-gradient(135deg, #ef4444 0%, #f87171 100%)' : 
@@ -1759,7 +1765,6 @@
                 `;
             });
             
-            // Show projects without dates
             if (projectsWithoutDates.length > 0) {
                 html += '<div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color);">';
                 html += '<h4 style="font-size: 12px; margin-bottom: 10px; color: var(--text-secondary);">⚠️ Projects without dates:</h4>';
@@ -2282,11 +2287,14 @@
             
             if (editingId) {
                 const index = data.projects.findIndex(p => p.id === editingId);
-                data.projects[index] = { ...data.projects[index], ...projectData };
+                data.projects[index] = addTimestamps({ 
+                    ...data.projects[index], 
+                    ...projectData 
+                }, false);
                 showToast('Project updated');
             } else {
                 projectData.id = Date.now();
-                data.projects.push(projectData);
+                data.projects.push(addTimestamps(projectData, true));
                 showToast('Project created');
             }
             
@@ -2301,16 +2309,30 @@
             if (!project) return;
             
             if (confirm(`⚠️ Permanently delete project "${project.name}"?\n\nThis will delete all associated tasks and transactions.\n\nThis action CANNOT be undone.`)) {
+                const now = new Date().toISOString();
+                
                 if (!data.permanentlyDeleted) data.permanentlyDeleted = [];
                 data.permanentlyDeleted.push({ 
                     id, 
                     type: 'project', 
-                    deletedAt: new Date().toISOString(),
+                    deletedAt: now,
                     name: project.name 
                 });
                 
                 data.projects = data.projects.filter(p => p.id !== id);
+                
+                data.tasks.forEach(task => {
+                    if (task.projectId === id) {
+                        task.deleted_at = now;
+                    }
+                });
                 data.tasks = data.tasks.filter(t => t.projectId !== id);
+                
+                data.transactions.forEach(trans => {
+                    if (trans.projectId === id) {
+                        trans.deleted_at = now;
+                    }
+                });
                 data.transactions = data.transactions.filter(t => t.projectId !== id);
                 
                 saveData();
@@ -2324,6 +2346,7 @@
             const project = data.projects.find(p => p.id === id);
             if (project) {
                 project.locked = !project.locked;
+                addTimestamps(project, false);
                 saveData();
                 renderView();
                 showToast(project.locked ? 'Project locked' : 'Project unlocked');
@@ -2464,11 +2487,14 @@
             
             if (editingId) {
                 const index = data.tasks.findIndex(t => t.id === editingId);
-                data.tasks[index] = { ...data.tasks[index], ...taskData };
+                data.tasks[index] = addTimestamps({ 
+                    ...data.tasks[index], 
+                    ...taskData 
+                }, false);
                 showToast('Task updated');
             } else {
                 taskData.id = Date.now();
-                data.tasks.push(taskData);
+                data.tasks.push(addTimestamps(taskData, true));
                 showToast('Task created');
             }
             
@@ -2483,6 +2509,7 @@
             if (task) {
                 task.status = 'Completed';
                 task.completedAt = new Date().toISOString();
+                addTimestamps(task, false);
                 saveData();
                 renderView();
                 showToast('✅ Task completed');
@@ -2538,7 +2565,7 @@
             }
             
             transData.id = Date.now();
-            data.transactions.push(transData);
+            data.transactions.push(addTimestamps(transData, true));
             showToast('Transaction added');
             
             saveData();
@@ -2610,7 +2637,91 @@
             syncMode.textContent = 'Syncing...';
             
             try {
-                const response = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
+                // STEP 1: PULL cloud data
+                const getResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
+                    headers: {
+                        'X-Master-Key': syncApiKey
+                    }
+                });
+                
+                let cloudData = null;
+                if (getResponse.ok) {
+                    const result = await getResponse.json();
+                    cloudData = result.record || {};
+                }
+                
+                // STEP 2: MERGE local and cloud data
+                if (cloudData && cloudData.projects) {
+                    const beforeCounts = {
+                        projects: data.projects.length,
+                        tasks: data.tasks.length,
+                        transactions: data.transactions.length
+                    };
+                    
+                    const mergedProjects = mergeByTimestamp(
+                        data.projects || [], 
+                        cloudData.projects || [], 
+                        'projects'
+                    );
+                    
+                    const mergedTasks = mergeByTimestamp(
+                        data.tasks || [], 
+                        cloudData.tasks || [], 
+                        'tasks'
+                    );
+                    
+                    const mergedTransactions = mergeByTimestamp(
+                        data.transactions || [], 
+                        cloudData.transactions || [], 
+                        'transactions'
+                    );
+                    
+                    // Update local data with merged results
+                    data.projects = mergedProjects;
+                    data.tasks = mergedTasks;
+                    data.transactions = mergedTransactions;
+                    
+                    // Keep track of permanently deleted items
+                    if (cloudData.permanentlyDeleted) {
+                        data.permanentlyDeleted = [
+                            ...(data.permanentlyDeleted || []),
+                            ...cloudData.permanentlyDeleted
+                        ];
+                        // Remove duplicates based on id
+                        data.permanentlyDeleted = Array.from(
+                            new Map(data.permanentlyDeleted.map(item => [item.id, item])).values()
+                        );
+                    }
+                    
+                    const afterCounts = {
+                        projects: data.projects.length,
+                        tasks: data.tasks.length,
+                        transactions: data.transactions.length
+                    };
+                    
+                    // Show what changed during merge
+                    const changes = [];
+                    if (afterCounts.projects !== beforeCounts.projects) {
+                        changes.push(`${afterCounts.projects - beforeCounts.projects > 0 ? '+' : ''}${afterCounts.projects - beforeCounts.projects} projects`);
+                    }
+                    if (afterCounts.tasks !== beforeCounts.tasks) {
+                        changes.push(`${afterCounts.tasks - beforeCounts.tasks > 0 ? '+' : ''}${afterCounts.tasks - beforeCounts.tasks} tasks`);
+                    }
+                    if (afterCounts.transactions !== beforeCounts.transactions) {
+                        changes.push(`${afterCounts.transactions - beforeCounts.transactions > 0 ? '+' : ''}${afterCounts.transactions - beforeCounts.transactions} trans`);
+                    }
+                    
+                    saveData();
+                    renderView();
+                    updateStats();
+                    
+                    if (changes.length > 0) {
+                        console.log('Sync merge changes:', changes.join(', '));
+                    }
+                }
+                
+                // STEP 3: PUSH merged data back to cloud
+                const putResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json',
@@ -2619,18 +2730,19 @@
                     body: JSON.stringify(data)
                 });
                 
-                if (response.ok) {
+                if (putResponse.ok) {
                     localStorage.setItem('lastSyncTime', Date.now().toString());
                     document.getElementById('lastSyncTime').textContent = new Date().toLocaleTimeString();
-                    showToast('Sync complete!');
+                    showToast('✅ Smart sync complete!');
                     indicator.classList.remove('syncing');
                     syncMode.textContent = 'Connected';
                 } else {
-                    showToast(`Sync failed - ${response.status}`);
+                    showToast(`Sync failed - ${putResponse.status}`);
                     indicator.classList.remove('syncing');
                     syncMode.textContent = 'Error';
                 }
             } catch (error) {
+                console.error('Sync error:', error);
                 showToast('Sync error - check connection');
                 indicator.classList.remove('syncing');
                 syncMode.textContent = 'Offline';
