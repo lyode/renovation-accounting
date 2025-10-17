@@ -1063,12 +1063,11 @@
         </div>
         
         <div>
-            <button class="btn btn-primary" onclick="exportData()" style="width: 100%; margin-bottom: 10px;">📤 Export Data</button>
-            <label class="btn btn-success" style="display: block; text-align: center; margin-bottom: 10px; width: 100%;">
+            <button class="btn btn-primary" onclick="exportData()" style="width: 100%;">📤 Export Data</button>
+            <label class="btn btn-success" style="display: block; text-align: center; margin-top: 10px; width: 100%;">
                 📥 Import Data
                 <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
             </label>
-            <button class="btn btn-danger" onclick="clearAllProjectsNow()" style="width: 100%;">🗑️ Delete All Projects & Data</button>
         </div>
     </div>
 
@@ -1341,6 +1340,7 @@
 
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
+            aggressiveCleanup(); // Run cleanup EVERY time
             initUI();
             updateStats();
             renderView();
@@ -1359,6 +1359,56 @@
                 }, 1000);
             }
         });
+
+        function aggressiveCleanup() {
+            // List of unwanted project names - runs EVERY time until they're gone
+            const unwantedNames = [
+                'william. mock up 1',
+                'fnn ice cream booth',
+                'fnn meeting room 1-refreshment',
+                'fnn add on ac diffuser',
+                'ms ng- tmn midah. kl',
+                'fnn ceo blind',
+                'fnn. relocate ac thermostat',
+                'ss3 winsum',
+                'usj 11. nicky',
+                'dsara damai. james house',
+                'william mockup 2',
+                'liam. production 50 crackle set',
+                'william. production 50 crackle set',
+                'elaine bu11/14',
+                "adrian home. - d'clover residences",
+                'wong n carol no 37, ss3'
+            ];
+            
+            const beforeCount = data.projects.length;
+            
+            // Remove ALL projects that match these names (case-insensitive)
+            data.projects = data.projects.filter(project => {
+                const projectNameLower = project.name.toLowerCase().trim();
+                const shouldRemove = unwantedNames.some(unwantedName => 
+                    projectNameLower === unwantedName.toLowerCase().trim() ||
+                    projectNameLower.includes(unwantedName.toLowerCase().trim())
+                );
+                return !shouldRemove;
+            });
+            
+            const removedCount = beforeCount - data.projects.length;
+            
+            if (removedCount > 0) {
+                // Get remaining project IDs
+                const validProjectIds = data.projects.map(p => p.id);
+                
+                // Remove orphaned tasks
+                data.tasks = data.tasks.filter(task => validProjectIds.includes(task.projectId));
+                
+                // Remove orphaned transactions
+                data.transactions = data.transactions.filter(trans => validProjectIds.includes(trans.projectId));
+                
+                saveData();
+                console.log(`✅ CLEANUP: Removed ${removedCount} unwanted projects`);
+            }
+        }
 
         function clearAllProjectsNow() {
             if (confirm('⚠️ DELETE ALL PROJECTS?\n\nThis will permanently delete:\n• All projects\n• All tasks\n• All transactions\n\nThis CANNOT be undone!\n\nClick OK to proceed.')) {
