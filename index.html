@@ -2220,8 +2220,6 @@
         function renderCalendar(container) {
             container.innerHTML = '<div class="empty-state">Calendar view placeholder</div>';
         }
-
-        function updateStats() {
             document.getElementById('totalProjects').textContent = data.projects.length;
             document.getElementById('totalTasks').textContent = data.tasks.length;
             
@@ -2319,10 +2317,12 @@
             });
             
             document.getElementById('taskModal').classList.add('show');
-            toggleFabMenu();
+            
+            // Only toggle fab menu if not called from projects or schedule page  
+            if (data.currentView !== 'projects' && data.currentView !== 'schedule') {
+                toggleFabMenu();
+            }
         }
-
-        function saveTask() {
             const taskData = {
                 name: document.getElementById('taskName').value.trim(),
                 projectId: parseInt(document.getElementById('taskProject').value),
@@ -2380,7 +2380,11 @@
             
             updateCategories();
             document.getElementById('transactionModal').classList.add('show');
-            toggleFabMenu();
+            
+            // Only toggle fab menu if called from fab (not from projects page)
+            if (data.currentView !== 'projects') {
+                toggleFabMenu();
+            }
         }
 
         function updateCategories() {
