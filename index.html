@@ -88,7 +88,28 @@
         .header-btn:active { background: rgba(255,255,255,0.3); }
         .sync-indicator { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: var(--success); border: 2px solid white; }
         .sync-indicator.syncing { background: var(--warning); animation: pulse 1s infinite; }
+        #alertBadge { 
+            background: var(--danger) !important; 
+            width: 18px !important; 
+            height: 18px !important; 
+            font-size: 10px !important; 
+            font-weight: bold !important; 
+            display: flex !important; 
+            align-items: center !important; 
+            justify-content: center !important;
+            animation: alertPulse 2s infinite;
+        }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes alertPulse { 
+            0%, 100% { 
+                transform: scale(1); 
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); 
+            } 
+            50% { 
+                transform: scale(1.1); 
+                box-shadow: 0 0 0 4px rgba(239, 68, 68, 0); 
+            } 
+        }
         .sync-status { background: var(--btn-primary); color: white; padding: 4px 10px; font-size: calc(11px * var(--font-scale)); text-align: center; display: flex; justify-content: center; align-items: center; gap: 10px; }
         
         /* Tabs */
@@ -226,6 +247,10 @@
                         </div>
                     </div>
                     <div class="header-controls">
+                        <button class="header-btn" onclick="app.showAlerts()" title="Alerts">
+                            🔔
+                            <span class="sync-indicator" id="alertBadge" style="background: var(--danger); display: none;">0</span>
+                        </button>
                         <button class="header-btn" onclick="app.sync()" title="Smart Sync">
                             🔄
                             <span class="sync-indicator" id="syncIndicator"></span>
@@ -287,7 +312,19 @@
                 <input type="password" id="apiKeyInput" placeholder="JSONBin API Key" style="flex: 1; padding: 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text);">
                 <button class="btn btn-primary" onclick="app.saveApiKey()">Save</button>
             </div>
-            <button class="btn btn-primary" onclick="app.sync()" style="width: 100%; margin-bottom: 8px;">🔄 Manual Sync</button>
+            <div style="padding: 8px; background: var(--bg); border-radius: 6px; font-size: 11px; color: var(--text-secondary); margin-bottom: 10px;">
+                <strong style="color: var(--text);">🧠 Smart Sync Logic:</strong><br>
+                1️⃣ Pull cloud data<br>
+                2️⃣ Compare timestamps<br>
+                3️⃣ Keep most recent version<br>
+                4️⃣ Push merged data back<br>
+                <span style="color: var(--accent); font-weight: bold;">✓ Latest edits always win!</span>
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; padding: 8px; background: var(--bg); border-radius: 6px;">
+                <span style="font-weight: 500;">⚡ Auto-Sync (every 5 min)</span>
+                <input type="checkbox" id="autoSyncToggle" onchange="app.toggleAutoSync()" style="width: 44px; height: 24px;">
+            </div>
+            <button class="btn btn-primary" onclick="app.sync()" style="width: 100%; margin-bottom: 8px;">🔄 Manual Sync Now</button>
             <button class="btn btn-secondary" onclick="app.testSync()" style="width: 100%;">🔍 Test Connection</button>
         </div>
         
@@ -325,6 +362,18 @@
             <div style="display: flex; align-items: center; justify-content: space-between;">
                 <span style="font-weight: 600;">🌙 Night Mode</span>
                 <input type="checkbox" id="nightToggle" onchange="app.toggleNight()" style="width: 44px; height: 24px;">
+            </div>
+        </div>
+        
+        <!-- Usage Statistics -->
+        <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border);">
+            <label style="display: block; font-weight: 600; margin-bottom: 10px;">📊 Your Usage Stats</label>
+            <div style="background: var(--bg); padding: 12px; border-radius: 8px; font-size: 12px; line-height: 1.8; color: var(--text-secondary);" id="usageStats">
+                <div><strong style="color: var(--text);">Sessions:</strong> <span id="statSessions">0</span></div>
+                <div><strong style="color: var(--text);">Projects Created:</strong> <span id="statProjects">0</span></div>
+                <div><strong style="color: var(--text);">Tasks Created:</strong> <span id="statTasks">0</span></div>
+                <div><strong style="color: var(--text);">Actions Today:</strong> <span id="statActions">0</span></div>
+                <div><strong style="color: var(--text);">Most Used View:</strong> <span id="statTopView">-</span></div>
             </div>
         </div>
         
@@ -447,6 +496,25 @@
         </div>
     </div>
 
+    <!-- Alert Modal -->
+    <div class="modal" id="alertModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2 style="display: flex; align-items: center; gap: 8px;">
+                    <span>🔔</span> 
+                    <span>Alerts & Reminders</span>
+                    <span id="alertCount" style="background: var(--danger); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 8px;">0</span>
+                </h2>
+                <span style="font-size: 24px; cursor: pointer;" onclick="app.closeModal('alertModal')">×</span>
+            </div>
+            <div class="modal-body" id="alertBody" style="max-height: 60vh; overflow-y: auto;"></div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="app.dismissAllAlerts()">Dismiss All</button>
+                <button class="btn btn-primary" onclick="app.closeModal('alertModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
     <div class="toast" id="toast"></div>
 
     <script>
@@ -477,12 +545,27 @@
                 themeColor: 0,
                 fontSize: 'm',
                 contrast: 'normal',
-                nightMode: false
+                nightMode: false,
+                alerts: [],
+                dismissedAlerts: [],
+                userBehavior: {
+                    lastActive: null,
+                    totalSessions: 0,
+                    viewCounts: { home: 0, kanban: 0, projects: 0, schedule: 0, calendar: 0 },
+                    lastSync: null,
+                    projectsCreated: 0,
+                    tasksCreated: 0,
+                    actionsToday: 0,
+                    lastActionDate: null
+                }
             },
             
             editingId: null,
             editingType: null,
             apiKey: '',
+            autoSyncInterval: null,
+            autoSyncEnabled: false,
+            alertCheckInterval: null,
             
             // Initialize
             init() {
@@ -490,6 +573,9 @@
                 this.applySettings();
                 this.updateStats();
                 this.render();
+                this.initAutoSync();
+                this.initBehaviorTracking();
+                this.startAlertChecking();
                 document.getElementById('deviceType').textContent = this.config.deviceType;
                 
                 // Cache DOM elements
@@ -498,8 +584,17 @@
                     toast: document.getElementById('toast'),
                     syncIndicator: document.getElementById('syncIndicator'),
                     syncMode: document.getElementById('syncMode'),
-                    lastSync: document.getElementById('lastSync')
+                    lastSync: document.getElementById('lastSync'),
+                    alertBadge: document.getElementById('alertBadge')
                 };
+                
+                // Welcome message
+                if (this.data.projects.length === 0 && this.data.tasks.length === 0) {
+                    setTimeout(() => this.toast('👋 Welcome to Builder Pro! Press + to start'), 1000);
+                }
+                
+                // Check for important alerts after 2 seconds
+                setTimeout(() => this.checkAndShowAlerts(), 2000);
             },
             
             // Data Management
@@ -508,7 +603,25 @@
                 if (saved) {
                     Object.assign(this.data, JSON.parse(saved));
                 }
+                
+                // Initialize arrays if they don't exist
+                if (!this.data.alerts) this.data.alerts = [];
+                if (!this.data.dismissedAlerts) this.data.dismissedAlerts = [];
+                if (!this.data.userBehavior) {
+                    this.data.userBehavior = {
+                        lastActive: null,
+                        totalSessions: 0,
+                        viewCounts: { home: 0, kanban: 0, projects: 0, schedule: 0, calendar: 0 },
+                        lastSync: null,
+                        projectsCreated: 0,
+                        tasksCreated: 0,
+                        actionsToday: 0,
+                        lastActionDate: null
+                    };
+                }
+                
                 this.apiKey = localStorage.getItem('builderProApiKey') || '';
+                this.autoSyncEnabled = localStorage.getItem('autoSyncEnabled') === 'true';
                 this.updateSyncStatus();
             },
             
@@ -541,6 +654,7 @@
             // View Management
             switchView(view) {
                 this.data.currentView = view;
+                this.trackAction('view_changed', { view: view });
                 document.querySelectorAll('.tab').forEach((tab, i) => {
                     tab.classList.toggle('active', ['home','kanban','projects','schedule','calendar'][i] === view);
                 });
@@ -747,7 +861,40 @@
                 
                 if (isShow) {
                     this.initThemePicker();
+                    // Update auto-sync toggle state
+                    document.getElementById('autoSyncToggle').checked = this.autoSyncEnabled;
+                    // Update usage statistics
+                    this.updateUsageStats();
                 }
+            },
+            
+            updateUsageStats() {
+                document.getElementById('statSessions').textContent = this.data.userBehavior.totalSessions || 0;
+                document.getElementById('statProjects').textContent = this.data.userBehavior.projectsCreated || 0;
+                document.getElementById('statTasks').textContent = this.data.userBehavior.tasksCreated || 0;
+                document.getElementById('statActions').textContent = this.data.userBehavior.actionsToday || 0;
+                
+                // Find most used view
+                const views = this.data.userBehavior.viewCounts || {};
+                let topView = 'home';
+                let maxCount = 0;
+                
+                Object.entries(views).forEach(([view, count]) => {
+                    if (count > maxCount) {
+                        maxCount = count;
+                        topView = view;
+                    }
+                });
+                
+                const viewNames = {
+                    home: 'Home',
+                    kanban: 'Kanban',
+                    projects: 'Projects',
+                    schedule: 'Schedule',
+                    calendar: 'Calendar'
+                };
+                
+                document.getElementById('statTopView').textContent = `${viewNames[topView]} (${maxCount}x)`;
             },
             
             initThemePicker() {
@@ -822,11 +969,13 @@
                 if (this.editingId) {
                     const index = this.data.projects.findIndex(p => p.id === this.editingId);
                     this.data.projects[index] = { ...this.data.projects[index], ...data, updated_at: new Date().toISOString() };
+                    this.trackAction('project_updated', { projectId: this.editingId, name: data.name });
                     this.toast('Project updated');
                 } else {
                     data.id = Date.now();
                     data.created_at = new Date().toISOString();
                     this.data.projects.push(data);
+                    this.trackAction('project_created', { projectId: data.id, name: data.name });
                     this.toast('Project created');
                 }
                 
@@ -834,6 +983,7 @@
                 this.updateStats();
                 this.render();
                 this.closeModal('projectModal');
+                this.checkAndShowAlerts();
             },
             
             showTaskModal() {
@@ -878,11 +1028,13 @@
                 if (this.editingId) {
                     const index = this.data.tasks.findIndex(t => t.id === this.editingId);
                     this.data.tasks[index] = { ...this.data.tasks[index], ...data, updated_at: new Date().toISOString() };
+                    this.trackAction('task_updated', { taskId: this.editingId, name: data.name });
                     this.toast('Task updated');
                 } else {
                     data.id = Date.now();
                     data.created_at = new Date().toISOString();
                     this.data.tasks.push(data);
+                    this.trackAction('task_created', { taskId: data.id, name: data.name });
                     this.toast('Task created');
                 }
                 
@@ -890,6 +1042,7 @@
                 this.updateStats();
                 this.render();
                 this.closeModal('taskModal');
+                this.checkAndShowAlerts();
             },
             
             showTransactionModal(type) {
@@ -911,16 +1064,86 @@
             // Sync
             async sync() {
                 if (!this.apiKey) {
-                    this.toast('⚠️ No API key! Go to Settings', 4000);
+                    this.toast('⚠️ No API key! Go to Settings → Smart Sync API', 5000);
                     this.dom.syncMode.textContent = 'No API key';
                     return;
                 }
                 
                 this.dom.syncIndicator.classList.add('syncing');
                 this.dom.syncMode.textContent = 'Syncing...';
+                const startTime = Date.now();
                 
                 try {
-                    const response = await fetch(`${this.config.baseUrl}/b/${this.config.binId}`, {
+                    // STEP 1: Pull cloud data
+                    console.log('🔄 Step 1: Pulling cloud data...');
+                    this.dom.syncMode.textContent = 'Pulling...';
+                    
+                    const getResponse = await fetch(`${this.config.baseUrl}/b/${this.config.binId}/latest`, {
+                        headers: { 'X-Master-Key': this.apiKey }
+                    });
+                    
+                    if (!getResponse.ok) {
+                        throw new Error(`Pull failed: ${getResponse.status}`);
+                    }
+                    
+                    const result = await getResponse.json();
+                    const cloudData = result.record || {};
+                    
+                    console.log('✅ Cloud data pulled:', {
+                        projects: cloudData.projects?.length || 0,
+                        tasks: cloudData.tasks?.length || 0,
+                        transactions: cloudData.transactions?.length || 0
+                    });
+                    
+                    // STEP 2: Merge data by timestamp
+                    console.log('🔄 Step 2: Merging data...');
+                    this.dom.syncMode.textContent = 'Merging...';
+                    
+                    const beforeCounts = {
+                        projects: this.data.projects.length,
+                        tasks: this.data.tasks.length,
+                        transactions: this.data.transactions.length
+                    };
+                    
+                    if (cloudData.projects) {
+                        this.data.projects = this.mergeByTimestamp(this.data.projects || [], cloudData.projects || []);
+                        this.data.tasks = this.mergeByTimestamp(this.data.tasks || [], cloudData.tasks || []);
+                        this.data.transactions = this.mergeByTimestamp(this.data.transactions || [], cloudData.transactions || []);
+                        
+                        // Preserve other settings from cloud if they exist
+                        if (cloudData.currentUser) this.data.currentUser = cloudData.currentUser;
+                        if (cloudData.userPosition) this.data.userPosition = cloudData.userPosition;
+                    }
+                    
+                    const afterCounts = {
+                        projects: this.data.projects.length,
+                        tasks: this.data.tasks.length,
+                        transactions: this.data.transactions.length
+                    };
+                    
+                    // Show what changed
+                    const changes = [];
+                    if (afterCounts.projects !== beforeCounts.projects) {
+                        changes.push(`${afterCounts.projects - beforeCounts.projects > 0 ? '+' : ''}${afterCounts.projects - beforeCounts.projects}p`);
+                    }
+                    if (afterCounts.tasks !== beforeCounts.tasks) {
+                        changes.push(`${afterCounts.tasks - beforeCounts.tasks > 0 ? '+' : ''}${afterCounts.tasks - beforeCounts.tasks}t`);
+                    }
+                    if (afterCounts.transactions !== beforeCounts.transactions) {
+                        changes.push(`${afterCounts.transactions - beforeCounts.transactions > 0 ? '+' : ''}${afterCounts.transactions - beforeCounts.transactions}tr`);
+                    }
+                    
+                    console.log('✅ Merge complete:', changes.length > 0 ? changes.join(', ') : 'No changes');
+                    
+                    this.saveData();
+                    this.updateStats();
+                    this.render();
+                    
+                    // STEP 3: Push merged data back to cloud
+                    console.log('🔄 Step 3: Pushing merged data...');
+                    this.dom.syncMode.textContent = 'Pushing...';
+                    
+                    const putResponse = await fetch(`${this.config.baseUrl}/b/${this.config.binId}`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
@@ -929,19 +1152,93 @@
                         body: JSON.stringify(this.data)
                     });
                     
-                    if (!response.ok) throw new Error('Sync failed');
+                    if (!putResponse.ok) {
+                        throw new Error(`Push failed: ${putResponse.status}`);
+                    }
+                    
+                    const syncDuration = ((Date.now() - startTime) / 1000).toFixed(1);
+                    console.log(`✅ Sync complete in ${syncDuration}s`);
                     
                     localStorage.setItem('lastSyncTime', Date.now().toString());
                     this.updateSyncStatus();
-                    this.toast('✅ Synced successfully!');
+                    
+                    const msg = changes.length > 0 
+                        ? `✅ Synced ${this.data.projects.length}p ${this.data.tasks.length}t (${changes.join(', ')}) in ${syncDuration}s`
+                        : `✅ Synced ${this.data.projects.length}p ${this.data.tasks.length}t in ${syncDuration}s`;
+                    
+                    this.toast(msg, 5000);
                     this.dom.syncIndicator.classList.remove('syncing');
                     this.dom.syncMode.textContent = 'Connected';
+                    
                 } catch (error) {
-                    console.error('Sync error:', error);
-                    this.toast('❌ Sync failed! ' + error.message);
+                    const syncDuration = ((Date.now() - startTime) / 1000).toFixed(1);
+                    console.error('❌ Sync error:', error);
+                    
+                    let errorMsg = error.message;
+                    if (error.message.includes('401')) {
+                        errorMsg = 'Invalid API key! Check Settings';
+                    } else if (error.message.includes('404')) {
+                        errorMsg = 'Bin not found!';
+                    } else if (error.message.includes('Failed to fetch')) {
+                        errorMsg = 'No internet connection!';
+                    }
+                    
+                    this.toast(`❌ ${errorMsg}`, 6000);
                     this.dom.syncIndicator.classList.remove('syncing');
                     this.dom.syncMode.textContent = 'Error';
+                    
+                    console.log('Sync diagnostics:', {
+                        duration: syncDuration + 's',
+                        apiKey: this.apiKey ? 'SET (length: ' + this.apiKey.length + ')' : 'NOT SET',
+                        binId: this.config.binId,
+                        online: navigator.onLine,
+                        localData: {
+                            projects: this.data.projects.length,
+                            tasks: this.data.tasks.length,
+                            transactions: this.data.transactions.length
+                        }
+                    });
                 }
+            },
+            
+            // Merge arrays by timestamp - keeps most recent version of each item
+            mergeByTimestamp(localItems, cloudItems) {
+                const merged = new Map();
+                
+                // Add all local items
+                localItems.forEach(item => {
+                    merged.set(item.id, { ...item, _source: 'local' });
+                });
+                
+                // Add/update with cloud items if they're newer
+                cloudItems.forEach(cloudItem => {
+                    const localItem = merged.get(cloudItem.id);
+                    
+                    if (!localItem) {
+                        // New item from cloud
+                        merged.set(cloudItem.id, { ...cloudItem, _source: 'cloud' });
+                    } else {
+                        // Item exists in both - compare timestamps
+                        const localTime = new Date(localItem.updated_at || localItem.created_at || 0);
+                        const cloudTime = new Date(cloudItem.updated_at || cloudItem.created_at || 0);
+                        
+                        if (cloudTime > localTime) {
+                            // Cloud version is newer
+                            merged.set(cloudItem.id, { ...cloudItem, _source: 'cloud' });
+                        }
+                        // else keep local version (it's newer or same)
+                    }
+                });
+                
+                // Convert back to array and remove deleted items and source marker
+                const result = Array.from(merged.values())
+                    .filter(item => !item.deleted_at)
+                    .map(item => {
+                        const { _source, ...cleanItem } = item;
+                        return cleanItem;
+                    });
+                
+                return result;
             },
             
             saveApiKey() {
@@ -955,35 +1252,94 @@
                 localStorage.setItem('builderProApiKey', key);
                 document.getElementById('apiKeyInput').value = '';
                 this.dom.syncMode.textContent = 'Ready';
-                this.toast('✅ API key saved!');
+                this.toast('✅ API key saved! Click "Test Connection" to verify', 5000);
             },
             
             async testSync() {
                 if (!this.apiKey) {
-                    this.toast('⚠️ No API key set!');
+                    this.toast('⚠️ No API key set! Enter your JSONBin API key first.', 5000);
                     return;
                 }
                 
                 this.toast('🔍 Testing connection...');
                 
                 try {
+                    console.log('🔍 Testing sync connection...');
+                    console.log('API Key length:', this.apiKey.length);
+                    console.log('Bin ID:', this.config.binId);
+                    console.log('Base URL:', this.config.baseUrl);
+                    
                     const response = await fetch(`${this.config.baseUrl}/b/${this.config.binId}/latest`, {
                         headers: { 'X-Master-Key': this.apiKey }
                     });
                     
+                    console.log('Response status:', response.status);
+                    console.log('Response OK:', response.ok);
+                    
                     if (response.ok) {
-                        this.toast('✅ Connection works!');
+                        const result = await response.json();
+                        console.log('✅ Connection successful!');
+                        console.log('Cloud data:', {
+                            projects: result.record?.projects?.length || 0,
+                            tasks: result.record?.tasks?.length || 0,
+                            transactions: result.record?.transactions?.length || 0
+                        });
+                        
+                        this.toast('✅ Connection works! Ready to sync.', 5000);
                         this.dom.syncMode.textContent = 'Connected';
                     } else if (response.status === 401) {
-                        this.toast('❌ Invalid API key!');
+                        this.toast('❌ Invalid API key! Get a new one from jsonbin.io', 6000);
                         this.dom.syncMode.textContent = 'Invalid Key';
+                    } else if (response.status === 404) {
+                        this.toast('❌ Bin not found! Check your Bin ID.', 6000);
+                        this.dom.syncMode.textContent = 'Invalid Bin';
                     } else {
-                        this.toast(`❌ Error ${response.status}`);
+                        this.toast(`❌ Error ${response.status}: ${response.statusText}`, 6000);
                         this.dom.syncMode.textContent = 'Error';
                     }
                 } catch (error) {
-                    this.toast('❌ Connection failed!');
+                    console.error('❌ Test failed:', error);
+                    this.toast('❌ Connection failed! Check internet connection.', 6000);
                     this.dom.syncMode.textContent = 'Offline';
+                }
+            },
+            
+            // Auto-sync functionality
+            initAutoSync() {
+                const savedAutoSync = localStorage.getItem('autoSyncEnabled');
+                if (savedAutoSync === 'true' && this.apiKey) {
+                    this.autoSyncEnabled = true;
+                    this.startAutoSync();
+                }
+            },
+            
+            toggleAutoSync() {
+                this.autoSyncEnabled = !this.autoSyncEnabled;
+                localStorage.setItem('autoSyncEnabled', this.autoSyncEnabled.toString());
+                
+                if (this.autoSyncEnabled) {
+                    this.startAutoSync();
+                    this.toast('⚡ Auto-sync enabled (every 5 min)');
+                } else {
+                    this.stopAutoSync();
+                    this.toast('Auto-sync disabled');
+                }
+            },
+            
+            startAutoSync() {
+                this.stopAutoSync();
+                if (this.apiKey && this.autoSyncEnabled) {
+                    this.autoSyncInterval = setInterval(() => {
+                        console.log('🔄 Auto-sync triggered');
+                        this.sync();
+                    }, 5 * 60 * 1000); // Every 5 minutes
+                }
+            },
+            
+            stopAutoSync() {
+                if (this.autoSyncInterval) {
+                    clearInterval(this.autoSyncInterval);
+                    this.autoSyncInterval = null;
                 }
             },
             
@@ -1027,6 +1383,370 @@
                 this.dom.toast.textContent = message;
                 this.dom.toast.classList.add('show');
                 setTimeout(() => this.dom.toast.classList.remove('show'), duration);
+            },
+            
+            // Behavior Tracking
+            initBehaviorTracking() {
+                // Track session start
+                this.data.userBehavior.totalSessions++;
+                this.data.userBehavior.lastActive = new Date().toISOString();
+                
+                // Reset daily action counter if new day
+                const today = new Date().toDateString();
+                if (this.data.userBehavior.lastActionDate !== today) {
+                    this.data.userBehavior.actionsToday = 0;
+                    this.data.userBehavior.lastActionDate = today;
+                }
+                
+                this.saveData();
+            },
+            
+            trackAction(actionType, details = {}) {
+                const action = {
+                    type: actionType,
+                    timestamp: new Date().toISOString(),
+                    details: details
+                };
+                
+                // Update behavior stats
+                this.data.userBehavior.actionsToday++;
+                this.data.userBehavior.lastActive = action.timestamp;
+                
+                // Track specific actions
+                if (actionType === 'project_created') this.data.userBehavior.projectsCreated++;
+                if (actionType === 'task_created') this.data.userBehavior.tasksCreated++;
+                if (actionType === 'view_changed') {
+                    this.data.userBehavior.viewCounts[details.view]++;
+                }
+                
+                this.saveData();
+                console.log('📊 Action tracked:', actionType, details);
+            },
+            
+            // Alert System
+            startAlertChecking() {
+                // Check alerts every 5 minutes
+                this.alertCheckInterval = setInterval(() => {
+                    this.generateAlerts();
+                }, 5 * 60 * 1000);
+                
+                // Initial check
+                this.generateAlerts();
+            },
+            
+            generateAlerts() {
+                const alerts = [];
+                const now = new Date();
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                // Clear old dismissed alerts (older than 7 days)
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                
+                // Reset dismissed alerts daily to re-check important items
+                const lastResetDate = localStorage.getItem('lastAlertResetDate');
+                const todayStr = today.toDateString();
+                
+                if (lastResetDate !== todayStr) {
+                    this.data.dismissedAlerts = [];
+                    localStorage.setItem('lastAlertResetDate', todayStr);
+                }
+                
+                // Check overdue tasks
+                const overdueTasks = this.data.tasks.filter(task => {
+                    const dueDate = new Date(task.dueDate);
+                    dueDate.setHours(0, 0, 0, 0);
+                    return dueDate < today && task.status !== 'Completed';
+                });
+                
+                if (overdueTasks.length > 0) {
+                    alerts.push({
+                        id: 'overdue_tasks',
+                        type: 'critical',
+                        icon: '🚨',
+                        title: `${overdueTasks.length} Overdue Task${overdueTasks.length > 1 ? 's' : ''}`,
+                        message: `You have ${overdueTasks.length} task${overdueTasks.length > 1 ? 's' : ''} past their due date.`,
+                        action: 'View Tasks',
+                        actionFn: () => { this.switchView('kanban'); this.closeModal('alertModal'); }
+                    });
+                }
+                
+                // Check tasks due today
+                const todayTasks = this.data.tasks.filter(task => {
+                    const dueDate = new Date(task.dueDate);
+                    dueDate.setHours(0, 0, 0, 0);
+                    return dueDate.getTime() === today.getTime() && task.status !== 'Completed';
+                });
+                
+                if (todayTasks.length > 0) {
+                    alerts.push({
+                        id: 'due_today',
+                        type: 'warning',
+                        icon: '⏰',
+                        title: `${todayTasks.length} Task${todayTasks.length > 1 ? 's' : ''} Due Today`,
+                        message: `Don't forget: ${todayTasks.map(t => t.name).slice(0, 2).join(', ')}${todayTasks.length > 2 ? '...' : ''}`,
+                        action: 'View Tasks',
+                        actionFn: () => { this.switchView('kanban'); this.closeModal('alertModal'); }
+                    });
+                }
+                
+                // Check tasks due in next 3 days
+                const threeDaysFromNow = new Date(today);
+                threeDaysFromNow.setDate(today.getDate() + 3);
+                
+                const upcomingTasks = this.data.tasks.filter(task => {
+                    const dueDate = new Date(task.dueDate);
+                    dueDate.setHours(0, 0, 0, 0);
+                    return dueDate > today && dueDate <= threeDaysFromNow && task.status !== 'Completed';
+                });
+                
+                if (upcomingTasks.length > 0) {
+                    alerts.push({
+                        id: 'upcoming_tasks',
+                        type: 'info',
+                        icon: '📅',
+                        title: `${upcomingTasks.length} Task${upcomingTasks.length > 1 ? 's' : ''} Due Soon`,
+                        message: `Coming up in the next 3 days: ${upcomingTasks.map(t => t.name).slice(0, 2).join(', ')}${upcomingTasks.length > 2 ? '...' : ''}`,
+                        action: 'View Schedule',
+                        actionFn: () => { this.switchView('schedule'); this.closeModal('alertModal'); }
+                    });
+                }
+                
+                // Check projects without dates
+                const projectsWithoutDates = this.data.projects.filter(p => !p.startDate || !p.endDate);
+                
+                if (projectsWithoutDates.length > 0) {
+                    alerts.push({
+                        id: 'projects_no_dates',
+                        type: 'warning',
+                        icon: '📆',
+                        title: `${projectsWithoutDates.length} Project${projectsWithoutDates.length > 1 ? 's' : ''} Missing Dates`,
+                        message: `Add start and end dates to track progress: ${projectsWithoutDates.map(p => p.name).slice(0, 2).join(', ')}${projectsWithoutDates.length > 2 ? '...' : ''}`,
+                        action: 'View Projects',
+                        actionFn: () => { this.switchView('projects'); this.closeModal('alertModal'); }
+                    });
+                }
+                
+                // Check tasks without assignees
+                const tasksWithoutAssignee = this.data.tasks.filter(t => !t.assignee && t.status !== 'Completed');
+                
+                if (tasksWithoutAssignee.length > 3) {
+                    alerts.push({
+                        id: 'tasks_no_assignee',
+                        type: 'info',
+                        icon: '👤',
+                        title: `${tasksWithoutAssignee.length} Tasks Unassigned`,
+                        message: `Assign workers to tasks for better tracking.`,
+                        action: 'View Tasks',
+                        actionFn: () => { this.switchView('kanban'); this.closeModal('alertModal'); }
+                    });
+                }
+                
+                // Check projects with no tasks
+                const projectsWithoutTasks = this.data.projects.filter(p => {
+                    return this.data.tasks.filter(t => t.projectId === p.id).length === 0;
+                });
+                
+                if (projectsWithoutTasks.length > 0) {
+                    alerts.push({
+                        id: 'projects_no_tasks',
+                        type: 'info',
+                        icon: '📋',
+                        title: `${projectsWithoutTasks.length} Project${projectsWithoutTasks.length > 1 ? 's' : ''} Without Tasks`,
+                        message: `Add tasks to: ${projectsWithoutTasks.map(p => p.name).slice(0, 2).join(', ')}${projectsWithoutTasks.length > 2 ? '...' : ''}`,
+                        action: 'Add Tasks',
+                        actionFn: () => { this.showTaskModal(); this.closeModal('alertModal'); }
+                    });
+                }
+                
+                // Check budget warnings (expenses > income)
+                const projectsWithBudgetIssues = this.data.projects.filter(p => {
+                    const trans = this.data.transactions.filter(t => t.projectId === p.id);
+                    const income = trans.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+                    const expenses = trans.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+                    return expenses > income && income > 0;
+                });
+                
+                if (projectsWithBudgetIssues.length > 0) {
+                    alerts.push({
+                        id: 'budget_warning',
+                        type: 'critical',
+                        icon: '💸',
+                        title: `Budget Alert: ${projectsWithBudgetIssues.length} Project${projectsWithBudgetIssues.length > 1 ? 's' : ''}`,
+                        message: `Expenses exceed income: ${projectsWithBudgetIssues.map(p => p.name).slice(0, 2).join(', ')}${projectsWithBudgetIssues.length > 2 ? '...' : ''}`,
+                        action: 'View Projects',
+                        actionFn: () => { this.switchView('projects'); this.closeModal('alertModal'); }
+                    });
+                }
+                
+                // Check last sync time
+                const lastSyncTime = localStorage.getItem('lastSyncTime');
+                if (this.apiKey && lastSyncTime) {
+                    const hoursSinceSync = (Date.now() - parseInt(lastSyncTime)) / (1000 * 60 * 60);
+                    if (hoursSinceSync > 24) {
+                        alerts.push({
+                            id: 'sync_reminder',
+                            type: 'info',
+                            icon: '🔄',
+                            title: 'Sync Reminder',
+                            message: `Last synced ${Math.floor(hoursSinceSync)} hours ago. Sync now to backup your data.`,
+                            action: 'Sync Now',
+                            actionFn: () => { this.sync(); this.closeModal('alertModal'); }
+                        });
+                    }
+                }
+                
+                // Check idle projects (no activity in 7 days)
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                
+                const idleProjects = this.data.projects.filter(p => {
+                    const projectTasks = this.data.tasks.filter(t => t.projectId === p.id);
+                    const recentActivity = projectTasks.some(t => {
+                        const updated = new Date(t.updated_at || t.created_at);
+                        return updated > sevenDaysAgo;
+                    });
+                    return !recentActivity && projectTasks.length > 0;
+                });
+                
+                if (idleProjects.length > 0) {
+                    alerts.push({
+                        id: 'idle_projects',
+                        type: 'info',
+                        icon: '⏸️',
+                        title: `${idleProjects.length} Idle Project${idleProjects.length > 1 ? 's' : ''}`,
+                        message: `No activity in 7+ days: ${idleProjects.map(p => p.name).slice(0, 2).join(', ')}${idleProjects.length > 2 ? '...' : ''}`,
+                        action: 'View Projects',
+                        actionFn: () => { this.switchView('projects'); this.closeModal('alertModal'); }
+                    });
+                }
+                
+                // Filter out dismissed alerts
+                const newAlerts = alerts.filter(alert => {
+                    return !this.data.dismissedAlerts.includes(alert.id);
+                });
+                
+                this.data.alerts = newAlerts;
+                this.updateAlertBadge();
+                this.saveData();
+            },
+            
+            checkAndShowAlerts() {
+                this.generateAlerts();
+                
+                // Show critical alerts automatically
+                const criticalAlerts = this.data.alerts.filter(a => a.type === 'critical');
+                if (criticalAlerts.length > 0) {
+                    setTimeout(() => this.showAlerts(), 500);
+                }
+            },
+            
+            updateAlertBadge() {
+                const badge = this.dom.alertBadge;
+                const count = this.data.alerts.length;
+                
+                if (count > 0) {
+                    badge.textContent = count;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+            },
+            
+            showAlerts() {
+                if (this.data.alerts.length === 0) {
+                    this.toast('No alerts! Everything looks good 👍');
+                    return;
+                }
+                
+                const modal = document.getElementById('alertModal');
+                const body = document.getElementById('alertBody');
+                const countBadge = document.getElementById('alertCount');
+                
+                countBadge.textContent = this.data.alerts.length;
+                
+                let html = '';
+                
+                // Group alerts by type
+                const critical = this.data.alerts.filter(a => a.type === 'critical');
+                const warning = this.data.alerts.filter(a => a.type === 'warning');
+                const info = this.data.alerts.filter(a => a.type === 'info');
+                
+                const renderAlerts = (alerts, title, color) => {
+                    if (alerts.length === 0) return '';
+                    
+                    let section = `<div style="margin-bottom: 20px;">`;
+                    section += `<h3 style="font-size: 13px; color: ${color}; margin-bottom: 10px;">${title}</h3>`;
+                    
+                    alerts.forEach(alert => {
+                        section += `
+                            <div style="padding: 12px; background: var(--bg); border-radius: 8px; border-left: 4px solid ${color}; margin-bottom: 10px;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; gap: 10px;">
+                                    <div style="flex: 1;">
+                                        <div style="font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px;">
+                                            ${alert.icon} ${alert.title}
+                                        </div>
+                                        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 8px;">
+                                            ${alert.message}
+                                        </div>
+                                        <div style="display: flex; gap: 8px;">
+                                            <button class="btn btn-primary" onclick="app.executeAlertAction('${alert.id}')" style="padding: 4px 12px; font-size: 11px;">
+                                                ${alert.action}
+                                            </button>
+                                            <button class="btn btn-secondary" onclick="app.dismissAlert('${alert.id}')" style="padding: 4px 12px; font-size: 11px;">
+                                                Dismiss
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    section += `</div>`;
+                    return section;
+                };
+                
+                html += renderAlerts(critical, '🚨 Critical', 'var(--danger)');
+                html += renderAlerts(warning, '⚠️ Warnings', 'var(--warning)');
+                html += renderAlerts(info, 'ℹ️ Info', 'var(--accent)');
+                
+                body.innerHTML = html;
+                modal.classList.add('show');
+            },
+            
+            dismissAlert(alertId) {
+                this.data.dismissedAlerts.push(alertId);
+                this.data.alerts = this.data.alerts.filter(a => a.id !== alertId);
+                this.updateAlertBadge();
+                this.saveData();
+                
+                if (this.data.alerts.length === 0) {
+                    this.closeModal('alertModal');
+                    this.toast('All alerts cleared! 🎉');
+                } else {
+                    this.showAlerts();
+                }
+            },
+            
+            dismissAllAlerts() {
+                this.data.alerts.forEach(alert => {
+                    this.data.dismissedAlerts.push(alert.id);
+                });
+                this.data.alerts = [];
+                this.updateAlertBadge();
+                this.saveData();
+                this.closeModal('alertModal');
+                this.toast('All alerts dismissed! 🎉');
+            },
+            
+            executeAlertAction(alertId) {
+                const alert = this.data.alerts.find(a => a.id === alertId);
+                if (alert && alert.actionFn) {
+                    alert.actionFn();
+                    this.dismissAlert(alertId);
+                }
             }
         };
         
