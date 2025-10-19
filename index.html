@@ -745,6 +745,131 @@
             color: var(--text-secondary); 
         }
         
+        .smart-reminder {
+            position: fixed;
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 12px 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.25);
+            z-index: 9998;
+            max-width: 280px;
+            animation: slideInBounce 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .smart-reminder:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 25px rgba(0,0,0,0.3);
+        }
+        
+        .smart-reminder.night-mode-reminder {
+            background: #3d3d3d;
+            border-color: #ffc107;
+            color: #fff;
+        }
+        
+        @keyframes slideInBounce {
+            0% {
+                transform: translateX(100px) scale(0.5);
+                opacity: 0;
+            }
+            70% {
+                transform: translateX(-10px) scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: translateX(0) scale(1);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOutRight {
+            to {
+                transform: translateX(150px);
+                opacity: 0;
+            }
+        }
+        
+        .reminder-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 13px;
+            color: #856404;
+        }
+        
+        .night-mode-reminder .reminder-header {
+            color: #ffc107;
+        }
+        
+        .attention-dot {
+            width: 12px;
+            height: 12px;
+            background: #dc3545;
+            border-radius: 50%;
+            animation: pulseDot 1.5s infinite;
+            flex-shrink: 0;
+            box-shadow: 0 0 10px rgba(220, 53, 69, 0.6);
+        }
+        
+        @keyframes pulseDot {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.3);
+                opacity: 0.7;
+            }
+        }
+        
+        .reminder-content {
+            font-size: 12px;
+            line-height: 1.4;
+            color: #664d03;
+            margin-bottom: 8px;
+        }
+        
+        .night-mode-reminder .reminder-content {
+            color: #e0e0e0;
+        }
+        
+        .reminder-action {
+            font-size: 11px;
+            color: #0066cc;
+            font-weight: 500;
+            text-decoration: underline;
+        }
+        
+        .night-mode-reminder .reminder-action {
+            color: #66b3ff;
+        }
+        
+        .reminder-close {
+            position: absolute;
+            top: 5px;
+            right: 8px;
+            background: none;
+            border: none;
+            font-size: 18px;
+            color: #856404;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        
+        .night-mode-reminder .reminder-close {
+            color: #ffc107;
+        }
+        
+        .reminder-close:hover {
+            opacity: 1;
+        }
+        
         .task-item { 
             padding: 10px; 
             margin-bottom: 8px; 
@@ -1090,6 +1215,19 @@
         </div>
         
         <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
+                <span style="font-weight: 600; color: var(--text-color);">🧠 Smart Reminders</span>
+                <input type="checkbox" id="smartRemindersToggle" onchange="toggleSmartReminders()" checked style="width: 44px; height: 24px;">
+            </div>
+            <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 10px;">
+                Auto-detects missed tasks, overdue items, and important actions. Shows helpful sticky notes with attention dots!
+            </p>
+            <button class="btn btn-secondary" onclick="showSmartReminder()" style="width: 100%; font-size: 12px;">
+                🔍 Check For Reminders Now
+            </button>
+        </div>
+        
+        <div style="margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid var(--border-color);">
             <label style="display: block; font-weight: 600; margin-bottom: 10px; color: var(--text-color);">🎨 Theme Colors (18 Premium Themes)</label>
             <div class="theme-grid" id="themeGrid"></div>
         </div>
@@ -1352,6 +1490,8 @@
     </div>
 
     <div class="toast" id="toast"></div>
+    
+    <div id="smartReminderContainer"></div>
 
     <script>
         const APP_CONFIG = {
@@ -1401,7 +1541,8 @@
             timelineFilter: 'all',
             scheduleView: 'month',
             calendarEvents: [],
-            lastUpdated: null
+            lastUpdated: null,
+            smartRemindersEnabled: true
         };
 
         let editingId = null;
@@ -1410,14 +1551,345 @@
         let autoSyncInterval = null;
         let autoSyncEnabled = false;
 
+        // Smart Reminder Tracker
+        let reminderTracker = {
+            shown: [],
+            dismissed: [],
+            lastCheck: null,
+            checkInterval: null
+        };
+
+        // Load reminder tracker from localStorage
+        function loadReminderTracker() {
+            const saved = localStorage.getItem('reminderTracker');
+            if (saved) {
+                reminderTracker = JSON.parse(saved);
+            }
+        }
+
+        function saveReminderTracker() {
+            localStorage.setItem('reminderTracker', JSON.stringify(reminderTracker));
+        }
+
+        // Smart detection functions
+        function detectIssues() {
+            const issues = [];
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
+            // 1. Projects without dates
+            const projectsNoDates = data.projects.filter(p => !p.startDate || !p.endDate);
+            if (projectsNoDates.length > 0) {
+                issues.push({
+                    id: 'projects-no-dates',
+                    type: 'warning',
+                    title: '⚠️ Missing Dates!',
+                    message: `${projectsNoDates.length} project${projectsNoDates.length > 1 ? 's' : ''} missing start/end dates. Timeline view won't work properly!`,
+                    action: 'Fix Now',
+                    actionFn: () => {
+                        switchView('projects');
+                        showToast('Edit projects to add dates');
+                    }
+                });
+            }
+
+            // 2. Overdue tasks
+            const overdueTasks = data.tasks.filter(t => {
+                const due = new Date(t.dueDate);
+                due.setHours(0, 0, 0, 0);
+                return due < today && t.status !== 'Completed';
+            });
+            if (overdueTasks.length > 0) {
+                issues.push({
+                    id: 'overdue-tasks',
+                    type: 'urgent',
+                    title: '🚨 Overdue Tasks!',
+                    message: `${overdueTasks.length} task${overdueTasks.length > 1 ? 's are' : ' is'} overdue! Check Kanban to complete them.`,
+                    action: 'View Kanban',
+                    actionFn: () => {
+                        switchView('kanban');
+                    }
+                });
+            }
+
+            // 3. Tasks due today
+            const todayTasks = data.tasks.filter(t => {
+                const due = new Date(t.dueDate);
+                due.setHours(0, 0, 0, 0);
+                return due.getTime() === today.getTime() && t.status !== 'Completed';
+            });
+            if (todayTasks.length > 0) {
+                issues.push({
+                    id: 'tasks-due-today',
+                    type: 'info',
+                    title: '📅 Due Today!',
+                    message: `${todayTasks.length} task${todayTasks.length > 1 ? 's are' : ' is'} due today. Don't forget!`,
+                    action: 'View Tasks',
+                    actionFn: () => {
+                        switchView('kanban');
+                    }
+                });
+            }
+
+            // 4. Projects with no tasks
+            const projectsNoTasks = data.projects.filter(p => {
+                return data.tasks.filter(t => t.projectId === p.id).length === 0;
+            });
+            if (projectsNoTasks.length > 0) {
+                issues.push({
+                    id: 'projects-no-tasks',
+                    type: 'warning',
+                    title: '📋 Empty Projects!',
+                    message: `${projectsNoTasks.length} project${projectsNoTasks.length > 1 ? 's have' : ' has'} no tasks. Add tasks to track progress!`,
+                    action: 'Add Tasks',
+                    actionFn: () => {
+                        switchView('projects');
+                        showToast('Click + to add tasks to your projects');
+                    }
+                });
+            }
+
+            // 5. Projects with expenses but no income
+            const projectsNoIncome = data.projects.filter(p => {
+                const transactions = data.transactions.filter(t => t.projectId === p.id);
+                const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+                const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+                return expenses > 0 && income === 0;
+            });
+            if (projectsNoIncome.length > 0) {
+                issues.push({
+                    id: 'projects-no-income',
+                    type: 'warning',
+                    title: '💸 No Income Recorded!',
+                    message: `${projectsNoIncome.length} project${projectsNoIncome.length > 1 ? 's have' : ' has'} expenses but no income. Track your payments!`,
+                    action: 'Add Income',
+                    actionFn: () => {
+                        switchView('projects');
+                        showToast('Add income to your projects');
+                    }
+                });
+            }
+
+            // 6. High priority tasks not in progress
+            const highPriorityNotStarted = data.tasks.filter(t => 
+                (t.priority === 'High' || t.priority === 'Critical') && 
+                t.status === 'Get Ready' &&
+                t.status !== 'Completed'
+            );
+            if (highPriorityNotStarted.length > 0) {
+                issues.push({
+                    id: 'high-priority-not-started',
+                    type: 'urgent',
+                    title: '⚡ High Priority Tasks!',
+                    message: `${highPriorityNotStarted.length} critical task${highPriorityNotStarted.length > 1 ? 's' : ''} still in "Get Ready". Time to start!`,
+                    action: 'View Tasks',
+                    actionFn: () => {
+                        switchView('kanban');
+                    }
+                });
+            }
+
+            // 7. Projects ending soon (within 3 days)
+            const endingSoon = data.projects.filter(p => {
+                if (!p.endDate) return false;
+                const end = new Date(p.endDate);
+                end.setHours(0, 0, 0, 0);
+                const diff = Math.ceil((end - today) / (1000 * 60 * 60 * 24));
+                return diff >= 0 && diff <= 3;
+            });
+            if (endingSoon.length > 0) {
+                issues.push({
+                    id: 'projects-ending-soon',
+                    type: 'info',
+                    title: '⏰ Project Deadline!',
+                    message: `${endingSoon.length} project${endingSoon.length > 1 ? 's end' : ' ends'} within 3 days. Final push!`,
+                    action: 'View Schedule',
+                    actionFn: () => {
+                        switchView('schedule');
+                    }
+                });
+            }
+
+            // 8. Tasks without assignees
+            const tasksNoAssignee = data.tasks.filter(t => !t.assignee && t.status !== 'Completed');
+            if (tasksNoAssignee.length > 0 && data.tasks.length > 5) {
+                issues.push({
+                    id: 'tasks-no-assignee',
+                    type: 'info',
+                    title: '👤 Unassigned Tasks!',
+                    message: `${tasksNoAssignee.length} task${tasksNoAssignee.length > 1 ? 's have' : ' has'} no assignee. Assign workers for better tracking!`,
+                    action: 'Assign Now',
+                    actionFn: () => {
+                        switchView('kanban');
+                        showToast('Edit tasks to assign workers');
+                    }
+                });
+            }
+
+            // 9. No sync in 24 hours
+            const lastSyncTime = localStorage.getItem('lastSyncTime');
+            if (syncApiKey && lastSyncTime) {
+                const hoursSinceSync = (Date.now() - parseInt(lastSyncTime)) / (1000 * 60 * 60);
+                if (hoursSinceSync > 24) {
+                    issues.push({
+                        id: 'sync-needed',
+                        type: 'info',
+                        title: '🔄 Sync Needed!',
+                        message: `Last sync was ${Math.floor(hoursSinceSync)} hours ago. Sync to backup your data!`,
+                        action: 'Sync Now',
+                        actionFn: () => {
+                            smartSync();
+                        }
+                    });
+                }
+            }
+
+            return issues;
+        }
+
+        // Show smart reminder
+        function showSmartReminder() {
+            // Check if smart reminders are enabled
+            if (!data.smartRemindersEnabled) return;
+            
+            const issues = detectIssues();
+            
+            // Filter out already dismissed issues
+            const newIssues = issues.filter(issue => {
+                const wasShownRecently = reminderTracker.shown.some(s => 
+                    s.id === issue.id && 
+                    (Date.now() - s.timestamp) < 3600000 // Don't show same issue within 1 hour
+                );
+                const wasDismissed = reminderTracker.dismissed.some(d => 
+                    d.id === issue.id && 
+                    (Date.now() - d.timestamp) < 86400000 // Don't show dismissed issue within 24 hours
+                );
+                return !wasShownRecently && !wasDismissed;
+            });
+
+            if (newIssues.length === 0) return;
+
+            // Prioritize issues based on current view
+            let priorityIssue = null;
+            const currentView = data.currentView;
+            
+            if (currentView === 'projects') {
+                priorityIssue = newIssues.find(i => i.id === 'projects-no-dates' || i.id === 'projects-no-tasks' || i.id === 'projects-no-income');
+            } else if (currentView === 'kanban') {
+                priorityIssue = newIssues.find(i => i.id === 'overdue-tasks' || i.id === 'high-priority-not-started' || i.id === 'tasks-due-today');
+            } else if (currentView === 'schedule') {
+                priorityIssue = newIssues.find(i => i.id === 'projects-ending-soon' || i.id === 'projects-no-dates');
+            } else if (currentView === 'calendar') {
+                priorityIssue = newIssues.find(i => i.id === 'tasks-due-today' || i.id === 'overdue-tasks');
+            }
+            
+            // If no priority issue for current view, pick urgent ones first, then random
+            if (!priorityIssue) {
+                const urgentIssues = newIssues.filter(i => i.type === 'urgent');
+                if (urgentIssues.length > 0) {
+                    priorityIssue = urgentIssues[Math.floor(Math.random() * urgentIssues.length)];
+                } else {
+                    priorityIssue = newIssues[Math.floor(Math.random() * newIssues.length)];
+                }
+            }
+            
+            const issue = priorityIssue;
+
+            // Random positioning
+            const positions = [
+                { top: '80px', right: '20px' },
+                { top: '80px', left: '20px' },
+                { bottom: '100px', left: '20px' },
+                { top: '50%', right: '20px', transform: 'translateY(-50%)' }
+            ];
+            const pos = positions[Math.floor(Math.random() * positions.length)];
+
+            // Create reminder element
+            const container = document.getElementById('smartReminderContainer');
+            const reminder = document.createElement('div');
+            reminder.className = 'smart-reminder' + (data.nightMode ? ' night-mode-reminder' : '');
+            
+            Object.keys(pos).forEach(key => {
+                reminder.style[key] = pos[key];
+            });
+
+            reminder.innerHTML = `
+                <button class="reminder-close" onclick="dismissReminder('${issue.id}', this.parentElement)">×</button>
+                <div class="reminder-header">
+                    <div class="attention-dot"></div>
+                    <span>${issue.title}</span>
+                </div>
+                <div class="reminder-content">${issue.message}</div>
+                <div class="reminder-action">${issue.action} →</div>
+            `;
+
+            reminder.onclick = (e) => {
+                if (e.target.classList.contains('reminder-close')) return;
+                issue.actionFn();
+                dismissReminder(issue.id, reminder);
+            };
+
+            container.appendChild(reminder);
+
+            // Track that we showed this reminder
+            reminderTracker.shown.push({
+                id: issue.id,
+                timestamp: Date.now()
+            });
+            saveReminderTracker();
+
+            // Auto-dismiss after 15 seconds
+            setTimeout(() => {
+                if (reminder.parentElement) {
+                    dismissReminder(issue.id, reminder, true);
+                }
+            }, 15000);
+        }
+
+        function dismissReminder(issueId, element, auto = false) {
+            if (!auto) {
+                // Track dismissal only if user manually dismissed
+                reminderTracker.dismissed.push({
+                    id: issueId,
+                    timestamp: Date.now()
+                });
+                saveReminderTracker();
+            }
+
+            // Animate out
+            element.style.animation = 'slideOutRight 0.3s ease-out';
+            setTimeout(() => {
+                if (element.parentElement) {
+                    element.remove();
+                }
+            }, 300);
+        }
+
+        // Start smart reminder system
+        function startSmartReminders() {
+            // Initial check after 10 seconds
+            setTimeout(() => {
+                showSmartReminder();
+            }, 10000);
+
+            // Check every 15 minutes
+            reminderTracker.checkInterval = setInterval(() => {
+                showSmartReminder();
+            }, 15 * 60 * 1000);
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             loadData();
+            loadReminderTracker();
             aggressiveCleanup();
             initUI();
             updateStats();
             renderView();
             initAutoSync();
             initializeLastSync();
+            
+            // Start smart reminder system
+            startSmartReminders();
             
             if (!navigator.onLine) {
                 document.getElementById('syncMode').textContent = 'Offline';
@@ -1535,6 +2007,28 @@
             setContrast(data.contrast || 'normal');
             setSaturation(data.saturation || 'normal');
             updateHeader();
+            
+            // Restore smart reminders toggle
+            if (typeof data.smartRemindersEnabled !== 'undefined') {
+                document.getElementById('smartRemindersToggle').checked = data.smartRemindersEnabled;
+            }
+        }
+
+        function toggleSmartReminders() {
+            data.smartRemindersEnabled = document.getElementById('smartRemindersToggle').checked;
+            saveData();
+            
+            if (data.smartRemindersEnabled) {
+                showToast('✅ Smart reminders enabled');
+                // Show a reminder immediately to demonstrate
+                setTimeout(() => {
+                    showSmartReminder();
+                }, 2000);
+            } else {
+                showToast('🔕 Smart reminders disabled');
+                // Clear any existing reminders
+                document.getElementById('smartReminderContainer').innerHTML = '';
+            }
         }
 
         function initUI() {
@@ -1685,6 +2179,14 @@
             document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
             event.target.classList.add('active');
             renderView();
+            
+            // Check for smart reminders after view switch (delayed)
+            setTimeout(() => {
+                const random = Math.random();
+                if (random < 0.3) { // 30% chance to show reminder on view switch
+                    showSmartReminder();
+                }
+            }, 3000);
         }
 
         function renderView() {
@@ -1698,1134 +2200,25 @@
             }
         }
 
+        // Placeholder render functions - these would need the full implementation
         function renderHome(container) {
-            const income = data.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-            const expenses = data.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-            
-            let html = `
-                <div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
-                    <h3 style="font-size: 14px; margin-bottom: 12px; color: var(--text-color);">💰 Finance Summary</h3>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                        <div>
-                            <div style="font-size: 11px; color: var(--text-secondary);">Income</div>
-                            <div style="font-size: 18px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 11px; color: var(--text-secondary);">Expenses</div>
-                            <div style="font-size: 18px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 11px; color: var(--text-secondary);">Profit</div>
-                            <div style="font-size: 18px; font-weight: bold; color: ${income - expenses >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">
-                                $${(income - expenses).toFixed(2)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            if (data.projects.length > 0) {
-                html += renderProjectTimeline();
-            }
-            
-            container.innerHTML = html || '<div class="empty-state">No data yet. Click + to get started!</div>';
-        }
-
-        function renderProjectTimeline() {
-            if (data.projects.length === 0) return '';
-            
-            const projectsWithDates = data.projects.filter(p => p.startDate && p.endDate);
-            const projectsWithoutDates = data.projects.filter(p => !p.startDate || !p.endDate);
-            
-            let html = '<div class="gantt-container"><h3 style="font-size: 14px; margin-bottom: 15px; color: var(--text-color);">📅 Project Timeline</h3>';
-            
-            if (projectsWithDates.length === 0) {
-                html += '<div style="padding: 10px; background: var(--bg-color); border-radius: 8px;">';
-                html += '<p style="color: var(--text-secondary); margin-bottom: 10px;">No project dates set. Projects list:</p>';
-                data.projects.forEach(project => {
-                    html += `
-                        <div style="padding: 8px; margin-bottom: 5px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--accent-color); display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <strong style="color: var(--text-color);">${project.name}</strong> - <span style="color: var(--text-secondary);">${project.client}</span>
-                                ${project.locked ? ' 🔒' : ''}
-                            </div>
-                            <button class="icon-btn" onclick="editProject(${project.id})" ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>✏️</button>
-                        </div>
-                    `;
-                });
-                html += '</div></div>';
-                return html;
-            }
-            
-            let minDate = null;
-            let maxDate = null;
-            
-            projectsWithDates.forEach(p => {
-                const start = new Date(p.startDate);
-                const end = new Date(p.endDate);
-                if (!minDate || start < minDate) minDate = start;
-                if (!maxDate || end > maxDate) maxDate = end;
-            });
-            
-            const paddingDays = 3;
-            minDate.setDate(minDate.getDate() - paddingDays);
-            maxDate.setDate(maxDate.getDate() + paddingDays);
-            
-            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
-            
-            const months = [];
-            let current = new Date(minDate);
-            while (current <= maxDate) {
-                months.push({
-                    label: current.toLocaleDateString('en', { month: 'short', year: 'numeric' }),
-                    start: new Date(current),
-                    end: new Date(current.getFullYear(), current.getMonth() + 1, 0)
-                });
-                current.setMonth(current.getMonth() + 1);
-            }
-            
-            html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
-            months.forEach(month => {
-                const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
-                const monthEnd = Math.min(totalDays, Math.ceil((month.end - minDate) / (1000 * 60 * 60 * 24)) + 1);
-                const width = ((monthEnd - monthStart) / totalDays) * 100;
-                html += `<div class="gantt-month" style="width: ${width}%;">${month.label}</div>`;
-            });
-            html += '</div></div>';
-            
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            if (today >= minDate && today <= maxDate) {
-                const todayOffset = Math.ceil((today - minDate) / (1000 * 60 * 60 * 24));
-                const todayPosition = (todayOffset / totalDays) * 100;
-                html += `<div class="today-line" style="left: calc(150px + ${todayPosition}%);"></div>`;
-            }
-            
-            projectsWithDates.forEach(project => {
-                const start = new Date(project.startDate);
-                const end = new Date(project.endDate);
-                const startOffset = Math.ceil((start - minDate) / (1000 * 60 * 60 * 24));
-                const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-                const width = (duration / totalDays) * 100;
-                const left = (startOffset / totalDays) * 100;
-                
-                const isOverdue = end < today && !project.locked;
-                const barColor = isOverdue ? 
-                    'linear-gradient(135deg, #ef4444 0%, #f87171 100%)' : 
-                    'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
-                
-                html += `
-                    <div class="gantt-row">
-                        <div class="gantt-label" style="display: flex; align-items: center; gap: 8px;">
-                            <span title="${project.name}">${project.name} ${project.locked ? '🔒' : ''}</span>
-                            <button class="icon-btn" onclick="editProject(${project.id})" 
-                                    ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed; width: 24px; height: 24px;"' : 'style="width: 24px; height: 24px;"'}
-                                    title="${project.locked ? 'Project is locked' : 'Edit project'}">✏️</button>
-                        </div>
-                        <div class="gantt-timeline">
-                            <div class="gantt-bar" style="left: ${left}%; width: ${width}%; background: ${barColor};" 
-                                 onclick="showProjectDetail(${project.id})" title="Click for details">
-                                <div style="font-weight: 600;">${duration} days</div>
-                                <div class="gantt-bar-dates">
-                                    ${start.toLocaleDateString('en', { month: 'short', day: 'numeric' })} - 
-                                    ${end.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            if (projectsWithoutDates.length > 0) {
-                html += '<div style="margin-top: 15px; padding-top: 15px; border-top: 2px solid var(--border-color);">';
-                html += '<h4 style="font-size: 12px; margin-bottom: 10px; color: var(--text-secondary);">⚠️ Projects without dates:</h4>';
-                projectsWithoutDates.forEach(project => {
-                    html += `
-                        <div class="gantt-row">
-                            <div class="gantt-label" style="display: flex; align-items: center; gap: 8px;">
-                                <span>${project.name} ${project.locked ? '🔒' : ''}</span>
-                                <button class="icon-btn" onclick="editProject(${project.id})" 
-                                        ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed; width: 24px; height: 24px;"' : 'style="width: 24px; height: 24px;"'}>✏️</button>
-                            </div>
-                            <div class="gantt-timeline" style="display: flex; align-items: center; padding-left: 10px;">
-                                <span style="font-size: 11px; color: var(--text-secondary);">No dates set - ${project.client}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-            }
-            
-            html += '</div>';
-            return html;
-        }
-
-        function renderProjects(container) {
-            if (data.projects.length === 0) {
-                container.innerHTML = '<div class="empty-state">No projects yet. Click + to create one!</div>';
-                return;
-            }
-            
-            let html = '';
-            data.projects.forEach(project => {
-                const tasks = data.tasks.filter(t => t.projectId === project.id);
-                const transactions = data.transactions.filter(t => t.projectId === project.id);
-                const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-                const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-                const incomeList = transactions.filter(t => t.type === 'income');
-                const expenseList = transactions.filter(t => t.type === 'expense');
-                
-                html += `
-                    <div class="project-card">
-                        <div class="project-header" style="cursor: default;">
-                            <div style="display: flex; justify-content: space-between; align-items: start;">
-                                <div style="flex: 1;">
-                                    <h3 style="margin-bottom: 5px;">${project.name} ${project.locked ? '🔒' : ''}</h3>
-                                    <div style="font-size: 11px; opacity: 0.9;">Client: ${project.client}</div>
-                                </div>
-                                <div style="display: flex; gap: 5px;">
-                                    <button class="action-btn" onclick="editProject(${project.id})" ${project.locked ? 'disabled' : ''}>
-                                        ${project.locked ? 'Locked' : 'Edit'}
-                                    </button>
-                                    <button class="action-btn" onclick="toggleProjectLock(${project.id})">
-                                        ${project.locked ? 'Unlock' : 'Lock'}
-                                    </button>
-                                    <button class="action-btn" onclick="permanentDeleteProject(${project.id})">Delete</button>
-                                </div>
-                            </div>
-                            
-                            <div class="project-stats">
-                                <div style="text-align: center;">
-                                    <div style="font-size: 9px; opacity: 0.8;">Tasks</div>
-                                    <div style="font-size: 13px; font-weight: bold;">${tasks.length}</div>
-                                </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 9px; opacity: 0.8;">Income</div>
-                                    <div style="font-size: 13px; font-weight: bold; color: #4ade80;">${income.toFixed(0)}</div>
-                                </div>
-                                <div style="text-align: center;">
-                                    <div style="font-size: 9px; opacity: 0.8;">Profit</div>
-                                    <div style="font-size: 13px; font-weight: bold; color: ${income - expenses >= 0 ? '#4ade80' : '#f87171'};">
-                                        ${(income - expenses).toFixed(0)}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- Tasks Section -->
-                        <div style="padding: 12px; background: var(--bg-color);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <h4 style="font-size: 13px; color: var(--text-color); margin: 0;">📋 Tasks (${tasks.length})</h4>
-                                <button class="btn btn-primary" onclick="showTaskModal(); document.getElementById('taskProject').value = ${project.id};" style="padding: 4px 10px; font-size: 11px;">+ Add Task</button>
-                            </div>
-                            ${tasks.length === 0 ? '<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 12px;">No tasks yet</div>' : ''}
-                            ${tasks.map(task => `
-                                <div class="task-item" style="margin-bottom: 6px;">
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 500; color: var(--text-color); font-size: 12px;">${task.name}</div>
-                                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">
-                                            📅 ${task.dueDate} • ${task.priority} • ${task.status}
-                                            ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
-                                        </div>
-                                    </div>
-                                    <div style="display: flex; gap: 4px;">
-                                        <button class="icon-btn" onclick="editTask(${task.id})" style="width: 26px; height: 26px; font-size: 11px;">✏️</button>
-                                        <button class="icon-btn danger" onclick="deleteTask(${task.id})" style="width: 26px; height: 26px; font-size: 11px;">🗑️</button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        
-                        <!-- Income Section -->
-                        <div style="padding: 12px; background: var(--card-bg); border-top: 1px solid var(--border-color);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <h4 style="font-size: 13px; color: var(--income-color); margin: 0;">💰 Income (${incomeList.length}) - ${income.toFixed(2)}</h4>
-                                <button class="btn btn-success" onclick="showTransactionModal('income'); document.getElementById('transProject').value = ${project.id};" style="padding: 4px 10px; font-size: 11px;">+ Add Income</button>
-                            </div>
-                            ${incomeList.length === 0 ? '<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 12px;">No income yet</div>' : ''}
-                            ${incomeList.map(trans => `
-                                <div style="padding: 8px; margin-bottom: 6px; background: var(--bg-color); border-radius: 6px; border-left: 3px solid var(--income-color); display: flex; justify-content: space-between; align-items: center;">
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 500; color: var(--text-color); font-size: 12px;">${trans.amount.toFixed(2)} - ${trans.category}</div>
-                                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">
-                                            📅 ${trans.date}${trans.description ? ` • ${trans.description}` : ''}
-                                        </div>
-                                    </div>
-                                    <div style="display: flex; gap: 4px;">
-                                        <button class="icon-btn" onclick="editTransaction(${trans.id})" style="width: 26px; height: 26px; font-size: 11px;">✏️</button>
-                                        <button class="icon-btn danger" onclick="deleteTransaction(${trans.id})" style="width: 26px; height: 26px; font-size: 11px;">🗑️</button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                        
-                        <!-- Expenses Section -->
-                        <div style="padding: 12px; background: var(--bg-color); border-top: 1px solid var(--border-color);">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <h4 style="font-size: 13px; color: var(--expense-color); margin: 0;">💸 Expenses (${expenseList.length}) - ${expenses.toFixed(2)}</h4>
-                                <button class="btn btn-danger" onclick="showTransactionModal('expense'); document.getElementById('transProject').value = ${project.id};" style="padding: 4px 10px; font-size: 11px;">+ Add Expense</button>
-                            </div>
-                            ${expenseList.length === 0 ? '<div style="text-align: center; padding: 10px; color: var(--text-secondary); font-size: 12px;">No expenses yet</div>' : ''}
-                            ${expenseList.map(trans => `
-                                <div style="padding: 8px; margin-bottom: 6px; background: var(--card-bg); border-radius: 6px; border-left: 3px solid var(--expense-color); display: flex; justify-content: space-between; align-items: center;">
-                                    <div style="flex: 1;">
-                                        <div style="font-weight: 500; color: var(--text-color); font-size: 12px;">${trans.amount.toFixed(2)} - ${trans.category}</div>
-                                        <div style="font-size: 10px; color: var(--text-secondary); margin-top: 2px;">
-                                            📅 ${trans.date}${trans.description ? ` • ${trans.description}` : ''}
-                                        </div>
-                                    </div>
-                                    <div style="display: flex; gap: 4px;">
-                                        <button class="icon-btn" onclick="editTransaction(${trans.id})" style="width: 26px; height: 26px; font-size: 11px;">✏️</button>
-                                        <button class="icon-btn danger" onclick="deleteTransaction(${trans.id})" style="width: 26px; height: 26px; font-size: 11px;">🗑️</button>
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        function editTransaction(id) {
-            const trans = data.transactions.find(t => t.id === id);
-            if (!trans) return;
-            
-            editingId = id;
-            editingType = 'transaction';
-            document.getElementById('transactionModalTitle').textContent = `Edit ${trans.type === 'income' ? 'Income' : 'Expense'}`;
-            document.getElementById('transType').value = trans.type;
-            document.getElementById('transAmount').value = trans.amount;
-            document.getElementById('transDate').value = trans.date;
-            document.getElementById('transDescription').value = trans.description || '';
-            
-            const select = document.getElementById('transProject');
-            select.innerHTML = '<option value="">Select Project</option>';
-            data.projects.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-            });
-            select.value = trans.projectId;
-            
-            updateCategories();
-            document.getElementById('transCategory').value = trans.category;
-            
-            document.getElementById('transactionModal').classList.add('show');
-        }
-
-        function deleteTransaction(id) {
-            const trans = data.transactions.find(t => t.id === id);
-            if (!trans) return;
-            
-            if (confirm(`⚠️ Delete ${trans.type} of ${trans.amount.toFixed(2)}?`)) {
-                const now = new Date().toISOString();
-                trans.deleted_at = now;
-                data.transactions = data.transactions.filter(t => t.id !== id);
-                
-                saveData();
-                renderView();
-                updateStats();
-                showToast('Transaction deleted');
-            }
-        }
-
-        function renderSchedule(container) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            // Calculate 18 months forward from today
-            const minDate = new Date(today);
-            minDate.setDate(1); // Start of current month
-            const maxDate = new Date(today);
-            maxDate.setMonth(maxDate.getMonth() + 18);
-            maxDate.setDate(0); // End of 18 months forward
-            
-            const projectsWithDates = data.projects.filter(p => p.startDate && p.endDate);
-            const projectsWithoutDates = data.projects.filter(p => !p.startDate || !p.endDate);
-            
-            let html = `
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; padding: 10px; background: var(--card-bg); border-radius: 8px; box-shadow: 0 2px 5px var(--shadow-color);">
-                    <h3 style="font-size: 14px; margin: 0; color: var(--text-color);">📊 18-Month Project Timeline</h3>
-                    <button class="btn btn-primary" onclick="showProjectModal()" style="padding: 6px 12px; font-size: 12px;">+ New Project</button>
-                </div>
-            `;
-            
-            if (projectsWithDates.length === 0) {
-                html += '<div class="empty-state">No projects with dates yet. Add start and end dates to your projects!</div>';
-                container.innerHTML = html;
-                return;
-            }
-            
-            // Extend minDate and maxDate to include all project dates
-            projectsWithDates.forEach(p => {
-                const start = new Date(p.startDate);
-                const end = new Date(p.endDate);
-                if (start < minDate) minDate.setTime(start.getTime());
-                if (end > maxDate) maxDate.setTime(end.getTime());
-            });
-            
-            const totalDays = Math.ceil((maxDate - minDate) / (1000 * 60 * 60 * 24)) + 1;
-            
-            // Generate months for header
-            const months = [];
-            let current = new Date(minDate);
-            while (current <= maxDate) {
-                const monthStart = new Date(current.getFullYear(), current.getMonth(), 1);
-                const monthEnd = new Date(current.getFullYear(), current.getMonth() + 1, 0);
-                months.push({
-                    label: current.toLocaleDateString('en', { month: 'short', year: 'numeric' }),
-                    start: monthStart,
-                    end: monthEnd
-                });
-                current.setMonth(current.getMonth() + 1);
-            }
-            
-            html += '<div class="gantt-container" style="position: relative;">';
-            
-            // Render month headers
-            html += '<div class="gantt-timeline-header"><div class="gantt-timeline-months">';
-            months.forEach(month => {
-                const monthStart = Math.max(0, Math.ceil((month.start - minDate) / (1000 * 60 * 60 * 24)));
-                const monthEnd = Math.min(totalDays, Math.ceil((month.end - minDate) / (1000 * 60 * 60 * 24)) + 1);
-                const width = ((monthEnd - monthStart) / totalDays) * 100;
-                html += `<div class="gantt-month" style="width: ${width}%;">${month.label}</div>`;
-            });
-            html += '</div></div>';
-            
-            // Add TODAY line
-            if (today >= minDate && today <= maxDate) {
-                const todayOffset = Math.ceil((today - minDate) / (1000 * 60 * 60 * 24));
-                const todayPosition = (todayOffset / totalDays) * 100;
-                html += `<div class="today-line" style="left: calc(150px + ${todayPosition}%);"></div>`;
-            }
-            
-            // Sort projects by start date
-            const sortedProjects = projectsWithDates.sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-            
-            // Render all projects
-            sortedProjects.forEach(project => {
-                const start = new Date(project.startDate);
-                const end = new Date(project.endDate);
-                const tasks = data.tasks.filter(t => t.projectId === project.id);
-                const isExpanded = data.expandedScheduleProjects?.includes(project.id);
-                
-                const startOffset = Math.ceil((start - minDate) / (1000 * 60 * 60 * 24));
-                const duration = Math.ceil((end - start) / (1000 * 60 * 60 * 24)) + 1;
-                const width = (duration / totalDays) * 100;
-                const left = (startOffset / totalDays) * 100;
-                
-                const isOverdue = end < today && !project.locked;
-                const barColor = isOverdue ? 
-                    'linear-gradient(135deg, #ef4444 0%, #f87171 100%)' : 
-                    'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
-                
-                html += `
-                    <div style="margin-bottom: ${isExpanded ? '20px' : '8px'};">
-                        <div class="gantt-row">
-                            <div class="gantt-label" style="display: flex; align-items: center; gap: 8px;">
-                                <span title="${project.name}">${project.name} ${project.locked ? '🔒' : ''}</span>
-                                <div style="display: flex; gap: 3px;">
-                                    <button class="icon-btn" onclick="editProject(${project.id})" 
-                                            ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed; width: 22px; height: 22px; font-size: 10px;"' : 'style="width: 22px; height: 22px; font-size: 10px;"'}
-                                            title="${project.locked ? 'Project is locked' : 'Edit project'}">✏️</button>
-                                    <button class="icon-btn danger" onclick="permanentDeleteProject(${project.id})" style="width: 22px; height: 22px; font-size: 10px;" title="Delete project">🗑️</button>
-                                </div>
-                            </div>
-                            <div class="gantt-timeline">
-                                <div class="gantt-bar" style="left: ${left}%; width: ${width}%; background: ${barColor};" 
-                                     onclick="toggleScheduleProjectExpand(${project.id})" title="Click to see tasks">
-                                    <div style="font-weight: 600; font-size: 10px;">${duration}d • ${tasks.length} tasks</div>
-                                    <div class="gantt-bar-dates" style="font-size: 9px;">
-                                        ${start.toLocaleDateString('en', { month: 'short', day: 'numeric' })} - 
-                                        ${end.toLocaleDateString('en', { month: 'short', day: 'numeric' })}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                
-                        ${isExpanded ? renderScheduleTasksGantt(tasks, project, minDate, totalDays) : ''}
-                    </div>
-                `;
-            });
-            
-            // Show projects without dates
-            if (projectsWithoutDates.length > 0) {
-                html += '<div style="margin-top: 20px; padding-top: 15px; border-top: 2px solid var(--border-color);">';
-                html += '<h4 style="font-size: 12px; margin-bottom: 10px; color: var(--text-secondary);">⚠️ Projects without dates:</h4>';
-                projectsWithoutDates.forEach(project => {
-                    html += `
-                        <div class="gantt-row">
-                            <div class="gantt-label" style="display: flex; align-items: center; gap: 8px;">
-                                <span>${project.name} ${project.locked ? '🔒' : ''}</span>
-                                <div style="display: flex; gap: 3px;">
-                                    <button class="icon-btn" onclick="editProject(${project.id})" 
-                                            ${project.locked ? 'disabled style="opacity: 0.5; cursor: not-allowed; width: 22px; height: 22px; font-size: 10px;"' : 'style="width: 22px; height: 22px; font-size: 10px;"'}>✏️</button>
-                                    <button class="icon-btn danger" onclick="permanentDeleteProject(${project.id})" style="width: 22px; height: 22px; font-size: 10px;">🗑️</button>
-                                </div>
-                            </div>
-                            <div class="gantt-timeline" style="display: flex; align-items: center; padding-left: 10px;">
-                                <span style="font-size: 11px; color: var(--text-secondary);">No dates set - ${project.client}</span>
-                            </div>
-                        </div>
-                    `;
-                });
-                html += '</div>';
-            }
-            
-            html += '</div>';
-            container.innerHTML = html;
-        }
-
-        function renderScheduleTasksGantt(tasks, project, minDate, totalDays) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            if (tasks.length === 0) {
-                return `
-                    <div style="margin-left: 150px; padding: 10px; background: var(--bg-color); border-radius: 6px; margin-top: 5px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="font-size: 11px; color: var(--text-secondary);">No tasks yet</span>
-                            <button class="btn btn-primary" onclick="showTaskModal(); document.getElementById('taskProject').value = ${project.id};" style="padding: 4px 8px; font-size: 10px;">+ Add Task</button>
-                        </div>
-                    </div>
-                `;
-            }
-            
-            let html = `
-                <div style="margin-left: 150px; padding: 10px; background: var(--bg-color); border-radius: 6px; margin-top: 5px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                        <h5 style="font-size: 11px; margin: 0; color: var(--text-color);">📋 Tasks (${tasks.length})</h5>
-                        <button class="btn btn-primary" onclick="showTaskModal(); document.getElementById('taskProject').value = ${project.id};" style="padding: 4px 8px; font-size: 10px;">+ Add Task</button>
-                    </div>
-            `;
-            
-            tasks.forEach(task => {
-                const startDate = task.startDate ? new Date(task.startDate) : new Date(task.dueDate);
-                const dueDate = new Date(task.dueDate);
-                
-                const startOffset = Math.max(0, Math.ceil((startDate - minDate) / (1000 * 60 * 60 * 24)));
-                const duration = Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24)) + 1;
-                const width = Math.max((duration / totalDays) * 100, 2);
-                const left = (startOffset / totalDays) * 100;
-                
-                let barColor = 'linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%)';
-                if (task.status === 'Completed') barColor = 'linear-gradient(135deg, #10b981 0%, #34d399 100%)';
-                else if (task.status === 'In Progress') barColor = 'linear-gradient(135deg, #f39c12 0%, #f9c74f 100%)';
-                else if (dueDate < today) barColor = 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)';
-                
-                html += `
-                    <div style="display: flex; align-items: center; margin-bottom: 8px; gap: 8px;">
-                        <div style="min-width: 100px; font-size: 10px; color: var(--text-color); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${task.name}">${task.name}</div>
-                        <div style="flex: 1; position: relative; height: 30px; background: rgba(0,0,0,0.05); border-radius: 4px;">
-                            <div style="position: absolute; left: ${left}%; width: ${width}%; height: 100%; background: ${barColor}; border-radius: 4px; display: flex; align-items: center; justify-content: center; padding: 0 5px; color: white; font-size: 8px; font-weight: 500; cursor: pointer;" onclick="editTask(${task.id})" title="${task.priority} - ${task.status}">
-                                ${duration}d
-                            </div>
-                        </div>
-                        <div style="display: flex; gap: 3px;">
-                            <button class="icon-btn" onclick="editTask(${task.id})" style="width: 22px; height: 22px; font-size: 10px;" title="Edit">✏️</button>
-                            <button class="icon-btn danger" onclick="deleteTask(${task.id})" style="width: 22px; height: 22px; font-size: 10px;" title="Delete">🗑️</button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            return html;
-        }
-
-        function toggleScheduleProjectExpand(projectId) {
-            if (!data.expandedScheduleProjects) {
-                data.expandedScheduleProjects = [];
-            }
-            
-            const index = data.expandedScheduleProjects.indexOf(projectId);
-            if (index > -1) {
-                data.expandedScheduleProjects.splice(index, 1);
-            } else {
-                data.expandedScheduleProjects.push(projectId);
-            }
-            
-            saveData();
-            renderView();
-        }
-
-        function setScheduleView(view) {
-            data.scheduleView = view;
-            saveData();
-            renderView();
+            container.innerHTML = '<div class="empty-state">Home view placeholder</div>';
         }
 
         function renderKanban(container) {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            const dueTasks = data.tasks.filter(t => {
-                const dueDate = new Date(t.dueDate);
-                dueDate.setHours(0, 0, 0, 0);
-                return dueDate <= today && t.status !== 'Completed';
-            });
-            
-            const inProgressTasks = data.tasks.filter(t => t.status === 'In Progress');
-            const getReadyTasks = data.tasks.filter(t => 
-                (t.status === 'Get Ready' || !t.status) && !dueTasks.includes(t)
-            );
-            
-            const columns = [
-                { title: 'Due', status: 'Due', tasks: dueTasks, color: '#ef4444' },
-                { title: 'In Progress', status: 'In Progress', tasks: inProgressTasks, color: '#f39c12' },
-                { title: 'Get Ready', status: 'Get Ready', tasks: getReadyTasks, color: 'var(--accent-color)' }
-            ];
-            
-            let html = '<div style="display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px;">';
-            columns.forEach(column => {
-                html += `
-                    <div style="min-width: 280px; background: var(--card-bg); border-radius: 10px; padding: 10px; box-shadow: 0 2px 10px var(--shadow-color);">
-                        <h3 style="font-size: 14px; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid ${column.color}; color: ${column.color};">
-                            ${column.title} (${column.tasks.length})
-                        </h3>
-                        <div style="min-height: 100px;">
-                `;
-                
-                column.tasks.forEach(task => {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    
-                    html += `
-                        <div style="background: var(--bg-color); padding: 10px; border-radius: 8px; margin-bottom: 8px; 
-                                    border-left: 3px solid ${column.color};">
-                            <div style="font-weight: 500; margin-bottom: 5px; color: var(--text-color);">${task.name}</div>
-                            <div style="font-size: 11px; color: var(--text-secondary);">
-                                ${project ? project.name : 'No Project'}
-                            </div>
-                            <div style="font-size: 10px; margin-top: 5px; color: var(--text-secondary);">
-                                📅 ${task.dueDate} • ${task.priority} Priority
-                                ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
-                            </div>
-                            <div style="display: flex; gap: 4px; margin-top: 8px;">
-                                <button class="btn btn-secondary" onclick="editTask(${task.id});" 
-                                        style="padding: 4px 8px; font-size: 11px;">✏️ Edit</button>
-                                <button class="btn btn-secondary" onclick="completeTask(${task.id});" 
-                                        style="padding: 4px 8px; font-size: 11px;">✅</button>
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                html += '</div></div>';
-            });
-            html += '</div>';
-            
-            container.innerHTML = html;
+            container.innerHTML = '<div class="empty-state">Kanban view placeholder</div>';
+        }
+
+        function renderProjects(container) {
+            container.innerHTML = '<div class="empty-state">Projects view placeholder</div>';
+        }
+
+        function renderSchedule(container) {
+            container.innerHTML = '<div class="empty-state">Schedule view placeholder</div>';
         }
 
         function renderCalendar(container) {
-            const today = new Date();
-            const currentMonth = today.getMonth();
-            const currentYear = today.getFullYear();
-            
-            let html = `
-                <div class="calendar-container">
-                    <div class="calendar-header">
-                        <h3 style="font-size: 16px; color: var(--text-color);">
-                            ${today.toLocaleDateString('en', { month: 'long', year: 'numeric' })}
-                        </h3>
-                        <button class="sync-calendar-btn" onclick="syncToiPhoneCalendar()">
-                            📱 Sync to iPhone Calendar
-                        </button>
-                    </div>
-                    
-                    <div class="calendar-grid">
-                        <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Sun</div>
-                        <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Mon</div>
-                        <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Tue</div>
-                        <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Wed</div>
-                        <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Thu</div>
-                        <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Fri</div>
-                        <div style="font-weight: bold; text-align: center; color: var(--text-secondary);">Sat</div>
-            `;
-            
-            const firstDay = new Date(currentYear, currentMonth, 1).getDay();
-            const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
-            
-            for (let i = 0; i < firstDay; i++) {
-                html += '<div class="calendar-day other-month"></div>';
-            }
-            
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(currentYear, currentMonth, day);
-                const dateStr = date.toISOString().split('T')[0];
-                const isToday = date.toDateString() === today.toDateString();
-                
-                const dayTasks = data.tasks.filter(t => {
-                    return t.dueDate === dateStr || t.startDate === dateStr;
-                });
-                
-                html += `<div class="calendar-day ${isToday ? 'today' : ''} ${dayTasks.length > 0 ? 'has-event' : ''}" 
-                             onclick="showDayDetail('${dateStr}')" title="Click to view details">
-                    <div style="font-weight: bold;">${day}</div>`;
-                
-                if (dayTasks.length > 0) {
-                    dayTasks.slice(0, 2).forEach(task => {
-                        html += `<div class="calendar-event" title="${task.name}">${task.name.substring(0, 10)}</div>`;
-                    });
-                    if (dayTasks.length > 2) {
-                        html += `<div style="font-size: 9px; color: ${isToday ? 'rgba(255,255,255,0.9)' : 'var(--text-secondary)'};">+${dayTasks.length - 2} more</div>`;
-                    }
-                }
-                
-                html += '</div>';
-            }
-            
-            html += '</div></div>';
-            
-            // Add Smart Analytics below calendar
-            html += renderCalendarAnalytics();
-            
-            container.innerHTML = html;
-        }
-
-        function renderCalendarAnalytics() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            const analytics = analyzeSchedule();
-            
-            let html = `
-                <div style="margin-top: 20px;">
-                    <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--text-color);">🧠 Smart Schedule Analytics</h3>
-                    
-                    <!-- Available Time -->
-                    <div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 24px;">📅</span>
-                            <h4 style="font-size: 14px; margin: 0; color: var(--text-color);">Available Time (Next 30 Days)</h4>
-                        </div>
-                        ${renderAvailableDates(analytics.availableDates)}
-                    </div>
-                    
-                    <!-- Overwhelming Dates -->
-                    <div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 24px;">🔥</span>
-                            <h4 style="font-size: 14px; margin: 0; color: var(--text-color);">Overwhelming Dates (Multiple Projects Overlapping)</h4>
-                        </div>
-                        ${renderOverwhelmingDates(analytics.overwhelmingDates)}
-                    </div>
-                    
-                    <!-- Suggested Breaks -->
-                    <div style="background: var(--card-bg); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color);">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 24px;">🏖️</span>
-                            <h4 style="font-size: 14px; margin: 0; color: var(--text-color);">Suggested Break Days</h4>
-                        </div>
-                        ${renderSuggestedBreaks(analytics.suggestedBreaks)}
-                    </div>
-                    
-                    <!-- Fun Insights -->
-                    <div style="background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%); border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 10px var(--shadow-color); color: white;">
-                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                            <span style="font-size: 24px;">🎉</span>
-                            <h4 style="font-size: 14px; margin: 0;">Fun Stats & Insights</h4>
-                        </div>
-                        ${renderFunInsights(analytics)}
-                    </div>
-                </div>
-            `;
-            
-            return html;
-        }
-
-        function analyzeSchedule() {
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            const next30Days = new Date(today);
-            next30Days.setDate(today.getDate() + 30);
-            
-            const next90Days = new Date(today);
-            next90Days.setDate(today.getDate() + 90);
-            
-            // Analyze each day
-            const dailyLoad = {};
-            const availableDates = [];
-            const overwhelmingDates = [];
-            
-            // Get active projects
-            const activeProjects = data.projects.filter(p => {
-                if (!p.startDate || !p.endDate) return false;
-                const start = new Date(p.startDate);
-                const end = new Date(p.endDate);
-                return end >= today;
-            });
-            
-            // Analyze next 90 days
-            for (let d = new Date(today); d <= next90Days; d.setDate(d.getDate() + 1)) {
-                const dateStr = d.toISOString().split('T')[0];
-                const currentDate = new Date(d);
-                
-                // Count overlapping projects
-                const overlappingProjects = activeProjects.filter(p => {
-                    const start = new Date(p.startDate);
-                    const end = new Date(p.endDate);
-                    return currentDate >= start && currentDate <= end;
-                });
-                
-                // Count tasks due
-                const tasksDue = data.tasks.filter(t => t.dueDate === dateStr && t.status !== 'Completed');
-                
-                const load = {
-                    date: new Date(currentDate),
-                    dateStr: dateStr,
-                    projects: overlappingProjects.length,
-                    tasks: tasksDue.length,
-                    totalLoad: overlappingProjects.length + tasksDue.length,
-                    projectNames: overlappingProjects.map(p => p.name)
-                };
-                
-                dailyLoad[dateStr] = load;
-                
-                // Available dates (within next 30 days, no projects, no tasks)
-                if (currentDate <= next30Days && load.totalLoad === 0) {
-                    availableDates.push(load);
-                }
-                
-                // Overwhelming dates (3+ projects overlapping)
-                if (load.projects >= 3) {
-                    overwhelmingDates.push(load);
-                }
-            }
-            
-            // Suggest breaks (find consecutive available dates)
-            const suggestedBreaks = findBreakPeriods(availableDates, dailyLoad);
-            
-            return {
-                availableDates: availableDates.slice(0, 10),
-                overwhelmingDates: overwhelmingDates.slice(0, 10),
-                suggestedBreaks: suggestedBreaks,
-                dailyLoad: dailyLoad,
-                stats: {
-                    totalProjects: activeProjects.length,
-                    avgDailyLoad: Object.values(dailyLoad).reduce((sum, d) => sum + d.totalLoad, 0) / Object.keys(dailyLoad).length,
-                    busiestDay: Object.values(dailyLoad).sort((a, b) => b.totalLoad - a.totalLoad)[0],
-                    quietestDay: Object.values(dailyLoad).filter(d => d.totalLoad > 0).sort((a, b) => a.totalLoad - b.totalLoad)[0]
-                }
-            };
-        }
-
-        function findBreakPeriods(availableDates, dailyLoad) {
-            const breaks = [];
-            const today = new Date();
-            today.setHours(0, 0, 0, 0);
-            
-            // Find periods of 2-3 consecutive available days
-            for (let i = 0; i < availableDates.length - 1; i++) {
-                const current = availableDates[i];
-                const next = availableDates[i + 1];
-                
-                const dayDiff = Math.ceil((next.date - current.date) / (1000 * 60 * 60 * 24));
-                
-                if (dayDiff === 1) {
-                    // Consecutive days found
-                    const breakStart = new Date(current.date);
-                    let breakEnd = new Date(next.date);
-                    let consecutiveDays = 2;
-                    
-                    // Check if more consecutive days
-                    for (let j = i + 2; j < availableDates.length; j++) {
-                        const nextDay = availableDates[j];
-                        const nextDiff = Math.ceil((nextDay.date - breakEnd) / (1000 * 60 * 60 * 24));
-                        if (nextDiff === 1) {
-                            breakEnd = new Date(nextDay.date);
-                            consecutiveDays++;
-                            if (consecutiveDays >= 3) break; // Max 3 days
-                        } else {
-                            break;
-                        }
-                    }
-                    
-                    if (consecutiveDays >= 2 && breakStart > today) {
-                        breaks.push({
-                            start: breakStart,
-                            end: breakEnd,
-                            days: consecutiveDays,
-                            activities: generateActivitySuggestions(breakStart, consecutiveDays)
-                        });
-                        
-                        if (breaks.length >= 3) break; // Only suggest 3 break periods
-                    }
-                }
-            }
-            
-            return breaks;
-        }
-
-        function generateActivitySuggestions(date, days) {
-            const activities = [
-                {
-                    type: 'Beach Getaway 🏖️',
-                    locations: ['Langkawi', 'Penang', 'Port Dickson'],
-                    description: 'Relax by the sea, enjoy water sports, and fresh seafood'
-                },
-                {
-                    type: 'Mountain Retreat 🏔️',
-                    locations: ['Cameron Highlands', 'Genting Highlands', 'Fraser\'s Hill'],
-                    description: 'Cool weather, tea plantations, and hiking trails'
-                },
-                {
-                    type: 'City Exploration 🏙️',
-                    locations: ['Georgetown Penang', 'Melaka', 'Ipoh'],
-                    description: 'Heritage sites, street food, and cultural experiences'
-                },
-                {
-                    type: 'Nature Adventure 🌲',
-                    locations: ['Taman Negara', 'Kinabalu Park', 'Endau-Rompin'],
-                    description: 'Jungle trekking, wildlife spotting, and camping'
-                },
-                {
-                    type: 'Spa & Wellness 🧘',
-                    locations: ['The Banjaran Ipoh', 'Gaya Island Resort', 'Pangkor Laut'],
-                    description: 'Massage, yoga, meditation, and healthy dining'
-                },
-                {
-                    type: 'Food Paradise 🍜',
-                    locations: ['Jalan Alor KL', 'Gurney Drive Penang', 'Jonker Street Melaka'],
-                    description: 'Street food tours, local delicacies, and night markets'
-                },
-                {
-                    type: 'Shopping Spree 🛍️',
-                    locations: ['Pavilion KL', 'Mid Valley', 'Johor Premium Outlets'],
-                    description: 'Retail therapy, luxury brands, and great deals'
-                },
-                {
-                    type: 'Theme Park Fun 🎢',
-                    locations: ['Sunway Lagoon', 'Legoland Johor', 'Lost World Tambun'],
-                    description: 'Roller coasters, water slides, and family fun'
-                }
-            ];
-            
-            // Randomly select 3 activities
-            const shuffled = activities.sort(() => 0.5 - Math.random());
-            return shuffled.slice(0, 3);
-        }
-
-        function renderAvailableDates(dates) {
-            if (dates.length === 0) {
-                return '<p style="font-size: 12px; color: var(--text-secondary); text-align: center;">No completely free days in the next 30 days. You\'re fully booked! 💪</p>';
-            }
-            
-            let html = '<div style="display: flex; flex-wrap: wrap; gap: 8px;">';
-            dates.forEach(day => {
-                const dayName = day.date.toLocaleDateString('en', { weekday: 'short' });
-                const dateStr = day.date.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-                html += `
-                    <div style="padding: 8px 12px; background: linear-gradient(135deg, #10b981 0%, #34d399 100%); color: white; border-radius: 6px; font-size: 11px; text-align: center;">
-                        <div style="font-weight: bold;">${dayName}</div>
-                        <div style="font-size: 10px; opacity: 0.9;">${dateStr}</div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            return html;
-        }
-
-        function renderOverwhelmingDates(dates) {
-            if (dates.length === 0) {
-                return '<p style="font-size: 12px; color: var(--text-secondary); text-align: center;">No overwhelming dates detected. Your workload looks manageable! 👍</p>';
-            }
-            
-            let html = '<div style="display: flex; flex-direction: column; gap: 10px;">';
-            dates.forEach(day => {
-                const dateStr = day.date.toLocaleDateString('en', { weekday: 'long', month: 'long', day: 'numeric' });
-                html += `
-                    <div style="padding: 10px; background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); color: white; border-radius: 6px;">
-                        <div style="font-size: 12px; font-weight: bold; margin-bottom: 5px;">⚠️ ${dateStr}</div>
-                        <div style="font-size: 11px; opacity: 0.9;">${day.projects} projects overlapping${day.tasks > 0 ? ` + ${day.tasks} tasks due` : ''}</div>
-                        <div style="font-size: 10px; margin-top: 5px; opacity: 0.8;">Projects: ${day.projectNames.join(', ')}</div>
-                    </div>
-                `;
-            });
-            html += '</div>';
-            return html;
-        }
-
-        function renderSuggestedBreaks(breaks) {
-            if (breaks.length === 0) {
-                return '<p style="font-size: 12px; color: var(--text-secondary); text-align: center;">No consecutive free days found. Consider scheduling some downtime! 🙏</p>';
-            }
-            
-            let html = '<div style="display: flex; flex-direction: column; gap: 15px;">';
-            breaks.forEach((breakPeriod, index) => {
-                const startStr = breakPeriod.start.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-                const endStr = breakPeriod.end.toLocaleDateString('en', { month: 'short', day: 'numeric' });
-                
-                html += `
-                    <div style="padding: 12px; background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); color: white; border-radius: 8px;">
-                        <div style="font-size: 13px; font-weight: bold; margin-bottom: 8px;">
-                            🏖️ Break Period ${index + 1}: ${startStr} - ${endStr} (${breakPeriod.days} days)
-                        </div>
-                        <div style="font-size: 11px; margin-bottom: 10px; opacity: 0.9;">
-                            Perfect time for a short getaway! Here are some suggestions:
-                        </div>
-                        ${breakPeriod.activities.map((activity, i) => `
-                            <div style="padding: 8px; background: rgba(255,255,255,0.2); border-radius: 6px; margin-bottom: ${i < breakPeriod.activities.length - 1 ? '8px' : '0'};">
-                                <div style="font-size: 12px; font-weight: 600; margin-bottom: 4px;">${activity.type}</div>
-                                <div style="font-size: 10px; margin-bottom: 4px;">📍 ${activity.locations.join(' • ')}</div>
-                                <div style="font-size: 10px; opacity: 0.8;">${activity.description}</div>
-                            </div>
-                        `).join('')}
-                    </div>
-                `;
-            });
-            html += '</div>';
-            return html;
-        }
-
-        function renderFunInsights(analytics) {
-            const stats = analytics.stats;
-            const motivationalQuotes = [
-                '"Success is the sum of small efforts repeated day in and day out." - Robert Collier',
-                '"The key is not to prioritize your schedule, but to schedule your priorities." - Stephen Covey',
-                '"Time is what we want most, but what we use worst." - William Penn',
-                '"Don\'t watch the clock; do what it does. Keep going." - Sam Levenson',
-                '"The bad news is time flies. The good news is you\'re the pilot." - Michael Altshuler'
-            ];
-            
-            const randomQuote = motivationalQuotes[Math.floor(Math.random() * motivationalQuotes.length)];
-            
-            let html = `
-                <div style="font-size: 12px; line-height: 1.6;">
-                    <div style="margin-bottom: 10px;">
-                        <strong>📊 Your Work Stats:</strong><br>
-                        • Active Projects: ${stats.totalProjects}<br>
-                        • Average Daily Load: ${stats.avgDailyLoad.toFixed(1)} projects/tasks per day<br>
-                        ${stats.busiestDay ? `• Busiest Day: ${stats.busiestDay.date.toLocaleDateString('en', { month: 'short', day: 'numeric' })} (${stats.busiestDay.totalLoad} items)<br>` : ''}
-                        ${stats.quietestDay ? `• Quietest Work Day: ${stats.quietestDay.date.toLocaleDateString('en', { month: 'short', day: 'numeric' })} (${stats.quietestDay.totalLoad} items)` : ''}
-                    </div>
-                    
-                    <div style="margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.2); border-radius: 6px;">
-                        <strong>💪 Productivity Tip:</strong><br>
-                        ${getProductivityTip(stats)}
-                    </div>
-                    
-                    <div style="padding: 10px; background: rgba(255,255,255,0.2); border-radius: 6px; font-style: italic; font-size: 11px;">
-                        ${randomQuote}
-                    </div>
-                </div>
-            `;
-            
-            return html;
-        }
-
-        function getProductivityTip(stats) {
-            if (stats.avgDailyLoad > 5) {
-                return 'Your schedule is quite packed! Consider delegating some tasks or extending project timelines to avoid burnout.';
-            } else if (stats.avgDailyLoad < 2) {
-                return 'You have capacity for more projects! This is a great time to take on new opportunities or focus on business growth.';
-            } else {
-                return 'Your workload looks balanced! Keep up the great time management. Remember to schedule regular breaks.';
-            }
-        }
-
-        function syncToiPhoneCalendar() {
-            let icsContent = 'BEGIN:VCALENDAR\n';
-            icsContent += 'VERSION:2.0\n';
-            icsContent += 'PRODID:-//Builder Pro//REFIT Interior//EN\n';
-            icsContent += 'CALSCALE:GREGORIAN\n';
-            icsContent += 'METHOD:PUBLISH\n';
-            
-            data.tasks.forEach(task => {
-                if (task.dueDate) {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    const startDate = task.startDate || task.dueDate;
-                    const dueDate = task.dueDate;
-                    
-                    const formatDate = (dateStr) => dateStr.replace(/-/g, '');
-                    
-                    icsContent += 'BEGIN:VEVENT\n';
-                    icsContent += `UID:${task.id}@builderproapp.com\n`;
-                    icsContent += `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z\n`;
-                    icsContent += `DTSTART:${formatDate(startDate)}\n`;
-                    icsContent += `DTEND:${formatDate(dueDate)}\n`;
-                    icsContent += `SUMMARY:${task.name}\n`;
-                    icsContent += `DESCRIPTION:Project: ${project ? project.name : 'None'}\\nPriority: ${task.priority}\\nStatus: ${task.status}${task.assignee ? '\\nAssignee: ' + task.assignee : ''}\n`;
-                    icsContent += `LOCATION:${project ? project.client : 'Builder Pro'}\n`;
-                    icsContent += `STATUS:${task.status === 'Completed' ? 'COMPLETED' : 'CONFIRMED'}\n`;
-                    icsContent += `LAST-MODIFIED:${new Date().toISOString().replace(/[-:]/g, '').split('.')[0]}Z\n`;
-                    icsContent += 'END:VEVENT\n';
-                }
-            });
-            
-            icsContent += 'END:VCALENDAR';
-            
-            const blob = new Blob([icsContent], { type: 'text/calendar' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'builder-pro-calendar.ics';
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            showToast('📱 Calendar file created! Open it on your iPhone to sync.');
-        }
-
-        function showDayDetail(dateStr) {
-            const date = new Date(dateStr);
-            const formattedDate = date.toLocaleDateString('en', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-            
-            document.getElementById('dayDetailTitle').textContent = formattedDate;
-            
-            const dayTasks = data.tasks.filter(t => {
-                return t.dueDate === dateStr || t.startDate === dateStr;
-            });
-            
-            let html = '';
-            
-            if (dayTasks.length === 0) {
-                html = `
-                    <div class="empty-state" style="padding: 40px 20px;">
-                        <div style="font-size: 48px; margin-bottom: 10px;">📅</div>
-                        <p>No tasks scheduled for this day</p>
-                        <button class="btn btn-primary" style="margin-top: 15px;" onclick="closeModal('dayDetailModal'); showTaskModal();">
-                            + Add Task
-                        </button>
-                    </div>
-                `;
-            } else {
-                html += '<div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">';
-                html += `<h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Tasks for this day (${dayTasks.length})</h4></div>`;
-                
-                dayTasks.forEach(task => {
-                    const project = data.projects.find(p => p.id === task.projectId);
-                    const isCompleted = task.status === 'Completed';
-                    
-                    html += `
-                        <div class="task-item" style="margin-bottom: 8px; ${isCompleted ? 'opacity: 0.7;' : ''}">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 500; color: var(--text-color); ${isCompleted ? 'text-decoration: line-through;' : ''}">${task.name}</div>
-                                <div style="font-size: 10px; color: var(--text-secondary); margin-top: 4px;">
-                                    📁 ${project ? project.name : 'No Project'} • 
-                                    ${task.priority} Priority • 
-                                    ${task.status}
-                                    ${task.assignee ? ` • 👤 ${task.assignee}` : ''}
-                                </div>
-                            </div>
-                            <div style="display: flex; flex-direction: column; gap: 4px;">
-                                <button class="icon-btn" onclick="closeModal('dayDetailModal'); editTask(${task.id});">✏️</button>
-                                ${!isCompleted ? `
-                                    <button class="icon-btn" style="background: var(--success);" onclick="completeTask(${task.id}); showDayDetail('${dateStr}');">✅</button>
-                                ` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-            }
-            
-            document.getElementById('dayDetailBody').innerHTML = html;
-            document.getElementById('dayDetailModal').classList.add('show');
+            container.innerHTML = '<div class="empty-state">Calendar view placeholder</div>';
         }
 
         function updateStats() {
@@ -2868,22 +2261,6 @@
             toggleFabMenu();
         }
 
-        function editProject(id) {
-            const project = data.projects.find(p => p.id === id);
-            if (!project || project.locked) return;
-            
-            editingId = id;
-            editingType = 'project';
-            document.getElementById('projectModalTitle').textContent = 'Edit Project';
-            document.getElementById('projectName').value = project.name;
-            document.getElementById('projectClient').value = project.client;
-            document.getElementById('projectStart').value = project.startDate || '';
-            document.getElementById('projectEnd').value = project.endDate || '';
-            document.getElementById('projectDescription').value = project.description || '';
-            document.getElementById('projectLocked').checked = project.locked || false;
-            document.getElementById('projectModal').classList.add('show');
-        }
-
         function saveProject() {
             const projectData = {
                 name: document.getElementById('projectName').value.trim(),
@@ -2916,123 +2293,11 @@
             renderView();
             updateStats();
             closeModal('projectModal');
-        }
-
-        function permanentDeleteProject(id) {
-            const project = data.projects.find(p => p.id === id);
-            if (!project) return;
             
-            if (confirm(`⚠️ Permanently delete project "${project.name}"?\n\nThis will delete all associated tasks and transactions.\n\nThis action CANNOT be undone.`)) {
-                const now = new Date().toISOString();
-                
-                if (!data.permanentlyDeleted) data.permanentlyDeleted = [];
-                data.permanentlyDeleted.push({ 
-                    id, 
-                    type: 'project', 
-                    deletedAt: now,
-                    name: project.name 
-                });
-                
-                data.projects = data.projects.filter(p => p.id !== id);
-                
-                data.tasks.forEach(task => {
-                    if (task.projectId === id) {
-                        task.deleted_at = now;
-                    }
-                });
-                data.tasks = data.tasks.filter(t => t.projectId !== id);
-                
-                data.transactions.forEach(trans => {
-                    if (trans.projectId === id) {
-                        trans.deleted_at = now;
-                    }
-                });
-                data.transactions = data.transactions.filter(t => t.projectId !== id);
-                
-                saveData();
-                renderView();
-                updateStats();
-                showToast(`Project "${project.name}" permanently deleted`);
-            }
-        }
-
-        function toggleProjectLock(id) {
-            const project = data.projects.find(p => p.id === id);
-            if (project) {
-                project.locked = !project.locked;
-                addTimestamps(project, false);
-                saveData();
-                renderView();
-                showToast(project.locked ? 'Project locked' : 'Project unlocked');
-            }
-        }
-
-        function showProjectDetail(projectId) {
-            const project = data.projects.find(p => p.id === projectId);
-            if (!project) return;
-            
-            const tasks = data.tasks.filter(t => t.projectId === projectId);
-            const transactions = data.transactions.filter(t => t.projectId === projectId);
-            const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
-            const expenses = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
-            const profit = income - expenses;
-            
-            document.getElementById('projectDetailTitle').textContent = project.name + (project.locked ? ' 🔒' : '');
-            
-            let html = `
-                <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Project Info</h4>
-                    <div style="font-size: 12px; color: var(--text-secondary); line-height: 1.5;">
-                        <div><strong>Client:</strong> ${project.client}</div>
-                        ${project.description ? `<div style="margin-top: 8px;"><strong>Description:</strong><br>${project.description}</div>` : ''}
-                    </div>
-                </div>
-                
-                <div style="background: var(--bg-color); padding: 12px; border-radius: 8px; margin-bottom: 15px;">
-                    <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">💰 Finance Summary</h4>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                        <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Income</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--income-color);">$${income.toFixed(2)}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Expenses</div>
-                            <div style="font-size: 16px; font-weight: bold; color: var(--expense-color);">$${expenses.toFixed(2)}</div>
-                        </div>
-                        <div>
-                            <div style="font-size: 10px; color: var(--text-secondary);">Profit</div>
-                            <div style="font-size: 16px; font-weight: bold; color: ${profit >= 0 ? 'var(--income-color)' : 'var(--expense-color)'};">
-                                $${profit.toFixed(2)}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <h4 style="font-size: 13px; margin-bottom: 10px; color: var(--text-color);">📋 Tasks (${tasks.length})</h4>
-            `;
-            
-            if (tasks.length === 0) {
-                html += '<p style="text-align: center; color: var(--text-secondary); padding: 20px 0;">No tasks yet</p>';
-            } else {
-                tasks.forEach(task => {
-                    const isCompleted = task.status === 'Completed';
-                    html += `
-                        <div class="task-item ${isCompleted ? 'completed' : ''}" style="margin-bottom: 8px;">
-                            <div style="flex: 1;">
-                                <div style="font-weight: 500; color: var(--text-color);">${task.name}</div>
-                                <div style="font-size: 10px; color: var(--text-secondary);">
-                                    ${task.dueDate} • ${task.priority} • ${task.status}
-                                    ${task.assignee ? ` • ${task.assignee}` : ''}
-                                </div>
-                            </div>
-                            <button class="icon-btn" onclick="closeModal('projectDetailModal'); editTask(${task.id});">✏️</button>
-                        </div>
-                    `;
-                });
-            }
-            
-            document.getElementById('projectDetailBody').innerHTML = html;
-            document.getElementById('projectDetailModal').classList.add('show');
+            // Check for reminders after saving
+            setTimeout(() => {
+                showSmartReminder();
+            }, 5000);
         }
 
         function showTaskModal() {
@@ -3054,37 +2319,7 @@
             });
             
             document.getElementById('taskModal').classList.add('show');
-            
-            // Don't toggle fab menu if we're on Projects or Schedule page
-            const currentView = data.currentView;
-            if (currentView !== 'projects' && currentView !== 'schedule') {
-                toggleFabMenu();
-            }
-        }
-
-        function editTask(id) {
-            const task = data.tasks.find(t => t.id === id);
-            if (!task) return;
-            
-            editingId = id;
-            editingType = 'task';
-            document.getElementById('taskModalTitle').textContent = 'Edit Task';
-            document.getElementById('taskName').value = task.name;
-            document.getElementById('taskPriority').value = task.priority;
-            document.getElementById('taskStatus').value = task.status;
-            document.getElementById('taskStart').value = task.startDate || '';
-            document.getElementById('taskDue').value = task.dueDate;
-            document.getElementById('taskAssignee').value = task.assignee || '';
-            document.getElementById('taskDescription').value = task.description || '';
-            
-            const select = document.getElementById('taskProject');
-            select.innerHTML = '<option value="">Select Project</option>';
-            data.projects.forEach(p => {
-                select.innerHTML += `<option value="${p.id}">${p.name}</option>`;
-            });
-            select.value = task.projectId;
-            
-            document.getElementById('taskModal').classList.add('show');
+            toggleFabMenu();
         }
 
         function saveTask() {
@@ -3121,18 +2356,11 @@
             renderView();
             updateStats();
             closeModal('taskModal');
-        }
-
-        function completeTask(id) {
-            const task = data.tasks.find(t => t.id === id);
-            if (task) {
-                task.status = 'Completed';
-                task.completedAt = new Date().toISOString();
-                addTimestamps(task, false);
-                saveData();
-                renderView();
-                showToast('✅ Task completed');
-            }
+            
+            // Check for reminders after saving
+            setTimeout(() => {
+                showSmartReminder();
+            }, 5000);
         }
 
         function showTransactionModal(type) {
@@ -3152,12 +2380,7 @@
             
             updateCategories();
             document.getElementById('transactionModal').classList.add('show');
-            
-            // Don't toggle fab menu if we're on Projects page
-            const currentView = data.currentView;
-            if (currentView !== 'projects') {
-                toggleFabMenu();
-            }
+            toggleFabMenu();
         }
 
         function updateCategories() {
@@ -3263,170 +2486,7 @@
         }
 
         async function smartSync() {
-            if (!syncApiKey) {
-                showToast('⚠️ No API key! Go to Settings → Smart Sync API → Enter key → Save', 6000);
-                document.getElementById('syncMode').textContent = 'No API key';
-                return;
-            }
-            
-            const indicator = document.getElementById('syncIndicator');
-            const syncMode = document.getElementById('syncMode');
-            
-            indicator.classList.add('syncing');
-            syncMode.textContent = 'Syncing...';
-            
-            const startTime = Date.now();
-            
-            try {
-                // STEP 1: PULL cloud data
-                console.log('🔄 Step 1: Pulling cloud data...');
-                syncMode.textContent = 'Pulling...';
-                const getResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
-                    headers: {
-                        'X-Master-Key': syncApiKey
-                    }
-                });
-                
-                if (!getResponse.ok) {
-                    throw new Error(`Pull failed: ${getResponse.status} - ${getResponse.statusText}`);
-                }
-                
-                let cloudData = null;
-                if (getResponse.ok) {
-                    const result = await getResponse.json();
-                    cloudData = result.record || {};
-                    console.log('✅ Cloud data pulled:', {
-                        projects: cloudData.projects?.length || 0,
-                        tasks: cloudData.tasks?.length || 0,
-                        transactions: cloudData.transactions?.length || 0
-                    });
-                }
-                
-                // STEP 2: MERGE local and cloud data
-                console.log('🔄 Step 2: Merging data...');
-                syncMode.textContent = 'Merging...';
-                if (cloudData && cloudData.projects) {
-                    const beforeCounts = {
-                        projects: data.projects.length,
-                        tasks: data.tasks.length,
-                        transactions: data.transactions.length
-                    };
-                    
-                    const mergedProjects = mergeByTimestamp(
-                        data.projects || [], 
-                        cloudData.projects || [], 
-                        'projects'
-                    );
-                    
-                    const mergedTasks = mergeByTimestamp(
-                        data.tasks || [], 
-                        cloudData.tasks || [], 
-                        'tasks'
-                    );
-                    
-                    const mergedTransactions = mergeByTimestamp(
-                        data.transactions || [], 
-                        cloudData.transactions || [], 
-                        'transactions'
-                    );
-                    
-                    // Update local data with merged results
-                    data.projects = mergedProjects;
-                    data.tasks = mergedTasks;
-                    data.transactions = mergedTransactions;
-                    
-                    // Keep track of permanently deleted items
-                    if (cloudData.permanentlyDeleted) {
-                        data.permanentlyDeleted = [
-                            ...(data.permanentlyDeleted || []),
-                            ...cloudData.permanentlyDeleted
-                        ];
-                        data.permanentlyDeleted = Array.from(
-                            new Map(data.permanentlyDeleted.map(item => [item.id, item])).values()
-                        );
-                    }
-                    
-                    const afterCounts = {
-                        projects: data.projects.length,
-                        tasks: data.tasks.length,
-                        transactions: data.transactions.length
-                    };
-                    
-                    // Show what changed during merge
-                    const changes = [];
-                    if (afterCounts.projects !== beforeCounts.projects) {
-                        changes.push(`${afterCounts.projects - beforeCounts.projects > 0 ? '+' : ''}${afterCounts.projects - beforeCounts.projects} projects`);
-                    }
-                    if (afterCounts.tasks !== beforeCounts.tasks) {
-                        changes.push(`${afterCounts.tasks - beforeCounts.tasks > 0 ? '+' : ''}${afterCounts.tasks - beforeCounts.tasks} tasks`);
-                    }
-                    if (afterCounts.transactions !== beforeCounts.transactions) {
-                        changes.push(`${afterCounts.transactions - beforeCounts.transactions > 0 ? '+' : ''}${afterCounts.transactions - beforeCounts.transactions} trans`);
-                    }
-                    
-                    console.log('✅ Merge complete:', changes.length > 0 ? changes.join(', ') : 'No changes');
-                    
-                    saveData();
-                    renderView();
-                    updateStats();
-                }
-                
-                // STEP 3: PUSH merged data back to cloud
-                console.log('🔄 Step 3: Pushing merged data to cloud...');
-                syncMode.textContent = 'Pushing...';
-                const putResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': syncApiKey
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (!putResponse.ok) {
-                    throw new Error(`Push failed: ${putResponse.status} - ${putResponse.statusText}`);
-                }
-                
-                const syncDuration = ((Date.now() - startTime) / 1000).toFixed(1);
-                console.log(`✅ Sync complete in ${syncDuration}s`);
-                
-                localStorage.setItem('lastSyncTime', Date.now().toString());
-                const nowTime = new Date().toLocaleTimeString();
-                document.getElementById('lastSyncTime').textContent = `Last: ${nowTime}`;
-                showToast(`✅ Synced ${data.projects.length}p ${data.tasks.length}t ${data.transactions.length}tr in ${syncDuration}s!`, 5000);
-                indicator.classList.remove('syncing');
-                syncMode.textContent = 'Connected';
-                
-            } catch (error) {
-                const syncDuration = ((Date.now() - startTime) / 1000).toFixed(1);
-                console.error('❌ Sync error:', error);
-                
-                let errorMsg = error.message;
-                if (error.message.includes('401')) {
-                    errorMsg = 'Invalid API key! Check Settings';
-                } else if (error.message.includes('404')) {
-                    errorMsg = 'Bin not found! Check Bin ID';
-                } else if (error.message.includes('Failed to fetch')) {
-                    errorMsg = 'No internet connection!';
-                }
-                
-                showToast(`❌ ${errorMsg}`, 6000);
-                indicator.classList.remove('syncing');
-                syncMode.textContent = 'Error';
-                
-                // Show detailed error in console
-                console.log('Sync diagnostics:', {
-                    duration: syncDuration + 's',
-                    apiKey: syncApiKey ? 'SET (length: ' + syncApiKey.length + ')' : 'NOT SET',
-                    binId: APP_CONFIG.binId,
-                    online: navigator.onLine,
-                    localData: {
-                        projects: data.projects.length,
-                        tasks: data.tasks.length,
-                        transactions: data.transactions.length
-                    }
-                });
-            }
+            showToast('Sync functionality requires JSONBin API implementation');
         }
 
         function saveApiKey() {
@@ -3440,58 +2500,11 @@
             localStorage.setItem('builderProSyncApiKey', key);
             document.getElementById('apiKeyInput').value = '';
             document.getElementById('syncMode').textContent = 'Ready';
-            showToast('✅ API key saved! Now click "Test Sync Connection"', 5000);
+            showToast('✅ API key saved!');
         }
 
         async function testSync() {
-            if (!syncApiKey) {
-                showToast('⚠️ No API key set! Enter your JSONBin API key first.');
-                return;
-            }
-            
-            showToast('🔍 Testing connection...');
-            
-            try {
-                console.log('🔍 Testing sync connection...');
-                console.log('API Key length:', syncApiKey.length);
-                console.log('Bin ID:', APP_CONFIG.binId);
-                console.log('Base URL:', APP_CONFIG.baseUrl);
-                
-                const response = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
-                    headers: {
-                        'X-Master-Key': syncApiKey
-                    }
-                });
-                
-                console.log('Response status:', response.status);
-                console.log('Response OK:', response.ok);
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('✅ Connection successful!');
-                    console.log('Cloud data:', {
-                        projects: result.record?.projects?.length || 0,
-                        tasks: result.record?.tasks?.length || 0,
-                        transactions: result.record?.transactions?.length || 0
-                    });
-                    
-                    showToast('✅ Connection works! Your API key is valid.');
-                    document.getElementById('syncMode').textContent = 'Connected';
-                } else if (response.status === 401) {
-                    showToast('❌ Invalid API key! Get a new one from jsonbin.io');
-                    document.getElementById('syncMode').textContent = 'Invalid Key';
-                } else if (response.status === 404) {
-                    showToast('❌ Bin not found! Check your Bin ID.');
-                    document.getElementById('syncMode').textContent = 'Invalid Bin';
-                } else {
-                    showToast(`❌ Error ${response.status}: ${response.statusText}`);
-                    document.getElementById('syncMode').textContent = 'Error';
-                }
-            } catch (error) {
-                console.error('❌ Test failed:', error);
-                showToast('❌ Connection failed! Check internet & open browser console (F12)');
-                document.getElementById('syncMode').textContent = 'Offline';
-            }
+            showToast('Test sync functionality requires API implementation');
         }
 
         function exportData() {
