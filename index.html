@@ -15,7 +15,7 @@
     <meta name="msapplication-starturl" content="/">
     <meta name="format-detection" content="telephone=no">
     
-    <!-- Apple Touch Icons - Fixed for iPad with PNG -->
+    <!-- Apple Touch Icons - Fixed for iPad -->
     <link rel="apple-touch-icon" sizes="180x180" id="icon180">
     <link rel="apple-touch-icon" sizes="152x152" id="icon152">
     <link rel="apple-touch-icon" sizes="120x120" id="icon120">
@@ -182,7 +182,11 @@
         
         @supports (padding-top: max(0px)) {
             .fixed-header-section {
-                padding-top: max(20px, var(--safe-area-inset-top));
+                padding-top: max(20px, env(safe-area-inset-top));
+            }
+            
+            .header {
+                padding-top: 12px;
             }
         }
         
@@ -193,712 +197,603 @@
             right: 0;
             z-index: 100;
             background: var(--bg-color);
-            padding: 20px 0 0;
+            padding-top: var(--safe-area-inset-top);
         }
         
-        .header {
-            padding: 0 16px 16px;
-            border-bottom: 2px solid var(--border-color);
+        .header { 
+            background: linear-gradient(135deg, var(--accent-color) 0%, var(--highlight-color) 100%); 
+            color: white; 
+            padding: 10px 12px; 
+            box-shadow: 0 2px 10px var(--shadow-color); 
         }
         
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .header-content { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            gap: 10px; 
         }
         
-        .header-left {
-            cursor: pointer;
+        .header-left { 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            flex: 1; 
+            cursor: pointer; 
         }
         
-        h1 {
-            font-size: calc(24px * var(--font-scale));
-            font-weight: 800;
-            color: var(--text-color);
+        .header h1 { 
+            font-size: calc(16px * var(--font-scale)); 
+            font-weight: 600; 
         }
         
-        .header-subtitle {
-            font-size: calc(12px * var(--font-scale));
-            color: var(--text-secondary);
-            margin-top: 4px;
+        .header-subtitle { 
+            font-size: calc(11px * var(--font-scale)); 
+            opacity: 0.9; 
+            margin-top: 2px; 
         }
         
-        .header-controls {
-            display: flex;
-            gap: 8px;
+        .header-controls { 
+            display: flex; 
+            gap: 8px; 
+            align-items: center; 
         }
         
-        .header-btn {
-            width: 44px;
-            height: 44px;
-            border: 2px solid var(--border-color);
-            background: var(--card-bg);
-            border-radius: 12px;
-            font-size: calc(18px * var(--font-scale));
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            position: relative;
+        .header-btn { 
+            background: rgba(255,255,255,0.2); 
+            border: none; 
+            color: white; 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 50%; 
+            cursor: pointer; 
+            font-size: calc(14px * var(--font-scale)); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative; 
+            transition: background 0.2s;
         }
         
         .header-btn:active {
-            background: var(--border-color);
-            transform: scale(0.95);
+            background: rgba(255,255,255,0.3);
         }
         
-        .sync-indicator {
-            position: absolute;
-            top: 8px;
-            right: 8px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background: var(--text-secondary);
-            opacity: 0.3;
+        .sync-indicator { 
+            position: absolute; 
+            top: -2px; 
+            right: -2px; 
+            width: 10px; 
+            height: 10px; 
+            border-radius: 50%; 
+            background: #10b981; 
+            border: 2px solid white; 
         }
         
-        .sync-indicator.syncing {
-            background: var(--warning);
-            opacity: 1;
-            animation: pulse 1s infinite;
+        .sync-indicator.syncing { 
+            background: #f39c12; 
+            animation: pulse 1s infinite; 
         }
         
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.3; }
+        @keyframes pulse { 
+            0%, 100% { opacity: 1; } 
+            50% { opacity: 0.5; } 
         }
         
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            padding: 16px;
-            background: var(--bg-color);
+        .stats { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 8px; 
+            padding: 12px; 
+            background: var(--bg-color); 
         }
         
-        .stat-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            box-shadow: 0 1px 3px var(--shadow-color);
+        .stat-card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            padding: 10px; 
+            box-shadow: 0 2px 8px var(--shadow-color); 
+            border: 1px solid var(--border-color); 
         }
         
-        .stat-label {
-            font-size: calc(11px * var(--font-scale));
-            color: var(--text-secondary);
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
+        .stat-label { 
+            font-size: calc(11px * var(--font-scale)); 
+            color: var(--text-secondary); 
+            margin-bottom: 4px; 
         }
         
-        .stat-value {
-            font-size: calc(22px * var(--font-scale));
-            font-weight: 800;
-            margin-bottom: 4px;
+        .stat-value { 
+            font-size: calc(18px * var(--font-scale)); 
+            font-weight: 700; 
         }
         
-        .stat-value.income { color: var(--income-color); }
-        .stat-value.expense { color: var(--expense-color); }
-        .stat-value.net { color: var(--text-color); }
-        
-        .stat-sub {
-            font-size: calc(11px * var(--font-scale));
-            color: var(--text-secondary);
+        .stat-value.income { 
+            color: var(--income-color); 
         }
         
-        .main-content-wrapper {
-            margin-top: 260px;
-            padding-bottom: calc(80px + var(--safe-area-inset-bottom));
-            flex: 1;
+        .stat-value.expense { 
+            color: var(--expense-color); 
         }
         
-        .tabs {
-            display: flex;
-            background: var(--card-bg);
-            border-bottom: 2px solid var(--border-color);
-            position: sticky;
-            top: 0;
-            z-index: 50;
+        .stat-sub { 
+            font-size: calc(10px * var(--font-scale)); 
+            color: var(--text-secondary); 
+            margin-top: 2px; 
         }
         
-        .tab {
-            flex: 1;
-            padding: 16px;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: calc(14px * var(--font-scale));
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            border-bottom: 3px solid transparent;
+        .nav-tabs { 
+            display: flex; 
+            justify-content: space-around; 
+            background: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color); 
+            padding: 0 12px; 
         }
         
-        .tab.active {
-            color: var(--button-primary);
-            border-bottom-color: var(--button-primary);
+        .nav-tab { 
+            flex: 1; 
+            padding: 12px 8px; 
+            text-align: center; 
+            cursor: pointer; 
+            color: var(--text-secondary); 
+            font-size: calc(12px * var(--font-scale)); 
+            position: relative; 
+            transition: color 0.2s; 
+            border: none; 
+            background: none; 
         }
         
-        .tab:active {
-            background: var(--border-color);
+        .nav-tab.active { 
+            color: var(--highlight-color); 
+            font-weight: 600; 
         }
         
-        .content {
-            padding: 16px;
+        .nav-tab.active::after { 
+            content: ''; 
+            position: absolute; 
+            bottom: 0; 
+            left: 0; 
+            right: 0; 
+            height: 3px; 
+            background: var(--highlight-color); 
+            border-radius: 3px 3px 0 0; 
         }
         
-        .view {
-            display: none;
+        .main-content-wrapper { 
+            margin-top: 260px; 
+            flex: 1; 
+            overflow-y: auto; 
+            padding-bottom: calc(80px + var(--safe-area-inset-bottom)); 
         }
         
-        .view.active {
-            display: block;
+        .view-section { 
+            display: none; 
         }
         
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--text-secondary);
+        .view-section.active { 
+            display: block; 
         }
         
-        .empty-icon {
-            font-size: calc(48px * var(--font-scale));
-            margin-bottom: 16px;
-            opacity: 0.5;
+        .section-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 16px; 
+            background: var(--card-bg); 
+            border-bottom: 1px solid var(--border-color); 
+            position: sticky; 
+            top: 0; 
+            z-index: 10; 
         }
         
-        .empty-text {
-            font-size: calc(16px * var(--font-scale));
-            margin-bottom: 8px;
+        .section-title { 
+            font-size: calc(16px * var(--font-scale)); 
+            font-weight: 600; 
         }
         
-        .empty-hint {
-            font-size: calc(13px * var(--font-scale));
-            opacity: 0.7;
+        .add-btn { 
+            background: var(--button-primary); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            padding: 8px 16px; 
+            font-size: calc(12px * var(--font-scale)); 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: background 0.2s; 
         }
         
-        .card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 16px;
-            margin-bottom: 12px;
-            box-shadow: 0 1px 3px var(--shadow-color);
-            cursor: pointer;
-            transition: all 0.2s;
+        .add-btn:active { 
+            background: var(--button-primary-hover); 
         }
         
-        .card:active {
-            transform: scale(0.98);
-            box-shadow: 0 2px 8px var(--shadow-color);
+        .content-list { 
+            padding: 12px; 
         }
         
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 12px;
+        .empty-state { 
+            text-align: center; 
+            padding: 40px 20px; 
+            color: var(--text-secondary); 
         }
         
-        .card-title {
-            font-size: calc(17px * var(--font-scale));
-            font-weight: 700;
-            color: var(--text-color);
-            margin-bottom: 4px;
+        .empty-icon { 
+            font-size: calc(48px * var(--font-scale)); 
+            margin-bottom: 12px; 
         }
         
-        .card-subtitle {
-            font-size: calc(13px * var(--font-scale));
-            color: var(--text-secondary);
+        .project-card, .task-card, .transaction-card { 
+            background: var(--card-bg); 
+            border-radius: 12px; 
+            padding: 14px; 
+            margin-bottom: 10px; 
+            box-shadow: 0 2px 8px var(--shadow-color); 
+            cursor: pointer; 
+            border: 2px solid transparent; 
+            transition: all 0.2s; 
         }
         
-        .badge {
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-size: calc(11px * var(--font-scale));
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .project-card:active, .task-card:active, .transaction-card:active { 
+            transform: scale(0.98); 
+            border-color: var(--accent-color); 
         }
         
-        .badge.active { background: rgba(16, 185, 129, 0.15); color: var(--success); }
-        .badge.pending { background: rgba(243, 156, 18, 0.15); color: var(--warning); }
-        .badge.completed { background: rgba(99, 102, 241, 0.15); color: #6366f1; }
-        
-        .card-body {
-            font-size: calc(14px * var(--font-scale));
-            color: var(--text-secondary);
-            line-height: 1.5;
+        .card-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 8px; 
         }
         
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--border-color);
-            font-size: calc(12px * var(--font-scale));
-            color: var(--text-secondary);
+        .card-title { 
+            font-size: calc(15px * var(--font-scale)); 
+            font-weight: 600; 
+            flex: 1; 
         }
         
-        .transaction-amount {
-            font-size: calc(18px * var(--font-scale));
-            font-weight: 700;
+        .card-amount { 
+            font-size: calc(14px * var(--font-scale)); 
+            font-weight: 700; 
         }
-        
-        .transaction-amount.income { color: var(--income-color); }
-        .transaction-amount.expense { color: var(--expense-color); }
         
-        .fab {
-            position: fixed;
-            bottom: calc(80px + var(--safe-area-inset-bottom));
-            right: 20px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--button-primary);
-            color: white;
-            border: none;
-            font-size: calc(28px * var(--font-scale));
-            box-shadow: 0 4px 12px var(--shadow-color);
-            cursor: pointer;
-            z-index: 90;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
+        .card-amount.income { 
+            color: var(--income-color); 
         }
         
-        .fab:active {
-            transform: scale(0.9);
-            background: var(--button-primary-hover);
+        .card-amount.expense { 
+            color: var(--expense-color); 
         }
         
-        .nav {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            padding-bottom: var(--safe-area-inset-bottom);
-            z-index: 100;
+        .card-meta { 
+            font-size: calc(12px * var(--font-scale)); 
+            color: var(--text-secondary); 
+            margin-bottom: 4px; 
         }
         
-        .nav-item {
-            flex: 1;
-            padding: 12px;
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: calc(22px * var(--font-scale));
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 4px;
+        .card-progress { 
+            margin-top: 8px; 
         }
         
-        .nav-label {
-            font-size: calc(10px * var(--font-scale));
-            font-weight: 600;
+        .progress-bar { 
+            height: 6px; 
+            background: var(--border-color); 
+            border-radius: 3px; 
+            overflow: hidden; 
         }
         
-        .nav-item.active {
-            color: var(--button-primary);
+        .progress-fill { 
+            height: 100%; 
+            background: linear-gradient(90deg, var(--accent-color), var(--highlight-color)); 
+            transition: width 0.3s; 
         }
         
-        .nav-item:active {
-            background: var(--border-color);
+        .status-badge { 
+            display: inline-block; 
+            padding: 4px 10px; 
+            border-radius: 12px; 
+            font-size: calc(11px * var(--font-scale)); 
+            font-weight: 600; 
         }
         
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+        .status-active { 
+            background: rgba(16, 185, 129, 0.1); 
+            color: var(--success); 
         }
         
-        .modal.active {
-            display: flex;
+        .status-pending { 
+            background: rgba(243, 156, 18, 0.1); 
+            color: var(--warning); 
         }
         
-        .modal-content {
-            background: var(--card-bg);
-            border-radius: 20px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        .status-completed { 
+            background: rgba(100, 100, 100, 0.1); 
+            color: var(--text-secondary); 
         }
         
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px;
-            border-bottom: 1px solid var(--border-color);
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            bottom: 0; 
+            background: rgba(0,0,0,0.5); 
+            z-index: 1000; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
         }
         
-        .modal-title {
-            font-size: calc(20px * var(--font-scale));
-            font-weight: 700;
+        .modal.active { 
+            display: flex; 
         }
         
-        .close-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: none;
-            background: var(--border-color);
-            color: var(--text-color);
-            font-size: calc(24px * var(--font-scale));
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .modal-content { 
+            background: var(--card-bg); 
+            border-radius: 16px; 
+            width: 100%; 
+            max-width: 500px; 
+            max-height: 90vh; 
+            overflow-y: auto; 
+            box-shadow: 0 8px 32px rgba(0,0,0,0.2); 
         }
         
-        .close-btn:active {
-            background: var(--text-secondary);
-            color: white;
+        .modal-header { 
+            padding: 20px; 
+            border-bottom: 1px solid var(--border-color); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
         }
         
-        .modal-body {
-            padding: 20px;
+        .modal-title { 
+            font-size: calc(18px * var(--font-scale)); 
+            font-weight: 600; 
         }
         
-        .form-group {
-            margin-bottom: 16px;
+        .close-btn { 
+            background: none; 
+            border: none; 
+            font-size: calc(24px * var(--font-scale)); 
+            color: var(--text-secondary); 
+            cursor: pointer; 
+            width: 32px; 
+            height: 32px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 50%; 
+            transition: background 0.2s; 
         }
         
-        .form-label {
-            display: block;
-            font-size: calc(13px * var(--font-scale));
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 8px;
+        .close-btn:active { 
+            background: var(--border-color); 
         }
         
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            font-size: calc(15px * var(--font-scale));
-            font-family: inherit;
-            background: var(--card-bg);
-            color: var(--text-color);
-            transition: border-color 0.2s;
+        .modal-body { 
+            padding: 20px; 
         }
         
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--button-primary);
+        .form-group { 
+            margin-bottom: 16px; 
         }
         
-        .form-textarea {
-            min-height: 100px;
-            resize: vertical;
+        .form-label { 
+            display: block; 
+            font-size: calc(13px * var(--font-scale)); 
+            font-weight: 600; 
+            margin-bottom: 6px; 
+            color: var(--text-color); 
         }
         
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+        .form-input, .form-select, .form-textarea { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid var(--border-color); 
+            border-radius: 8px; 
+            font-size: calc(14px * var(--font-scale)); 
+            font-family: inherit; 
+            background: var(--card-bg); 
+            color: var(--text-color); 
+            transition: border-color 0.2s; 
         }
         
-        .btn {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 10px;
-            font-size: calc(15px * var(--font-scale));
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
+        .form-input:focus, .form-select:focus, .form-textarea:focus { 
+            outline: none; 
+            border-color: var(--accent-color); 
         }
         
-        .btn-primary {
-            background: var(--button-primary);
-            color: white;
+        .form-textarea { 
+            min-height: 100px; 
+            resize: vertical; 
         }
         
-        .btn-primary:active {
-            background: var(--button-primary-hover);
-            transform: scale(0.98);
+        .form-row { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
         }
         
-        .btn-secondary {
-            background: var(--border-color);
-            color: var(--text-color);
+        .btn-group { 
+            display: flex; 
+            gap: 10px; 
+            margin-top: 20px; 
         }
         
-        .btn-secondary:active {
-            background: var(--text-secondary);
-            color: white;
+        .btn { 
+            flex: 1; 
+            padding: 12px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: calc(14px * var(--font-scale)); 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.2s; 
         }
         
-        .btn-danger {
-            background: var(--danger);
-            color: white;
-            width: 100%;
+        .btn-primary { 
+            background: var(--button-primary); 
+            color: white; 
         }
         
-        .btn-danger:active {
-            background: #dc2626;
+        .btn-primary:active { 
+            background: var(--button-primary-hover); 
+            transform: scale(0.98); 
         }
         
-        .btn-group {
-            display: flex;
-            gap: 12px;
+        .btn-secondary { 
+            background: var(--border-color); 
+            color: var(--text-color); 
         }
         
-        .btn-group .btn {
-            flex: 1;
+        .btn-secondary:active { 
+            background: #d0d0d0; 
         }
         
-        .settings-section {
-            margin-bottom: 24px;
-            padding-bottom: 24px;
-            border-bottom: 1px solid var(--border-color);
+        .btn-danger { 
+            background: var(--danger); 
+            color: white; 
         }
         
-        .settings-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
+        .btn-danger:active { 
+            background: #dc2626; 
         }
         
-        .settings-title {
-            font-size: calc(15px * var(--font-scale));
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--text-color);
+        .settings-section { 
+            margin-bottom: 24px; 
         }
         
-        .option-group {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
+        .settings-title { 
+            font-size: calc(15px * var(--font-scale)); 
+            font-weight: 600; 
+            margin-bottom: 12px; 
+            color: var(--text-color); 
         }
         
-        .option-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        .option-group { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+            overflow: hidden; 
         }
         
-        .option-label {
-            font-size: calc(14px * var(--font-scale));
-            color: var(--text-color);
+        .option-item { 
+            padding: 14px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border-color); 
         }
         
-        .toggle-group {
-            display: flex;
-            gap: 6px;
+        .option-item:last-child { 
+            border-bottom: none; 
         }
         
-        .toggle-btn {
-            padding: 6px 12px;
-            border: 2px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-color);
-            border-radius: 6px;
-            font-size: calc(12px * var(--font-scale));
-            cursor: pointer;
-            transition: all 0.2s;
+        .option-label { 
+            font-size: calc(14px * var(--font-scale)); 
+            color: var(--text-color); 
         }
         
-        .toggle-btn.active {
-            background: var(--button-primary);
-            color: white;
-            border-color: var(--button-primary);
+        .toggle-group { 
+            display: flex; 
+            gap: 6px; 
+            flex-wrap: wrap; 
         }
         
-        .action-btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            background: var(--card-bg);
-            color: var(--text-color);
-            text-align: left;
-            font-size: calc(14px * var(--font-scale));
-            cursor: pointer;
-            transition: background 0.2s;
-            border-bottom: 1px solid var(--border-color);
+        .toggle-btn { 
+            padding: 6px 12px; 
+            border: 2px solid var(--border-color); 
+            background: var(--card-bg); 
+            color: var(--text-color); 
+            border-radius: 6px; 
+            font-size: calc(12px * var(--font-scale)); 
+            cursor: pointer; 
+            transition: all 0.2s; 
         }
         
-        .action-btn:active {
-            background: var(--border-color);
+        .toggle-btn.active { 
+            background: var(--button-primary); 
+            color: white; 
+            border-color: var(--button-primary); 
         }
         
-        .action-btn:last-child {
-            border-bottom: none;
+        .action-btn { 
+            width: 100%; 
+            padding: 14px; 
+            border: none; 
+            background: var(--card-bg); 
+            color: var(--text-color); 
+            text-align: left; 
+            font-size: calc(14px * var(--font-scale)); 
+            cursor: pointer; 
+            transition: background 0.2s; 
+            border-bottom: 1px solid var(--border-color); 
         }
         
-        .toast {
-            position: fixed;
-            bottom: calc(80px + var(--safe-area-inset-bottom));
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.85);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-size: calc(13px * var(--font-scale));
-            z-index: 2000;
-            opacity: 0;
-            transition: opacity 0.3s;
-            max-width: 90%;
-            text-align: center;
+        .action-btn:active { 
+            background: var(--border-color); 
         }
         
-        .toast.show {
-            opacity: 1;
-        }
-
-        /* Reminder Popup Styles */
-        .reminder-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) scale(0.8);
-            background: var(--card-bg);
-            border: 3px solid var(--button-primary);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            z-index: 2500;
-            max-width: 90%;
-            width: 350px;
-            opacity: 0;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            pointer-events: none;
-        }
-
-        .reminder-popup.show {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-            pointer-events: all;
-        }
-
-        .reminder-popup-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .reminder-popup-icon {
-            font-size: calc(32px * var(--font-scale));
+        .action-btn:last-child { 
+            border-bottom: none; 
         }
-
-        .reminder-popup-title {
-            font-size: calc(18px * var(--font-scale));
-            font-weight: 700;
-            color: var(--text-color);
-        }
-
-        .reminder-popup-body {
-            font-size: calc(14px * var(--font-scale));
-            color: var(--text-secondary);
-            line-height: 1.6;
-            margin-bottom: 16px;
-        }
-
-        .reminder-popup-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .reminder-popup-list li {
-            padding: 8px 12px;
-            background: var(--bg-color);
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: calc(13px * var(--font-scale));
-        }
-
-        .reminder-popup-footer {
-            text-align: center;
-            font-size: calc(11px * var(--font-scale));
-            color: var(--text-secondary);
-            font-style: italic;
-        }
-
-        .reminder-popup-close {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: none;
-            background: var(--border-color);
-            color: var(--text-color);
-            font-size: calc(18px * var(--font-scale));
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        
+        .toast { 
+            position: fixed; 
+            bottom: calc(80px + var(--safe-area-inset-bottom)); 
+            left: 50%; 
+            transform: translateX(-50%); 
+            background: rgba(0,0,0,0.85); 
+            color: white; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            font-size: calc(13px * var(--font-scale)); 
+            z-index: 2000; 
+            opacity: 0; 
+            transition: opacity 0.3s; 
+            max-width: 90%; 
+            text-align: center; 
         }
-
-        .reminder-popup-close:active {
-            background: var(--text-secondary);
-            color: white;
+        
+        .toast.show { 
+            opacity: 1; 
         }
         
-        .detail-view {
-            padding: 20px;
+        .detail-view { 
+            padding: 20px; 
         }
         
-        .detail-header {
-            margin-bottom: 24px;
+        .detail-header { 
+            margin-bottom: 24px; 
         }
         
-        .detail-title {
-            font-size: calc(22px * var(--font-scale));
-            font-weight: 700;
-            margin-bottom: 8px;
+        .detail-title { 
+            font-size: calc(22px * var(--font-scale)); 
+            font-weight: 700; 
+            margin-bottom: 8px; 
         }
         
-        .detail-grid {
-            display: grid;
-            gap: 16px;
-            margin-bottom: 24px;
+        .detail-grid { 
+            display: grid; 
+            gap: 16px; 
+            margin-bottom: 24px; 
         }
         
-        .detail-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            padding: 16px;
+        .detail-card { 
+            background: var(--card-bg); 
+            border: 1px solid var(--border-color); 
+            border-radius: 12px; 
+            padding: 16px; 
         }
         
-        .detail-label {
-            font-size: calc(12px * var(--font-scale));
-            color: var(--text-secondary);
-            margin-bottom: 4px;
+        .detail-label { 
+            font-size: calc(12px * var(--font-scale)); 
+            color: var(--text-secondary); 
+            margin-bottom: 4px; 
         }
         
-        .detail-value {
-            font-size: calc(15px * var(--font-scale));
-            font-weight: 600;
+        .detail-value { 
+            font-size: calc(15px * var(--font-scale)); 
+            font-weight: 600; 
         }
 
         /* Theme Picker Styles */
@@ -966,6 +861,88 @@
         .theme-teal-preview { --theme-accent: #90b2b8; --theme-highlight: #2c4144; }
         .theme-aqua-preview { --theme-accent: #9cbbbf; --theme-highlight: #436266; }
         .theme-terracotta-preview { --theme-accent: #c48779; --theme-highlight: #391f19; }
+
+        /* Reminder Popup Styles */
+        .reminder-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: var(--card-bg);
+            border: 3px solid var(--button-primary);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+            z-index: 2500;
+            max-width: 90%;
+            width: 350px;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            pointer-events: none;
+        }
+        .reminder-popup.show {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: all;
+        }
+        .reminder-popup-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .reminder-popup-icon {
+            font-size: calc(32px * var(--font-scale));
+        }
+        .reminder-popup-title {
+            font-size: calc(18px * var(--font-scale));
+            font-weight: 700;
+            color: var(--text-color);
+        }
+        .reminder-popup-body {
+            font-size: calc(14px * var(--font-scale));
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .reminder-popup-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .reminder-popup-list li {
+            padding: 8px 12px;
+            background: var(--bg-color);
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: calc(13px * var(--font-scale));
+        }
+        .reminder-popup-footer {
+            text-align: center;
+            font-size: calc(11px * var(--font-scale));
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+        .reminder-popup-close {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: none;
+            background: var(--border-color);
+            color: var(--text-color);
+            font-size: calc(18px * var(--font-scale));
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .reminder-popup-close:active {
+            background: var(--text-secondary);
+            color: white;
+        }
     </style>
 </head>
 <body class="normal-contrast font-m sat-normal">
@@ -1018,46 +995,74 @@
                 </div>
                 <div class="stat-card">
                     <div class="stat-label">Net Balance</div>
-                    <div class="stat-value net" id="netBalance">RM 0</div>
-                    <div class="stat-sub" id="profitMargin">0% margin</div>
+                    <div class="stat-value" id="netBalance">RM 0</div>
+                    <div class="stat-sub">Current balance</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-label">Sync Status</div>
-                    <div class="stat-value" style="font-size: calc(14px * var(--font-scale));" id="syncMode">Offline</div>
-                    <div class="stat-sub" id="lastSyncTime">Never synced</div>
+                    <div class="stat-label">Active Projects</div>
+                    <div class="stat-value" id="activeProjects">0</div>
+                    <div class="stat-sub" id="completedProjects">0 completed</div>
                 </div>
             </div>
-        </div>
-        
-        <div class="main-content-wrapper">
-            <div class="tabs">
-                <button class="tab active" data-view="projects" onclick="showView('projects')">📁 Projects</button>
-                <button class="tab" data-view="tasks" onclick="showView('tasks')">✓ Tasks</button>
-                <button class="tab" data-view="finance" onclick="showView('finance')">💰 Finance</button>
-            </div>
             
-            <div class="content">
-                <div id="projects" class="view active"></div>
-                <div id="tasks" class="view"></div>
-                <div id="finance" class="view"></div>
+            <div class="nav-tabs">
+                <button class="nav-tab active" onclick="showView('projects')">📋 Projects</button>
+                <button class="nav-tab" onclick="showView('tasks')">✅ Tasks</button>
+                <button class="nav-tab" onclick="showView('finance')">💰 Finance</button>
+                <button class="nav-tab" onclick="showView('calendar')">📅 Calendar</button>
             </div>
         </div>
-        
-        <button class="fab" onclick="showAddOptions()">+</button>
-        
-        <div class="nav">
-            <button class="nav-item active" data-view="projects" onclick="showView('projects')">
-                📁
-                <span class="nav-label">Projects</span>
-            </button>
-            <button class="nav-item" data-view="tasks" onclick="showView('tasks')">
-                ✓
-                <span class="nav-label">Tasks</span>
-            </button>
-            <button class="nav-item" data-view="finance" onclick="showView('finance')">
-                💰
-                <span class="nav-label">Finance</span>
-            </button>
+
+        <div class="main-content-wrapper">
+            <div id="projectsView" class="view-section active">
+                <div class="section-header">
+                    <div class="section-title">Projects</div>
+                    <button class="add-btn" onclick="showProjectForm()">+ New Project</button>
+                </div>
+                <div class="content-list" id="projectsList">
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div>No projects yet. Create your first project!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tasksView" class="view-section">
+                <div class="section-header">
+                    <div class="section-title">Tasks</div>
+                    <button class="add-btn" onclick="showTaskForm()">+ New Task</button>
+                </div>
+                <div class="content-list" id="tasksList">
+                    <div class="empty-state">
+                        <div class="empty-icon">✅</div>
+                        <div>No tasks yet. Add your first task!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="financeView" class="view-section">
+                <div class="section-header">
+                    <div class="section-title">Finance</div>
+                    <button class="add-btn" onclick="showTransactionForm()">+ Transaction</button>
+                </div>
+                <div class="content-list" id="financeList">
+                    <div class="empty-state">
+                        <div class="empty-icon">💰</div>
+                        <div>No transactions yet. Track your income & expenses!</div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="calendarView" class="view-section">
+                <div class="section-header">
+                    <div class="section-title">Calendar</div>
+                </div>
+                <div class="content-list" id="calendarContent">
+                    <div style="padding: 20px; text-align: center; color: var(--text-secondary);">
+                        📅 Calendar view coming soon!
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1295,36 +1300,34 @@
                 </div>
 
                 <div class="settings-section">
-                    <div class="settings-title">☁️ Cloud Sync (JSONBin.io)</div>
-                    <div class="form-group">
-                        <label class="form-label">API Key</label>
-                        <input type="password" class="form-input" id="apiKeyInput" placeholder="Enter your JSONBin API key">
+                    <div class="settings-title">☁️ Cloud Sync</div>
+                    <div class="option-group">
+                        <div class="option-item">
+                            <span class="option-label">Status: <span id="syncMode">Not Connected</span></span>
+                            <span id="lastSyncTime" style="font-size: calc(11px * var(--font-scale)); color: var(--text-secondary);"></span>
+                        </div>
                     </div>
-                    <button class="btn btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="saveApiKey()">Save API Key</button>
-                    <button class="btn btn-secondary" style="width: 100%;" onclick="testSync()">Test Sync Connection</button>
+                    <div class="form-group" style="margin-top: 12px;">
+                        <label class="form-label">JSONBin API Key</label>
+                        <input type="password" class="form-input" id="apiKeyInput" placeholder="Enter your API key">
+                        <button class="btn btn-primary" style="width: 100%; margin-top: 8px;" onclick="saveApiKey()">Save API Key</button>
+                    </div>
+                    <button class="btn btn-secondary" style="width: 100%; margin-top: 8px;" onclick="testSync()">Test Sync Connection</button>
+                    <div style="font-size: calc(11px * var(--font-scale)); color: var(--text-secondary); margin-top: 8px; padding: 0 4px;">
+                        Get free API key at jsonbin.io. Your data syncs across all devices!
+                    </div>
                 </div>
 
                 <div class="settings-section">
-                    <div class="settings-title">💾 Data Management</div>
-                    <button class="action-btn" onclick="exportData()">📤 Export Backup (JSON)</button>
-                    <button class="action-btn" onclick="document.getElementById('importFile').click()">📥 Import Backup</button>
-                    <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                    <div class="settings-title">📦 Data</div>
+                    <div class="option-group">
+                        <button class="action-btn" onclick="exportData()">📤 Export Data</button>
+                        <label class="action-btn" style="cursor: pointer;">
+                            📥 Import Data
+                            <input type="file" accept=".json" onchange="importData(event)" style="display: none;">
+                        </label>
+                    </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Add Options Modal -->
-    <div id="addModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">Add New</div>
-                <button class="close-btn" onclick="closeModal('addModal')">×</button>
-            </div>
-            <div class="modal-body">
-                <button class="action-btn" onclick="closeModal('addModal'); showProjectForm()">📁 New Project</button>
-                <button class="action-btn" onclick="closeModal('addModal'); showTaskForm()">✓ New Task</button>
-                <button class="action-btn" onclick="closeModal('addModal'); showTransactionForm()">💰 New Transaction</button>
             </div>
         </div>
     </div>
@@ -1332,15 +1335,11 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // IMPORTANT: Your JSONBin configuration - Keep your bin number here
         const APP_CONFIG = {
-            binId: '678d47b3e41b4d34e47b381d',  // YOUR BIN NUMBER - DO NOT CHANGE
-            baseUrl: 'https://api.jsonbin.io/v3'
+            baseUrl: 'https://api.jsonbin.io/v3',
+            binId: '678d47b3e41b4d34e47b381d'
         };
 
-        let syncApiKey = localStorage.getItem('builderProSyncApiKey') || '';
-        
-        // Data structure
         let data = {
             projects: [],
             tasks: [],
@@ -1353,12 +1352,15 @@
                 theme: 'pink-rose'
             }
         };
-        
+
         let currentView = 'projects';
         let editingId = null;
         let editingType = null;
+        let syncApiKey = localStorage.getItem('builderProSyncApiKey') || '';
+        let reminderTimer = null;
+        let reminderCountdownInterval = null;
 
-        // ============ NEW: ICON GENERATOR FOR IPAD ============
+        // ============ ICON GENERATOR FOR IPAD ============
         function generateAppIcons() {
             const sizes = [
                 { id: 'icon180', size: 180 },
@@ -1366,25 +1368,18 @@
                 { id: 'icon120', size: 120 },
                 { id: 'favicon', size: 64 }
             ];
-
             sizes.forEach(({ id, size }) => {
                 const canvas = document.createElement('canvas');
                 canvas.width = size;
                 canvas.height = size;
                 const ctx = canvas.getContext('2d');
-
-                // Background
                 ctx.fillStyle = '#E8A9B3';
                 ctx.fillRect(0, 0, size, size);
-
-                // Letter "B"
                 ctx.fillStyle = 'white';
                 ctx.font = `bold ${size * 0.5}px -apple-system, sans-serif`;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText('B', size / 2, size / 2);
-
-                // Set icon
                 const link = document.getElementById(id);
                 if (link) {
                     link.href = canvas.toDataURL('image/png');
@@ -1392,56 +1387,78 @@
             });
         }
 
-        // ============ NEW: REMINDER SYSTEM ============
-        let reminderTimer = null;
-        let reminderCountdownInterval = null;
+        function updateAppIcons(theme) {
+            const themeColors = {
+                'pink-rose': '#d2bcbf',
+                'sage': '#c0ccb8',
+                'gold': '#e0b558',
+                'periwinkle': '#99b3ec',
+                'slate': '#8386a4',
+                'teal': '#90b2b8',
+                'aqua': '#9cbbbf',
+                'terracotta': '#c48779'
+            };
+            const color = themeColors[theme] || '#E8A9B3';
+            const sizes = [
+                { id: 'icon180', size: 180 },
+                { id: 'icon152', size: 152 },
+                { id: 'icon120', size: 120 },
+                { id: 'favicon', size: 64 }
+            ];
+            sizes.forEach(({ id, size }) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = color;
+                ctx.fillRect(0, 0, size, size);
+                ctx.fillStyle = 'white';
+                ctx.font = `bold ${size * 0.5}px -apple-system, sans-serif`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('B', size / 2, size / 2);
+                const link = document.getElementById(id);
+                if (link) {
+                    link.href = canvas.toDataURL('image/png');
+                }
+            });
+        }
 
+        // ============ REMINDER SYSTEM ============
         function startReminderSystem() {
             const scheduleNextReminder = () => {
-                // Random interval between 35-45 minutes
                 const minutes = 35 + Math.random() * 10;
                 const milliseconds = minutes * 60 * 1000;
-                
                 console.log(`⏰ Next reminder in ${minutes.toFixed(1)} minutes`);
-                
                 if (reminderTimer) clearTimeout(reminderTimer);
                 reminderTimer = setTimeout(() => {
                     showSmartReminder();
                     scheduleNextReminder();
                 }, milliseconds);
             };
-
             scheduleNextReminder();
         }
 
         function showSmartReminder() {
             const reminderData = analyzeWhatToCheck();
-            
             if (reminderData.items.length === 0) {
                 console.log('⏰ No reminders needed right now');
                 return;
             }
-
             const popup = document.getElementById('reminderPopup');
             const content = document.getElementById('reminderContent');
-            
             let html = `<p><strong>${reminderData.title}</strong></p><ul class="reminder-popup-list">`;
             reminderData.items.forEach(item => {
                 html += `<li>${item}</li>`;
             });
             html += '</ul>';
-            
             content.innerHTML = html;
             popup.classList.add('show');
-
-            // Auto-close countdown
             let countdown = 5;
             const countdownEl = document.getElementById('reminderCountdown');
-            
             reminderCountdownInterval = setInterval(() => {
                 countdown--;
                 countdownEl.textContent = countdown;
-                
                 if (countdown <= 0) {
                     dismissReminder();
                 }
@@ -1449,61 +1466,43 @@
         }
 
         function analyzeWhatToCheck() {
-            const result = {
-                title: '',
-                items: []
-            };
-
+            const result = { title: '', items: [] };
             const now = Date.now();
             const today = new Date().toISOString().split('T')[0];
-
-            // Check overdue tasks
             const overdueTasks = data.tasks.filter(t => {
                 if (t.status === 'completed' || !t.dueDate) return false;
                 return new Date(t.dueDate) < new Date(today);
             });
-
             if (overdueTasks.length > 0) {
                 result.title = '⚠️ Action Required';
                 result.items.push(`${overdueTasks.length} overdue task${overdueTasks.length > 1 ? 's' : ''}`);
             }
-
-            // Check tasks due today
             const dueTodayTasks = data.tasks.filter(t => {
                 return t.status !== 'completed' && t.dueDate === today;
             });
-
             if (dueTodayTasks.length > 0) {
                 if (!result.title) result.title = '📌 Today\'s Focus';
                 result.items.push(`${dueTodayTasks.length} task${dueTodayTasks.length > 1 ? 's' : ''} due today`);
             }
-
-            // Check active projects without recent activity
             const activeProjects = data.projects.filter(p => p.status === 'active');
             const staleProjects = activeProjects.filter(p => {
                 const daysSinceUpdate = (now - p.updatedAt) / (1000 * 60 * 60 * 24);
                 return daysSinceUpdate > 3;
             });
-
             if (staleProjects.length > 0) {
                 if (!result.title) result.title = '🔍 Time to Review';
                 result.items.push(`${staleProjects.length} project${staleProjects.length > 1 ? 's' : ''} need attention`);
             }
-
-            // Check pending tasks
             const pendingTasks = data.tasks.filter(t => t.status === 'pending');
             if (pendingTasks.length > 5) {
                 if (!result.title) result.title = '📋 Pending Items';
                 result.items.push(`${pendingTasks.length} tasks waiting to start`);
             }
-
-            // Check budget vs expenses
             activeProjects.forEach(project => {
                 if (project.budget > 0) {
                     const projectExpenses = data.transactions
                         .filter(t => t.type === 'expense' && t.projectId === project.id)
                         .reduce((sum, t) => sum + t.amount, 0);
-                    
                     const percentage = (projectExpenses / project.budget) * 100;
                     if (percentage > 80) {
                         if (!result.title) result.title = '💰 Budget Alert';
@@ -1511,8 +1510,6 @@
                     }
                 }
             });
-
-            // If nothing specific, provide general reminder
             if (result.items.length === 0 && (activeProjects.length > 0 || data.tasks.length > 0)) {
                 result.title = '✨ Quick Check-in';
                 result.items.push('Review your active projects');
@@ -1521,30 +1518,23 @@
                     result.items.push('Check your finances');
                 }
             }
-
             return result;
         }
 
         function dismissReminder() {
             const popup = document.getElementById('reminderPopup');
             popup.classList.remove('show');
-            
             if (reminderCountdownInterval) {
                 clearInterval(reminderCountdownInterval);
                 reminderCountdownInterval = null;
             }
-            
-            // Reset countdown for next time
             document.getElementById('reminderCountdown').textContent = '5';
         }
 
-        // ============ DATA MANAGEMENT ============
         function loadData() {
             const saved = localStorage.getItem('builderProData');
             if (saved) {
                 data = JSON.parse(saved);
-                
-                // Ensure theme exists
                 if (!data.settings.theme) {
                     data.settings.theme = 'pink-rose';
                 }
@@ -1553,211 +1543,6 @@
 
         function saveData() {
             localStorage.setItem('builderProData', JSON.stringify(data));
-        }
-
-        // ============ VIEW MANAGEMENT ============
-        function showView(viewName) {
-            currentView = viewName;
-            
-            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById(viewName).classList.add('active');
-            
-            const tab = document.querySelector(`.tab[data-view="${viewName}"]`);
-            if (tab) tab.classList.add('active');
-            
-            const navItem = document.querySelector(`.nav-item[data-view="${viewName}"]`);
-            if (navItem) navItem.classList.add('active');
-            
-            renderView();
-        }
-
-        function renderView() {
-            switch(currentView) {
-                case 'projects':
-                    renderProjects();
-                    break;
-                case 'tasks':
-                    renderTasks();
-                    break;
-                case 'finance':
-                    renderFinance();
-                    break;
-            }
-        }
-
-        function renderProjects() {
-            const container = document.getElementById('projects');
-            
-            if (data.projects.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">📁</div>
-                        <div class="empty-text">No projects yet</div>
-                        <div class="empty-hint">Tap + to create your first project</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            data.projects.forEach(project => {
-                const projectTasks = data.tasks.filter(t => t.projectId === project.id);
-                const completedTasks = projectTasks.filter(t => t.status === 'completed').length;
-                
-                const projectIncome = data.transactions
-                    .filter(t => t.type === 'income' && t.projectId === project.id)
-                    .reduce((sum, t) => sum + t.amount, 0);
-                
-                const projectExpense = data.transactions
-                    .filter(t => t.type === 'expense' && t.projectId === project.id)
-                    .reduce((sum, t) => sum + t.amount, 0);
-                
-                html += `
-                    <div class="card" onclick="showProjectForm('${project.id}')">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">${project.name}</div>
-                                <div class="card-subtitle">${project.description || 'No description'}</div>
-                            </div>
-                            <span class="badge ${project.status}">${project.status}</span>
-                        </div>
-                        <div class="card-footer">
-                            <div>📋 ${projectTasks.length} tasks (${completedTasks} done)</div>
-                            <div>💰 RM ${(projectIncome - projectExpense).toFixed(2)}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        function renderTasks() {
-            const container = document.getElementById('tasks');
-            
-            if (data.tasks.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">✓</div>
-                        <div class="empty-text">No tasks yet</div>
-                        <div class="empty-hint">Tap + to create your first task</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            data.tasks.forEach(task => {
-                const project = data.projects.find(p => p.id === task.projectId);
-                const projectName = project ? project.name : 'No project';
-                
-                html += `
-                    <div class="card" onclick="showTaskForm('${task.id}')">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title">${task.name}</div>
-                                <div class="card-subtitle">${projectName}</div>
-                            </div>
-                            <span class="badge ${task.status}">${task.status}</span>
-                        </div>
-                        ${task.description ? `<div class="card-body">${task.description}</div>` : ''}
-                        <div class="card-footer">
-                            <div>${task.dueDate ? '📅 ' + new Date(task.dueDate).toLocaleDateString() : 'No due date'}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        function renderFinance() {
-            const container = document.getElementById('finance');
-            
-            if (data.transactions.length === 0) {
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-icon">💰</div>
-                        <div class="empty-text">No transactions yet</div>
-                        <div class="empty-hint">Tap + to add your first transaction</div>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            const sortedTransactions = [...data.transactions].sort((a, b) => 
-                new Date(b.date) - new Date(a.date)
-            );
-            
-            sortedTransactions.forEach(trans => {
-                const project = data.projects.find(p => p.id === trans.projectId);
-                const projectName = project ? project.name : 'No project';
-                
-                html += `
-                    <div class="card" onclick="showTransactionForm('${trans.id}')">
-                        <div class="card-header">
-                            <div>
-                                <div class="card-title transaction-amount ${trans.type}">
-                                    ${trans.type === 'income' ? '+' : '-'} RM ${trans.amount.toFixed(2)}
-                                </div>
-                                <div class="card-subtitle">${trans.description}</div>
-                            </div>
-                        </div>
-                        <div class="card-footer">
-                            <div>📁 ${projectName}</div>
-                            <div>📅 ${new Date(trans.date).toLocaleDateString()}</div>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            container.innerHTML = html;
-        }
-
-        function updateStats() {
-            document.getElementById('projectCount').textContent = data.projects.length;
-            document.getElementById('taskCount').textContent = data.tasks.length;
-            
-            const income = data.transactions
-                .filter(t => t.type === 'income')
-                .reduce((sum, t) => sum + t.amount, 0);
-            
-            const expense = data.transactions
-                .filter(t => t.type === 'expense')
-                .reduce((sum, t) => sum + t.amount, 0);
-            
-            const net = income - expense;
-            
-            document.getElementById('totalIncome').textContent = `RM ${income.toFixed(2)}`;
-            document.getElementById('totalExpense').textContent = `RM ${expense.toFixed(2)}`;
-            document.getElementById('netBalance').textContent = `RM ${net.toFixed(2)}`;
-            
-            const incomeCount = data.transactions.filter(t => t.type === 'income').length;
-            const expenseCount = data.transactions.filter(t => t.type === 'expense').length;
-            
-            document.getElementById('incomeCount').textContent = `${incomeCount} transaction${incomeCount !== 1 ? 's' : ''}`;
-            document.getElementById('expenseCount').textContent = `${expenseCount} transaction${expenseCount !== 1 ? 's' : ''}`;
-            
-            const margin = income > 0 ? ((net / income) * 100).toFixed(1) : '0.0';
-            document.getElementById('profitMargin').textContent = `${margin}% margin`;
-        }
-
-        function showToast(message, duration = 3000) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, duration);
-        }
-
-        function showAddOptions() {
-            document.getElementById('addModal').classList.add('active');
         }
 
         function applySettings() {
@@ -1790,49 +1575,6 @@
             
             // Update night mode toggle
             updateNightModeToggle(nightMode);
-        }
-
-        function updateAppIcons(theme) {
-            const themeColors = {
-                'pink-rose': '#d2bcbf',
-                'sage': '#c0ccb8',
-                'gold': '#e0b558',
-                'periwinkle': '#99b3ec',
-                'slate': '#8386a4',
-                'teal': '#90b2b8',
-                'aqua': '#9cbbbf',
-                'terracotta': '#c48779'
-            };
-
-            const color = themeColors[theme] || '#E8A9B3';
-            
-            const sizes = [
-                { id: 'icon180', size: 180 },
-                { id: 'icon152', size: 152 },
-                { id: 'icon120', size: 120 },
-                { id: 'favicon', size: 64 }
-            ];
-
-            sizes.forEach(({ id, size }) => {
-                const canvas = document.createElement('canvas');
-                canvas.width = size;
-                canvas.height = size;
-                const ctx = canvas.getContext('2d');
-
-                ctx.fillStyle = color;
-                ctx.fillRect(0, 0, size, size);
-
-                ctx.fillStyle = 'white';
-                ctx.font = `bold ${size * 0.5}px -apple-system, sans-serif`;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('B', size / 2, size / 2);
-
-                const link = document.getElementById(id);
-                if (link) {
-                    link.href = canvas.toDataURL('image/png');
-                }
-            });
         }
 
         function updateThemeSelector(theme) {
@@ -1906,6 +1648,27 @@
                     }
                 }
             });
+        }
+
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, duration);
+        }
+
+        function showView(view) {
+            currentView = view;
+            
+            document.querySelectorAll('.view-section').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(`${view}View`).classList.add('active');
+            event.target.classList.add('active');
+            
+            renderView();
         }
 
         function showSettings() {
@@ -2108,7 +1871,8 @@
                 description: document.getElementById('transactionDesc').value,
                 projectId: document.getElementById('transactionProject').value || null,
                 date: document.getElementById('transactionDate').value,
-                createdAt: editingId ? data.transactions.find(t => t.id === editingId).createdAt : Date.now()
+                createdAt: editingId ? data.transactions.find(t => t.id === editingId).createdAt : Date.now(),
+                updatedAt: Date.now()
             };
             
             if (editingId) {
@@ -2122,7 +1886,7 @@
             closeModal('transactionModal');
             renderView();
             updateStats();
-            showToast(editingId ? 'Transaction updated' : 'Transaction added');
+            showToast(editingId ? 'Transaction updated' : 'Transaction created');
         }
 
         function deleteTransaction() {
@@ -2136,16 +1900,153 @@
             }
         }
 
-        // ============ SYNC FUNCTIONS ============
+        function renderView() {
+            if (currentView === 'projects') {
+                renderProjects();
+            } else if (currentView === 'tasks') {
+                renderTasks();
+            } else if (currentView === 'finance') {
+                renderTransactions();
+            }
+        }
+
+        function renderProjects() {
+            const list = document.getElementById('projectsList');
+            
+            if (data.projects.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div>No projects yet. Create your first project!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = data.projects.map(p => {
+                const tasks = data.tasks.filter(t => t.projectId === p.id);
+                const completedTasks = tasks.filter(t => t.status === 'completed').length;
+                const progress = tasks.length > 0 ? (completedTasks / tasks.length) * 100 : 0;
+                
+                return `
+                    <div class="project-card" onclick="showProjectForm('${p.id}')">
+                        <div class="card-header">
+                            <div class="card-title">${p.name}</div>
+                            <span class="status-badge status-${p.status}">${p.status}</span>
+                        </div>
+                        ${p.description ? `<div class="card-meta">${p.description}</div>` : ''}
+                        <div class="card-meta">
+                            ${tasks.length} tasks • ${completedTasks} completed
+                        </div>
+                        ${p.budget ? `<div class="card-meta">Budget: RM ${p.budget.toFixed(2)}</div>` : ''}
+                        <div class="card-progress">
+                            <div class="progress-bar">
+                                <div class="progress-fill" style="width: ${progress}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTasks() {
+            const list = document.getElementById('tasksList');
+            
+            if (data.tasks.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">✅</div>
+                        <div>No tasks yet. Add your first task!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = data.tasks.map(t => {
+                const project = t.projectId ? data.projects.find(p => p.id === t.projectId) : null;
+                
+                return `
+                    <div class="task-card" onclick="showTaskForm('${t.id}')">
+                        <div class="card-header">
+                            <div class="card-title">${t.name}</div>
+                            <span class="status-badge status-${t.status}">${t.status}</span>
+                        </div>
+                        ${t.description ? `<div class="card-meta">${t.description}</div>` : ''}
+                        ${project ? `<div class="card-meta">📋 ${project.name}</div>` : ''}
+                        ${t.dueDate ? `<div class="card-meta">📅 Due: ${new Date(t.dueDate).toLocaleDateString()}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderTransactions() {
+            const list = document.getElementById('financeList');
+            
+            if (data.transactions.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💰</div>
+                        <div>No transactions yet. Track your income & expenses!</div>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = data.transactions.map(t => {
+                const project = t.projectId ? data.projects.find(p => p.id === t.projectId) : null;
+                
+                return `
+                    <div class="transaction-card" onclick="showTransactionForm('${t.id}')">
+                        <div class="card-header">
+                            <div class="card-title">${t.description}</div>
+                            <div class="card-amount ${t.type}">
+                                ${t.type === 'income' ? '+' : '-'}RM ${t.amount.toFixed(2)}
+                            </div>
+                        </div>
+                        <div class="card-meta">
+                            ${t.type === 'income' ? '💰 Income' : '💸 Expense'} • 
+                            ${new Date(t.date).toLocaleDateString()}
+                        </div>
+                        ${project ? `<div class="card-meta">📋 ${project.name}</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateStats() {
+            const income = data.transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const expense = data.transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + t.amount, 0);
+            
+            const incomeCount = data.transactions.filter(t => t.type === 'income').length;
+            const expenseCount = data.transactions.filter(t => t.type === 'expense').length;
+            
+            const activeProjects = data.projects.filter(p => p.status === 'active').length;
+            const completedProjects = data.projects.filter(p => p.status === 'completed').length;
+            
+            document.getElementById('totalIncome').textContent = `RM ${income.toFixed(2)}`;
+            document.getElementById('totalExpense').textContent = `RM ${expense.toFixed(2)}`;
+            document.getElementById('netBalance').textContent = `RM ${(income - expense).toFixed(2)}`;
+            document.getElementById('incomeCount').textContent = `${incomeCount} transactions`;
+            document.getElementById('expenseCount').textContent = `${expenseCount} transactions`;
+            document.getElementById('activeProjects').textContent = activeProjects;
+            document.getElementById('completedProjects').textContent = `${completedProjects} completed`;
+            document.getElementById('projectCount').textContent = data.projects.length;
+            document.getElementById('taskCount').textContent = data.tasks.length;
+        }
+
         async function syncNow() {
             if (!syncApiKey) {
-                showToast('⚠️ No API key! Set it in Settings first.');
+                showToast('⚠️ Sync not configured! Open Settings to add your API key.');
                 return;
             }
             
             const indicator = document.getElementById('syncIndicator');
             const syncMode = document.getElementById('syncMode');
-            
             indicator.classList.add('syncing');
             syncMode.textContent = 'Syncing...';
             
@@ -2153,64 +2054,88 @@
             
             try {
                 console.log('🔄 Step 1: Fetching cloud data...');
-                const getResponse = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
+                const response = await fetch(`${APP_CONFIG.baseUrl}/b/${APP_CONFIG.binId}/latest`, {
                     headers: {
                         'X-Master-Key': syncApiKey
                     }
                 });
                 
-                if (!getResponse.ok) {
-                    throw new Error(`Fetch failed: ${getResponse.status} - ${getResponse.statusText}`);
+                if (!response.ok) {
+                    throw new Error(`Fetch failed: ${response.status} - ${response.statusText}`);
                 }
                 
-                const cloudData = await getResponse.json();
-                const cloudRecord = cloudData.record;
+                const result = await response.json();
+                const cloudData = result.record || {};
                 
-                console.log('📊 Cloud data:', {
-                    projects: cloudRecord.projects?.length || 0,
-                    tasks: cloudRecord.tasks?.length || 0,
-                    transactions: cloudRecord.transactions?.length || 0
+                console.log('📥 Cloud data received:', {
+                    projects: cloudData.projects?.length || 0,
+                    tasks: cloudData.tasks?.length || 0,
+                    transactions: cloudData.transactions?.length || 0
                 });
                 
-                console.log('📱 Local data:', {
-                    projects: data.projects.length,
-                    tasks: data.tasks.length,
-                    transactions: data.transactions.length
-                });
-                
-                console.log('🔄 Step 2: Merging data...');
-                syncMode.textContent = 'Merging...';
-                
-                const mergeArrays = (local, cloud, type) => {
-                    const merged = new Map();
+                if (cloudData.projects || cloudData.tasks || cloudData.transactions) {
+                    console.log('🔄 Step 2: Merging data...');
+                    syncMode.textContent = 'Merging...';
                     
-                    cloud.forEach(item => {
-                        merged.set(item.id, { ...item, source: 'cloud' });
-                    });
+                    const beforeCounts = {
+                        projects: data.projects.length,
+                        tasks: data.tasks.length,
+                        transactions: data.transactions.length
+                    };
                     
-                    local.forEach(item => {
-                        if (!merged.has(item.id)) {
-                            merged.set(item.id, { ...item, source: 'local' });
-                        } else {
-                            const existing = merged.get(item.id);
-                            const localTime = item.updatedAt || item.createdAt || 0;
-                            const cloudTime = existing.updatedAt || existing.createdAt || 0;
-                            
-                            if (localTime > cloudTime) {
-                                merged.set(item.id, { ...item, source: 'local-newer' });
+                    const mergeByTimestamp = (local, cloud, idField = 'id') => {
+                        const map = new Map();
+                        
+                        local.forEach(item => {
+                            map.set(item[idField], item);
+                        });
+                        
+                        cloud.forEach(item => {
+                            const existing = map.get(item[idField]);
+                            if (!existing || item.updatedAt > existing.updatedAt) {
+                                map.set(item[idField], item);
                             }
-                        }
-                    });
+                        });
+                        
+                        return Array.from(map.values());
+                    };
                     
-                    return Array.from(merged.values());
-                };
-                
-                const hasCloudData = cloudRecord.projects || cloudRecord.tasks || cloudRecord.transactions;
-                
-                if (hasCloudData) {
-                    data.projects = mergeArrays(data.projects, cloudRecord.projects || [], 'projects');
-                    data.tasks = mergeArrays(data.tasks, cloudRecord.tasks || [], 'tasks');
-                    data.transactions = mergeArrays(data.transactions, cloudRecord.transactions || [], 'transactions');
+                    const mergedProjects = mergeByTimestamp(data.projects, cloudData.projects || []);
+                    const mergedTasks = mergeByTimestamp(data.tasks, cloudData.tasks || []);
+                    const mergedTransactions = mergeByTimestamp(data.transactions, cloudData.transactions || []);
+                    
+                    data.projects = mergedProjects;
+                    data.tasks = mergedTasks;
+                    data.transactions = mergedTransactions;
+                    
+                    if (cloudData.permanentlyDeleted) {
+                        data.permanentlyDeleted = [
+                            ...(data.permanentlyDeleted || []),
+                            ...cloudData.permanentlyDeleted
+                        ];
+                        data.permanentlyDeleted = Array.from(
+                            new Map(data.permanentlyDeleted.map(item => [item.id, item])).values()
+                        );
+                    }
+                    
+                    const afterCounts = {
+                        projects: data.projects.length,
+                        tasks: data.tasks.length,
+                        transactions: data.transactions.length
+                    };
+                    
+                    const changes = [];
+                    if (afterCounts.projects !== beforeCounts.projects) {
+                        changes.push(`${afterCounts.projects - beforeCounts.projects > 0 ? '+' : ''}${afterCounts.projects - beforeCounts.projects} projects`);
+                    }
+                    if (afterCounts.tasks !== beforeCounts.tasks) {
+                        changes.push(`${afterCounts.tasks - beforeCounts.tasks > 0 ? '+' : ''}${afterCounts.tasks - beforeCounts.tasks} tasks`);
+                    }
+                    if (afterCounts.transactions !== beforeCounts.transactions) {
+                        changes.push(`${afterCounts.transactions - beforeCounts.transactions > 0 ? '+' : ''}${afterCounts.transactions - beforeCounts.transactions} trans`);
+                    }
+                    
+                    console.log('✅ Merge complete:', changes.length > 0 ? changes.join(', ') : 'No changes');
                     
                     saveData();
                     renderView();
@@ -2375,7 +2300,7 @@
             }
         }
 
-        // ============ INITIALIZE APP ============
+        // Initialize
         loadData();
         applySettings();
         renderView();
