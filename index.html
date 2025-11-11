@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -17,1559 +16,2137 @@
             box-sizing: border-box;
         }
 
-```
-    :root {
-        --primary: #6C63FF;
-        --primary-dark: #5548E0;
-        --secondary: #00D9FF;
-        --background: #000000;
-        --surface: #0a0a0a;
-        --surface-light: #1a1a1a;
-        --text: #ffffff;
-        --text-secondary: #888888;
-        --success: #00ff88;
-        --warning: #ffaa00;
-        --error: #ff4444;
-        --shadow: rgba(0, 0, 0, 0.5);
-    }
-
-    /* Light Mode Theme */
-    body.light-mode {
-        --primary: #6C63FF;
-        --primary-dark: #5548E0;
-        --secondary: #00D9FF;
-        --background: #f5f5f5;
-        --surface: #ffffff;
-        --surface-light: #f0f0f0;
-        --text: #1a1a1a;
-        --text-secondary: #666666;
-        --success: #00c853;
-        --warning: #ff9800;
-        --error: #f44336;
-        --shadow: rgba(0, 0, 0, 0.1);
-    }
-
-    body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        background: var(--background);
-        color: var(--text);
-        overflow-x: hidden;
-        padding-bottom: 80px;
-        -webkit-font-smoothing: antialiased;
-    }
-
-    /* Header */
-    .header {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        padding: 20px;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-        box-shadow: 0 4px 20px var(--shadow);
-    }
-
-    .header-content {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .logo {
-        font-size: 24px;
-        font-weight: 700;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .logo-icon {
-        width: 36px;
-        height: 36px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 20px;
-    }
-
-    .header-actions {
-        display: flex;
-        gap: 10px;
-    }
-
-    .icon-btn {
-        background: rgba(255, 255, 255, 0.2);
-        border: none;
-        width: 40px;
-        height: 40px;
-        border-radius: 10px;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-        transition: all 0.3s;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .icon-btn:active {
-        transform: scale(0.95);
-        background: rgba(255, 255, 255, 0.3);
-    }
-
-    /* Container */
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-
-    /* Tab Navigation */
-    .tab-nav {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 20px;
-        overflow-x: auto;
-        padding-bottom: 5px;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .tab-nav::-webkit-scrollbar {
-        display: none;
-    }
-
-    .tab-btn {
-        background: var(--surface);
-        border: 2px solid transparent;
-        padding: 12px 24px;
-        border-radius: 12px;
-        color: var(--text-secondary);
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-        white-space: nowrap;
-        flex-shrink: 0;
-    }
-
-    .tab-btn.active {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: white;
-        border-color: transparent;
-    }
-
-    .tab-btn:active {
-        transform: scale(0.98);
-    }
-
-    /* Tab Content */
-    .tab-content {
-        display: none;
-    }
-
-    .tab-content.active {
-        display: block;
-        animation: fadeIn 0.3s;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* Calculator Card */
-    .calc-card {
-        background: var(--surface);
-        border-radius: 20px;
-        padding: 24px;
-        margin-bottom: 20px;
-        box-shadow: 0 8px 32px var(--shadow);
-    }
-
-    .calc-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 20px;
-    }
-
-    .calc-icon {
-        width: 48px;
-        height: 48px;
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border-radius: 12px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 24px;
-    }
-
-    .calc-info h3 {
-        font-size: 20px;
-        margin-bottom: 4px;
-    }
-
-    .calc-info p {
-        font-size: 13px;
-        color: var(--text-secondary);
-    }
-
-    /* Input Groups */
-    .input-group {
-        margin-bottom: 20px;
-    }
-
-    .input-group label {
-        display: block;
-        font-size: 14px;
-        color: var(--text-secondary);
-        margin-bottom: 8px;
-        font-weight: 500;
-    }
-
-    .input-wrapper {
-        position: relative;
-        display: flex;
-        gap: 10px;
-    }
-
-    .input-wrapper input,
-    .input-wrapper select {
-        flex: 1;
-        background: var(--surface-light);
-        border: 2px solid transparent;
-        padding: 14px 16px;
-        border-radius: 12px;
-        color: var(--text);
-        font-size: 16px;
-        transition: all 0.3s;
-    }
-
-    .input-wrapper input:focus,
-    .input-wrapper select:focus {
-        outline: none;
-        border-color: var(--primary);
-        background: var(--background);
-    }
-
-    .input-wrapper .unit {
-        background: var(--surface-light);
-        padding: 14px 16px;
-        border-radius: 12px;
-        color: var(--text-secondary);
-        font-size: 14px;
-        white-space: nowrap;
-        display: flex;
-        align-items: center;
-    }
-
-    /* Toggle Switch */
-    .toggle-group {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-bottom: 20px;
-    }
-
-    .toggle-switch {
-        position: relative;
-        width: 56px;
-        height: 32px;
-    }
-
-    .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
-
-    .toggle-slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: var(--surface-light);
-        transition: 0.3s;
-        border-radius: 32px;
-    }
-
-    .toggle-slider:before {
-        position: absolute;
-        content: "";
-        height: 24px;
-        width: 24px;
-        left: 4px;
-        bottom: 4px;
-        background: white;
-        transition: 0.3s;
-        border-radius: 50%;
-    }
-
-    input:checked + .toggle-slider {
-        background: var(--primary);
-    }
-
-    input:checked + .toggle-slider:before {
-        transform: translateX(24px);
-    }
-
-    /* Result Display */
-    .result-box {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        border-radius: 16px;
-        padding: 24px;
-        margin-top: 24px;
-    }
-
-    .result-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 12px 0;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    .result-item:last-child {
-        border-bottom: none;
-        font-size: 20px;
-        font-weight: 700;
-    }
-
-    .result-label {
-        color: rgba(255, 255, 255, 0.8);
-        font-size: 14px;
-    }
-
-    .result-value {
-        font-weight: 600;
-        font-size: 16px;
-    }
-
-    /* Buttons */
-    .btn-primary {
-        background: linear-gradient(135deg, var(--primary), var(--secondary));
-        color: white;
-        border: none;
-        padding: 16px 32px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        width: 100%;
-        margin-top: 20px;
-        transition: all 0.3s;
-        box-shadow: 0 4px 16px rgba(108, 99, 255, 0.3);
-    }
-
-    .btn-primary:active {
-        transform: scale(0.98);
-    }
-
-    .btn-secondary {
-        background: var(--surface-light);
-        color: white;
-        border: none;
-        padding: 12px 24px;
-        border-radius: 12px;
-        font-size: 14px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .btn-secondary:active {
-        transform: scale(0.98);
-    }
-
-    /* Project List */
-    .project-list {
-        display: grid;
-        gap: 16px;
-    }
-
-    .project-card {
-        background: var(--surface);
-        border-radius: 16px;
-        padding: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .project-card:active {
-        transform: scale(0.98);
-        background: var(--surface-light);
-    }
-
-    .project-info h4 {
-        font-size: 18px;
-        margin-bottom: 4px;
-    }
-
-    .project-info p {
-        font-size: 13px;
-        color: var(--text-secondary);
-    }
-
-    .project-cost {
-        font-size: 20px;
-        font-weight: 700;
-        color: var(--success);
-    }
-
-    /* Empty State */
-    .empty-state {
-        text-align: center;
-        padding: 60px 20px;
-    }
-
-    .empty-icon {
-        font-size: 64px;
-        margin-bottom: 16px;
-        opacity: 0.3;
-    }
-
-    .empty-text {
-        color: var(--text-secondary);
-        font-size: 16px;
-    }
-
-    /* Modal */
-    .modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 1000;
-        backdrop-filter: blur(10px);
-        animation: fadeIn 0.3s;
-    }
-
-    .modal.active {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-
-    .modal-content {
-        background: var(--surface);
-        border-radius: 20px;
-        padding: 24px;
-        max-width: 500px;
-        width: 100%;
-        max-height: 90vh;
-        overflow-y: auto;
-        animation: slideUp 0.3s;
-    }
-
-    @keyframes slideUp {
-        from { transform: translateY(50px); opacity: 0; }
-        to { transform: translateY(0); opacity: 1; }
-    }
-
-    .modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 24px;
-    }
-
-    .modal-header h3 {
-        font-size: 22px;
-    }
-
-    .close-btn {
-        background: var(--surface-light);
-        border: none;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        color: white;
-        font-size: 20px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    /* Bottom Navigation */
-    .bottom-nav {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--surface);
-        display: flex;
-        justify-content: space-around;
-        padding: 12px 0;
-        box-shadow: 0 -4px 20px var(--shadow);
-        z-index: 99;
-    }
-
-    .nav-item {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 4px;
-        color: var(--text-secondary);
-        font-size: 11px;
-        cursor: pointer;
-        padding: 8px 16px;
-        transition: all 0.3s;
-        border-radius: 12px;
-    }
-
-    .nav-item.active {
-        color: var(--primary);
-        background: rgba(108, 99, 255, 0.1);
-    }
-
-    .nav-item .nav-icon {
-        font-size: 24px;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
-        .container {
-            padding: 16px;
+        :root {
+            --primary: #6C63FF;
+            --primary-dark: #5548E0;
+            --secondary: #00D9FF;
+            --background: #000000;
+            --surface: #0a0a0a;
+            --surface-light: #1a1a1a;
+            --text: #ffffff;
+            --text-secondary: #888888;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --error: #ff4444;
+            --shadow: rgba(0, 0, 0, 0.5);
         }
 
-        .calc-card {
+        /* Light Mode Theme */
+        body.light-mode {
+            --primary: #6C63FF;
+            --primary-dark: #5548E0;
+            --secondary: #00D9FF;
+            --background: #f5f5f5;
+            --surface: #ffffff;
+            --surface-light: #f0f0f0;
+            --text: #1a1a1a;
+            --text-secondary: #666666;
+            --success: #00c853;
+            --warning: #ff9800;
+            --error: #f44336;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            overflow-x: hidden;
+            padding-bottom: 80px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px var(--shadow);
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
             padding: 20px;
         }
-    }
 
-    /* Loading Animation */
-    .loading {
-        display: inline-block;
-        width: 20px;
-        height: 20px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        border-top-color: white;
-        animation: spin 0.8s linear infinite;
-    }
+        /* Tab Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+            -webkit-overflow-scrolling: touch;
+        }
 
-    @keyframes spin {
-        to { transform: rotate(360deg); }
-    }
+        .tab-nav::-webkit-scrollbar {
+            display: none;
+        }
 
-    /* Toast Notification */
-    .toast {
-        position: fixed;
-        bottom: 100px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: var(--success);
-        color: white;
-        padding: 16px 24px;
-        border-radius: 12px;
-        font-weight: 600;
-        box-shadow: 0 4px 20px var(--shadow);
-        z-index: 1001;
-        animation: toastIn 0.3s;
-    }
+        .tab-btn {
+            background: var(--surface);
+            border: 2px solid transparent;
+            padding: 12px 24px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
 
-    @keyframes toastIn {
-        from { transform: translateX(-50%) translateY(20px); opacity: 0; }
-        to { transform: translateX(-50%) translateY(0); opacity: 1; }
-    }
-</style>
-```
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+        }
 
+        .tab-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* Tab Content */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Calculator Card */
+        .calc-card {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px var(--shadow);
+        }
+
+        .calc-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .calc-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+
+        .calc-info h3 {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .calc-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Input Groups */
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-wrapper input,
+        .input-wrapper select {
+            flex: 1;
+            background: var(--surface-light);
+            border: 2px solid transparent;
+            padding: 14px 16px;
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+
+        .input-wrapper input:focus,
+        .input-wrapper select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: var(--background);
+        }
+
+        .input-wrapper .unit {
+            background: var(--surface-light);
+            padding: 14px 16px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Toggle Switch */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 56px;
+            height: 32px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--surface-light);
+            transition: 0.3s;
+            border-radius: 32px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 24px;
+            width: 24px;
+            left: 4px;
+            bottom: 4px;
+            background: white;
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background: var(--primary);
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Result Display */
+        .result-box {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 16px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .result-label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+        }
+
+        .result-value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(108, 99, 255, 0.3);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-secondary {
+            background: var(--surface-light);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-secondary:active {
+            transform: scale(0.98);
+        }
+
+        /* Project List */
+        .project-list {
+            display: grid;
+            gap: 16px;
+        }
+
+        .project-card {
+            background: var(--surface);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .project-card:active {
+            transform: scale(0.98);
+            background: var(--surface-light);
+        }
+
+        .project-info h4 {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+
+        .project-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .project-cost {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--success);
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-text {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: var(--surface);
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .modal-header h3 {
+            font-size: 22px;
+        }
+
+        .close-btn {
+            background: var(--surface-light);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -4px 20px var(--shadow);
+            z-index: 99;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            color: var(--text-secondary);
+            font-size: 11px;
+            cursor: pointer;
+            padding: 8px 16px;
+            transition: all 0.3s;
+            border-radius: 12px;
+        }
+
+        .nav-item.active {
+            color: var(--primary);
+            background: rgba(108, 99, 255, 0.1);
+        }
+
+        .nav-item .nav-icon {
+            font-size: 24px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+
+            .calc-card {
+                padding: 20px;
+            }
+        }
+
+        /* Loading Animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 100px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--success);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            box-shadow: 0 4px 20px var(--shadow);
+            z-index: 1001;
+            animation: toastIn 0.3s;
+        }
+
+        @keyframes toastIn {
+            from { transform: translateX(-50%) translateY(20px); opacity: 0; }
+            to { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        /* Settings Styles */
+        .settings-section {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--surface-light);
+        }
+
+        .settings-section:last-child {
+            border-bottom: none;
+        }
+
+        .settings-title {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            gap: 20px;
+        }
+
+        .setting-info {
+            flex: 1;
+        }
+
+        .setting-label {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--text);
+        }
+
+        .setting-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .setting-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .setting-control select {
+            background: var(--surface-light);
+            border: 2px solid transparent;
+            padding: 10px 14px;
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 14px;
+            min-width: 140px;
+            cursor: pointer;
+        }
+
+        .setting-control select:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        /* Font Size Adjustments */
+        body.font-small {
+            font-size: 14px;
+        }
+
+        body.font-small .calc-info h3 {
+            font-size: 18px;
+        }
+
+        body.font-small .input-wrapper input,
+        body.font-small .input-wrapper select {
+            font-size: 14px;
+        }
+
+        body.font-large {
+            font-size: 18px;
+        }
+
+        body.font-large .calc-info h3 {
+            font-size: 22px;
+        }
+
+        body.font-large .input-wrapper input,
+        body.font-large .input-wrapper select {
+            font-size: 18px;
+        }
+
+        body.font-xlarge {
+            font-size: 20px;
+        }
+
+        body.font-xlarge .calc-info h3 {
+            font-size: 24px;
+        }
+
+        body.font-xlarge .input-wrapper input,
+        body.font-xlarge .input-wrapper select {
+            font-size: 20px;
+        }
+
+        /* Compact Mode */
+        body.compact-mode .calc-card {
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+
+        body.compact-mode .input-group {
+            margin-bottom: 12px;
+        }
+
+        body.compact-mode .result-item {
+            padding: 8px 0;
+        }
+
+        body.compact-mode .container {
+            padding: 12px;
+        }
+
+        /* Range Slider Styling */
+        input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: var(--surface-light);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(108, 99, 255, 0.4);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(108, 99, 255, 0.4);
+        }
+    </style>
 </head>
 <body>
 
-```
-<!-- Header -->
-<div class="header">
-    <div class="header-content">
-        <div class="logo">
-            <div class="logo-icon">🧮</div>
-            <span>MaterialMate</span>
-        </div>
-        <div class="header-actions">
-            <button class="icon-btn" onclick="toggleTheme()" id="theme-toggle">🌙</button>
-            <button class="icon-btn" onclick="showSettings()">⚙️</button>
-            <button class="icon-btn" onclick="exportData()">📤</button>
-        </div>
-    </div>
-</div>
-
-<!-- Container -->
-<div class="container">
-    <!-- Tab Navigation -->
-    <div class="tab-nav">
-        <button class="tab-btn active" onclick="switchTab('calculators')">🧮 Calculators</button>
-        <button class="tab-btn" onclick="switchTab('projects')">📁 Projects</button>
-        <button class="tab-btn" onclick="switchTab('suppliers')">🏪 Suppliers</button>
-        <button class="tab-btn" onclick="switchTab('saved')">💾 Saved</button>
-    </div>
-
-    <!-- Calculators Tab -->
-    <div id="calculators" class="tab-content active">
-        <!-- Terrazzo/Epoxy Calculator -->
-        <div class="calc-card">
-            <div class="calc-header">
-                <div class="calc-icon">🎨</div>
-                <div class="calc-info">
-                    <h3>Terrazzo / Epoxy</h3>
-                    <p>Calculate resin, hardener, aggregates & fillers</p>
-                </div>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🧮</div>
+                <span>MaterialMate</span>
             </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="toggleTheme()" id="theme-toggle">🌙</button>
+                <button class="icon-btn" onclick="showSettings()">⚙️</button>
+                <button class="icon-btn" onclick="exportData()">📤</button>
+            </div>
+        </div>
+    </div>
 
-            <div class="input-group">
-                <label>Coverage Area</label>
-                <div class="input-wrapper">
-                    <input type="number" id="terrazzo-area" placeholder="10" step="0.1">
-                    <select id="terrazzo-unit" class="unit">
-                        <option>m²</option>
-                        <option>ft²</option>
+    <!-- Container -->
+    <div class="container">
+        <!-- Tab Navigation -->
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="switchTab('calculators')">🧮 Calculators</button>
+            <button class="tab-btn" onclick="switchTab('projects')">📁 Projects</button>
+            <button class="tab-btn" onclick="switchTab('suppliers')">🏪 Suppliers</button>
+            <button class="tab-btn" onclick="switchTab('saved')">💾 Saved</button>
+        </div>
+
+        <!-- Calculators Tab -->
+        <div id="calculators" class="tab-content active">
+            <!-- Terrazzo/Epoxy Calculator -->
+            <div class="calc-card">
+                <div class="calc-header">
+                    <div class="calc-icon">🎨</div>
+                    <div class="calc-info">
+                        <h3>Terrazzo / Epoxy</h3>
+                        <p>Calculate resin, hardener, aggregates & fillers</p>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Coverage Area</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="terrazzo-area" placeholder="10" step="0.1">
+                        <select id="terrazzo-unit" class="unit">
+                            <option>m²</option>
+                            <option>ft²</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Thickness</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="terrazzo-thickness" placeholder="10" value="10" step="1">
+                        <div class="unit">mm</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Mix Ratio</label>
+                    <select id="terrazzo-ratio" class="input-wrapper">
+                        <option value="standard">Standard (40:45:10:5)</option>
+                        <option value="heavy">Heavy Stone (35:50:10:5)</option>
+                        <option value="smooth">Smooth Finish (45:40:10:5)</option>
+                        <option value="custom">Custom Mix</option>
                     </select>
                 </div>
-            </div>
 
-            <div class="input-group">
-                <label>Thickness</label>
-                <div class="input-wrapper">
-                    <input type="number" id="terrazzo-thickness" placeholder="10" value="10" step="1">
-                    <div class="unit">mm</div>
+                <div class="toggle-group">
+                    <label>Include Cost Calculation</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="terrazzo-cost">
+                        <span class="toggle-slider"></span>
+                    </label>
                 </div>
+
+                <div id="terrazzo-cost-inputs" style="display: none;">
+                    <div class="input-group">
+                        <label>Epoxy Resin Price (per kg)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="terrazzo-resin-price" placeholder="45" step="0.1">
+                            <div class="unit">RM</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Stone Chips Price (per kg)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="terrazzo-chips-price" placeholder="8" step="0.1">
+                            <div class="unit">RM</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Powder Filler Price (per kg)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="terrazzo-powder-price" placeholder="3" step="0.1">
+                            <div class="unit">RM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="calculateTerrazzo()">Calculate Materials</button>
+
+                <div id="terrazzo-result" style="display: none;"></div>
             </div>
 
-            <div class="input-group">
-                <label>Mix Ratio</label>
-                <select id="terrazzo-ratio" class="input-wrapper">
-                    <option value="standard">Standard (40:45:10:5)</option>
-                    <option value="heavy">Heavy Stone (35:50:10:5)</option>
-                    <option value="smooth">Smooth Finish (45:40:10:5)</option>
-                    <option value="custom">Custom Mix</option>
-                </select>
-            </div>
-
-            <div class="toggle-group">
-                <label>Include Cost Calculation</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="terrazzo-cost">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div id="terrazzo-cost-inputs" style="display: none;">
-                <div class="input-group">
-                    <label>Epoxy Resin Price (per kg)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="terrazzo-resin-price" placeholder="45" step="0.1">
-                        <div class="unit">RM</div>
+            <!-- Concrete Calculator -->
+            <div class="calc-card">
+                <div class="calc-header">
+                    <div class="calc-icon">🏗️</div>
+                    <div class="calc-info">
+                        <h3>Concrete Mix</h3>
+                        <p>Calculate cement, sand, aggregate & water</p>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <label>Stone Chips Price (per kg)</label>
+                    <label>Volume</label>
                     <div class="input-wrapper">
-                        <input type="number" id="terrazzo-chips-price" placeholder="8" step="0.1">
-                        <div class="unit">RM</div>
+                        <input type="number" id="concrete-volume" placeholder="1" step="0.1">
+                        <select id="concrete-unit" class="unit">
+                            <option>m³</option>
+                            <option>ft³</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <label>Powder Filler Price (per kg)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="terrazzo-powder-price" placeholder="3" step="0.1">
-                        <div class="unit">RM</div>
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn-primary" onclick="calculateTerrazzo()">Calculate Materials</button>
-
-            <div id="terrazzo-result" style="display: none;"></div>
-        </div>
-
-        <!-- Concrete Calculator -->
-        <div class="calc-card">
-            <div class="calc-header">
-                <div class="calc-icon">🏗️</div>
-                <div class="calc-info">
-                    <h3>Concrete Mix</h3>
-                    <p>Calculate cement, sand, aggregate & water</p>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label>Volume</label>
-                <div class="input-wrapper">
-                    <input type="number" id="concrete-volume" placeholder="1" step="0.1">
-                    <select id="concrete-unit" class="unit">
-                        <option>m³</option>
-                        <option>ft³</option>
+                    <label>Mix Ratio</label>
+                    <select id="concrete-ratio">
+                        <option value="1:2:4">1:2:4 (Standard)</option>
+                        <option value="1:1.5:3">1:1.5:3 (High Strength)</option>
+                        <option value="1:3:6">1:3:6 (Foundation)</option>
+                        <option value="1:2:3">1:2:3 (Structural)</option>
                     </select>
                 </div>
+
+                <div class="toggle-group">
+                    <label>Include Cost Calculation</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="concrete-cost">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div id="concrete-cost-inputs" style="display: none;">
+                    <div class="input-group">
+                        <label>Cement Price (per bag - 50kg)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="concrete-cement-price" placeholder="25" step="0.1">
+                            <div class="unit">RM</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Sand Price (per m³)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="concrete-sand-price" placeholder="80" step="1">
+                            <div class="unit">RM</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Aggregate Price (per m³)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="concrete-aggregate-price" placeholder="100" step="1">
+                            <div class="unit">RM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="calculateConcrete()">Calculate Materials</button>
+
+                <div id="concrete-result" style="display: none;"></div>
             </div>
 
-            <div class="input-group">
-                <label>Mix Ratio</label>
-                <select id="concrete-ratio">
-                    <option value="1:2:4">1:2:4 (Standard)</option>
-                    <option value="1:1.5:3">1:1.5:3 (High Strength)</option>
-                    <option value="1:3:6">1:3:6 (Foundation)</option>
-                    <option value="1:2:3">1:2:3 (Structural)</option>
-                </select>
-            </div>
-
-            <div class="toggle-group">
-                <label>Include Cost Calculation</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="concrete-cost">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div id="concrete-cost-inputs" style="display: none;">
-                <div class="input-group">
-                    <label>Cement Price (per bag - 50kg)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="concrete-cement-price" placeholder="25" step="0.1">
-                        <div class="unit">RM</div>
+            <!-- Paint Calculator -->
+            <div class="calc-card">
+                <div class="calc-header">
+                    <div class="calc-icon">🎨</div>
+                    <div class="calc-info">
+                        <h3>Paint Coverage</h3>
+                        <p>Calculate paint quantity needed</p>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <label>Sand Price (per m³)</label>
+                    <label>Wall Area</label>
                     <div class="input-wrapper">
-                        <input type="number" id="concrete-sand-price" placeholder="80" step="1">
-                        <div class="unit">RM</div>
+                        <input type="number" id="paint-area" placeholder="50" step="0.1">
+                        <select id="paint-unit" class="unit">
+                            <option>m²</option>
+                            <option>ft²</option>
+                        </select>
                     </div>
                 </div>
 
                 <div class="input-group">
-                    <label>Aggregate Price (per m³)</label>
+                    <label>Number of Coats</label>
                     <div class="input-wrapper">
-                        <input type="number" id="concrete-aggregate-price" placeholder="100" step="1">
-                        <div class="unit">RM</div>
+                        <input type="number" id="paint-coats" placeholder="2" value="2" step="1" min="1">
+                        <div class="unit">coats</div>
                     </div>
                 </div>
-            </div>
 
-            <button class="btn-primary" onclick="calculateConcrete()">Calculate Materials</button>
-
-            <div id="concrete-result" style="display: none;"></div>
-        </div>
-
-        <!-- Paint Calculator -->
-        <div class="calc-card">
-            <div class="calc-header">
-                <div class="calc-icon">🎨</div>
-                <div class="calc-info">
-                    <h3>Paint Coverage</h3>
-                    <p>Calculate paint quantity needed</p>
+                <div class="input-group">
+                    <label>Coverage per Liter</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="paint-coverage" placeholder="12" value="12" step="0.1">
+                        <div class="unit">m²/L</div>
+                    </div>
                 </div>
+
+                <div class="toggle-group">
+                    <label>Include Cost Calculation</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="paint-cost">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div id="paint-cost-inputs" style="display: none;">
+                    <div class="input-group">
+                        <label>Paint Price (per liter)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="paint-price" placeholder="35" step="0.1">
+                            <div class="unit">RM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn-primary" onclick="calculatePaint()">Calculate Paint</button>
+
+                <div id="paint-result" style="display: none;"></div>
             </div>
 
-            <div class="input-group">
-                <label>Wall Area</label>
-                <div class="input-wrapper">
-                    <input type="number" id="paint-area" placeholder="50" step="0.1">
-                    <select id="paint-unit" class="unit">
-                        <option>m²</option>
-                        <option>ft²</option>
+            <!-- Tiles Calculator -->
+            <div class="calc-card">
+                <div class="calc-header">
+                    <div class="calc-icon">⬜</div>
+                    <div class="calc-info">
+                        <h3>Tiles & Grout</h3>
+                        <p>Calculate tiles, adhesive & grout needed</p>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Floor/Wall Area</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="tile-area" placeholder="20" step="0.1">
+                        <select id="tile-unit" class="unit">
+                            <option>m²</option>
+                            <option>ft²</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Tile Size</label>
+                    <select id="tile-size">
+                        <option value="300x300">300mm x 300mm</option>
+                        <option value="600x600">600mm x 600mm</option>
+                        <option value="400x400">400mm x 400mm</option>
+                        <option value="300x600">300mm x 600mm</option>
+                        <option value="custom">Custom Size</option>
                     </select>
                 </div>
-            </div>
 
-            <div class="input-group">
-                <label>Number of Coats</label>
-                <div class="input-wrapper">
-                    <input type="number" id="paint-coats" placeholder="2" value="2" step="1" min="1">
-                    <div class="unit">coats</div>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label>Coverage per Liter</label>
-                <div class="input-wrapper">
-                    <input type="number" id="paint-coverage" placeholder="12" value="12" step="0.1">
-                    <div class="unit">m²/L</div>
-                </div>
-            </div>
-
-            <div class="toggle-group">
-                <label>Include Cost Calculation</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="paint-cost">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div id="paint-cost-inputs" style="display: none;">
                 <div class="input-group">
-                    <label>Paint Price (per liter)</label>
+                    <label>Wastage Allowance</label>
                     <div class="input-wrapper">
-                        <input type="number" id="paint-price" placeholder="35" step="0.1">
-                        <div class="unit">RM</div>
-                    </div>
-                </div>
-            </div>
-
-            <button class="btn-primary" onclick="calculatePaint()">Calculate Paint</button>
-
-            <div id="paint-result" style="display: none;"></div>
-        </div>
-
-        <!-- Tiles Calculator -->
-        <div class="calc-card">
-            <div class="calc-header">
-                <div class="calc-icon">⬜</div>
-                <div class="calc-info">
-                    <h3>Tiles & Grout</h3>
-                    <p>Calculate tiles, adhesive & grout needed</p>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label>Floor/Wall Area</label>
-                <div class="input-wrapper">
-                    <input type="number" id="tile-area" placeholder="20" step="0.1">
-                    <select id="tile-unit" class="unit">
-                        <option>m²</option>
-                        <option>ft²</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="input-group">
-                <label>Tile Size</label>
-                <select id="tile-size">
-                    <option value="300x300">300mm x 300mm</option>
-                    <option value="600x600">600mm x 600mm</option>
-                    <option value="400x400">400mm x 400mm</option>
-                    <option value="300x600">300mm x 600mm</option>
-                    <option value="custom">Custom Size</option>
-                </select>
-            </div>
-
-            <div class="input-group">
-                <label>Wastage Allowance</label>
-                <div class="input-wrapper">
-                    <input type="number" id="tile-wastage" placeholder="10" value="10" step="1" min="0" max="30">
-                    <div class="unit">%</div>
-                </div>
-            </div>
-
-            <div class="toggle-group">
-                <label>Include Cost Calculation</label>
-                <label class="toggle-switch">
-                    <input type="checkbox" id="tile-cost">
-                    <span class="toggle-slider"></span>
-                </label>
-            </div>
-
-            <div id="tile-cost-inputs" style="display: none;">
-                <div class="input-group">
-                    <label>Tile Price (per box / m²)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="tile-price" placeholder="25" step="0.1">
-                        <div class="unit">RM</div>
+                        <input type="number" id="tile-wastage" placeholder="10" value="10" step="1" min="0" max="30">
+                        <div class="unit">%</div>
                     </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Adhesive Price (per bag)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="tile-adhesive-price" placeholder="18" step="0.1">
-                        <div class="unit">RM</div>
+                <div class="toggle-group">
+                    <label>Include Cost Calculation</label>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="tile-cost">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
+
+                <div id="tile-cost-inputs" style="display: none;">
+                    <div class="input-group">
+                        <label>Tile Price (per box / m²)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="tile-price" placeholder="25" step="0.1">
+                            <div class="unit">RM</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Adhesive Price (per bag)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="tile-adhesive-price" placeholder="18" step="0.1">
+                            <div class="unit">RM</div>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Grout Price (per bag)</label>
+                        <div class="input-wrapper">
+                            <input type="number" id="tile-grout-price" placeholder="12" step="0.1">
+                            <div class="unit">RM</div>
+                        </div>
                     </div>
                 </div>
 
-                <div class="input-group">
-                    <label>Grout Price (per bag)</label>
-                    <div class="input-wrapper">
-                        <input type="number" id="tile-grout-price" placeholder="12" step="0.1">
-                        <div class="unit">RM</div>
-                    </div>
-                </div>
-            </div>
+                <button class="btn-primary" onclick="calculateTiles()">Calculate Tiles</button>
 
-            <button class="btn-primary" onclick="calculateTiles()">Calculate Tiles</button>
-
-            <div id="tile-result" style="display: none;"></div>
-        </div>
-    </div>
-
-    <!-- Projects Tab -->
-    <div id="projects" class="tab-content">
-        <button class="btn-primary" onclick="showNewProjectModal()">➕ New Project</button>
-        <div id="project-list" class="project-list" style="margin-top: 20px;">
-            <div class="empty-state">
-                <div class="empty-icon">📁</div>
-                <div class="empty-text">No projects yet. Create your first project!</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Suppliers Tab -->
-    <div id="suppliers" class="tab-content">
-        <div class="calc-card">
-            <h3 style="margin-bottom: 16px;">🏪 Common Suppliers in Malaysia</h3>
-            
-            <div style="margin-bottom: 20px;">
-                <h4 style="color: var(--primary); margin-bottom: 12px;">Hardware Stores</h4>
-                <div style="color: var(--text-secondary); line-height: 1.8;">
-                    • Mr DIY - General hardware & tools<br>
-                    • HomePro - Home improvement & building materials<br>
-                    • DIY Hardware - Construction materials<br>
-                    • Bunnings - Wide range of materials
-                </div>
-            </div>
-
-            <div style="margin-bottom: 20px;">
-                <h4 style="color: var(--primary); margin-bottom: 12px;">Specialist Suppliers</h4>
-                <div style="color: var(--text-secondary); line-height: 1.8;">
-                    • YTL Cement - Cement & concrete products<br>
-                    • Nippon Paint - Paint & coatings<br>
-                    • Guocera - Tiles & ceramics<br>
-                    • CT Tiles - Premium tiles
-                </div>
-            </div>
-
-            <div>
-                <h4 style="color: var(--primary); margin-bottom: 12px;">Online Marketplaces</h4>
-                <div style="color: var(--text-secondary); line-height: 1.8;">
-                    • Lazada - Wide selection, home delivery<br>
-                    • Shopee - Competitive prices<br>
-                    • Lelong - Local sellers<br>
-                    • Mudah - Classified ads
-                </div>
+                <div id="tile-result" style="display: none;"></div>
             </div>
         </div>
 
-        <div class="calc-card">
-            <h3 style="margin-bottom: 16px;">💰 Typical Price Ranges (RM)</h3>
-            
-            <div style="margin-bottom: 16px;">
-                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--surface-light);">
-                    <span>Cement (50kg bag)</span>
-                    <span style="color: var(--success); font-weight: 600;">RM 20-30</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--surface-light);">
-                    <span>Epoxy Resin (per kg)</span>
-                    <span style="color: var(--success); font-weight: 600;">RM 40-60</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--surface-light);">
-                    <span>Paint (per liter)</span>
-                    <span style="color: var(--success); font-weight: 600;">RM 30-80</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--surface-light);">
-                    <span>Tiles (per m²)</span>
-                    <span style="color: var(--success); font-weight: 600;">RM 15-100</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; padding: 12px 0;">
-                    <span>Stone chips (per kg)</span>
-                    <span style="color: var(--success); font-weight: 600;">RM 5-15</span>
-                </div>
-            </div>
-
-            <div style="background: var(--surface-light); padding: 16px; border-radius: 12px; margin-top: 16px;">
-                <div style="font-size: 13px; color: var(--text-secondary);">
-                    💡 <strong>Tip:</strong> Prices vary by location and brand. Always compare at least 3 suppliers before buying. Bulk purchases often get discounts!
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Saved Tab -->
-    <div id="saved" class="tab-content">
-        <div id="saved-list" class="project-list">
-            <div class="empty-state">
-                <div class="empty-icon">💾</div>
-                <div class="empty-text">No saved calculations yet. Save a calculation to access it later!</div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- New Project Modal -->
-<div id="newProjectModal" class="modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3>New Project</h3>
-            <button class="close-btn" onclick="closeModal('newProjectModal')">×</button>
-        </div>
-        
-        <div class="input-group">
-            <label>Project Name</label>
-            <input type="text" id="new-project-name" placeholder="e.g., Master Bathroom Renovation" style="width: 100%; background: var(--surface-light); border: 2px solid transparent; padding: 14px 16px; border-radius: 12px; color: var(--text); font-size: 16px;">
-        </div>
-
-        <div class="input-group">
-            <label>Description (Optional)</label>
-            <textarea id="new-project-desc" placeholder="Project details..." style="width: 100%; background: var(--surface-light); border: 2px solid transparent; padding: 14px 16px; border-radius: 12px; color: var(--text); font-size: 16px; min-height: 80px; resize: vertical;"></textarea>
-        </div>
-
-        <div class="input-group">
-            <label>Budget (Optional)</label>
-            <div class="input-wrapper">
-                <input type="number" id="new-project-budget" placeholder="5000" step="1">
-                <div class="unit">RM</div>
-            </div>
-        </div>
-
-        <button class="btn-primary" onclick="createProject()">Create Project</button>
-    </div>
-</div>
-
-<!-- Bottom Navigation -->
-<div class="bottom-nav">
-    <div class="nav-item active" onclick="switchTab('calculators')">
-        <div class="nav-icon">🧮</div>
-        <div>Calculators</div>
-    </div>
-    <div class="nav-item" onclick="switchTab('projects')">
-        <div class="nav-icon">📁</div>
-        <div>Projects</div>
-    </div>
-    <div class="nav-item" onclick="switchTab('suppliers')">
-        <div class="nav-icon">🏪</div>
-        <div>Suppliers</div>
-    </div>
-    <div class="nav-item" onclick="switchTab('saved')">
-        <div class="nav-icon">💾</div>
-        <div>Saved</div>
-    </div>
-</div>
-
-<script>
-    // Data Storage
-    let projects = JSON.parse(localStorage.getItem('materialmate_projects')) || [];
-    let savedCalculations = JSON.parse(localStorage.getItem('materialmate_saved')) || [];
-
-    // Theme Management
-    function toggleTheme() {
-        const body = document.body;
-        const themeBtn = document.getElementById('theme-toggle');
-        
-        if (body.classList.contains('light-mode')) {
-            body.classList.remove('light-mode');
-            themeBtn.textContent = '🌙';
-            localStorage.setItem('materialmate_theme', 'dark');
-            showToast('🌙 Dark mode activated');
-        } else {
-            body.classList.add('light-mode');
-            themeBtn.textContent = '☀️';
-            localStorage.setItem('materialmate_theme', 'light');
-            showToast('☀️ Light mode activated');
-        }
-    }
-
-    // Load saved theme on startup
-    function loadTheme() {
-        const savedTheme = localStorage.getItem('materialmate_theme');
-        const themeBtn = document.getElementById('theme-toggle');
-        
-        if (savedTheme === 'light') {
-            document.body.classList.add('light-mode');
-            if (themeBtn) themeBtn.textContent = '☀️';
-        } else {
-            if (themeBtn) themeBtn.textContent = '🌙';
-        }
-    }
-
-    // Tab Switching
-    function switchTab(tabName) {
-        // Hide all tabs
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        document.querySelectorAll('.nav-item').forEach(nav => {
-            nav.classList.remove('active');
-        });
-
-        // Show selected tab
-        document.getElementById(tabName).classList.add('active');
-        
-        // Update button states
-        const tabButtons = document.querySelectorAll('.tab-btn');
-        tabButtons.forEach(btn => {
-            if (btn.textContent.toLowerCase().includes(tabName.slice(0, 4))) {
-                btn.classList.add('active');
-            }
-        });
-
-        // Update nav states
-        const navItems = document.querySelectorAll('.nav-item');
-        navItems.forEach(nav => {
-            if (nav.textContent.toLowerCase().includes(tabName)) {
-                nav.classList.add('active');
-            }
-        });
-
-        // Load data for specific tabs
-        if (tabName === 'projects') {
-            loadProjects();
-        } else if (tabName === 'saved') {
-            loadSavedCalculations();
-        }
-    }
-
-    // Toggle cost inputs
-    document.getElementById('terrazzo-cost').addEventListener('change', function() {
-        document.getElementById('terrazzo-cost-inputs').style.display = this.checked ? 'block' : 'none';
-    });
-
-    document.getElementById('concrete-cost').addEventListener('change', function() {
-        document.getElementById('concrete-cost-inputs').style.display = this.checked ? 'block' : 'none';
-    });
-
-    document.getElementById('paint-cost').addEventListener('change', function() {
-        document.getElementById('paint-cost-inputs').style.display = this.checked ? 'block' : 'none';
-    });
-
-    document.getElementById('tile-cost').addEventListener('change', function() {
-        document.getElementById('tile-cost-inputs').style.display = this.checked ? 'block' : 'none';
-    });
-
-    // Terrazzo Calculator
-    function calculateTerrazzo() {
-        const area = parseFloat(document.getElementById('terrazzo-area').value);
-        const thickness = parseFloat(document.getElementById('terrazzo-thickness').value);
-        const unit = document.getElementById('terrazzo-unit').value;
-        
-        if (!area || !thickness) {
-            showToast('Please enter area and thickness');
-            return;
-        }
-
-        // Convert to m² if needed
-        const areaM2 = unit === 'ft²' ? area * 0.092903 : area;
-        
-        // Calculate volume in liters (m² * mm thickness / 1000)
-        const volumeL = areaM2 * thickness / 1000 * 1000; // Convert to liters
-        
-        // Get mix ratio (default 40:45:10:5 = Resin:Chips:Powder:Pigment)
-        const resinPercent = 0.40;
-        const chipsPercent = 0.45;
-        const powderPercent = 0.10;
-        const pigmentPercent = 0.05;
-        
-        // Density: Epoxy ~1.1 kg/L, Stone ~1.5 kg/L, Powder ~1.2 kg/L
-        const totalWeight = volumeL * 1.3; // Average density
-        
-        const resinKg = (totalWeight * resinPercent).toFixed(2);
-        const chipsKg = (totalWeight * chipsPercent).toFixed(2);
-        const powderKg = (totalWeight * powderPercent).toFixed(2);
-        const pigmentKg = (totalWeight * pigmentPercent).toFixed(2);
-
-        let resultHTML = `
-            <div class="result-box">
-                <div class="result-item">
-                    <span class="result-label">Epoxy Resin + Hardener</span>
-                    <span class="result-value">${resinKg} kg</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Stone Chips (5-10mm)</span>
-                    <span class="result-value">${chipsKg} kg</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Powder Filler (CaCO₃)</span>
-                    <span class="result-value">${powderKg} kg</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Pigment</span>
-                    <span class="result-value">${pigmentKg} kg</span>
-                </div>
-        `;
-
-        // Add cost if enabled
-        if (document.getElementById('terrazzo-cost').checked) {
-            const resinPrice = parseFloat(document.getElementById('terrazzo-resin-price').value) || 0;
-            const chipsPrice = parseFloat(document.getElementById('terrazzo-chips-price').value) || 0;
-            const powderPrice = parseFloat(document.getElementById('terrazzo-powder-price').value) || 0;
-
-            const totalCost = (resinKg * resinPrice) + (chipsKg * chipsPrice) + (powderKg * powderPrice);
-
-            resultHTML += `
-                <div class="result-item">
-                    <span class="result-label">Total Material Cost</span>
-                    <span class="result-value">RM ${totalCost.toFixed(2)}</span>
-                </div>
-            `;
-        }
-
-        resultHTML += `</div>`;
-        
-        document.getElementById('terrazzo-result').innerHTML = resultHTML;
-        document.getElementById('terrazzo-result').style.display = 'block';
-
-        showToast('✅ Calculation complete!');
-    }
-
-    // Concrete Calculator
-    function calculateConcrete() {
-        const volume = parseFloat(document.getElementById('concrete-volume').value);
-        const unit = document.getElementById('concrete-unit').value;
-        const ratio = document.getElementById('concrete-ratio').value;
-
-        if (!volume) {
-            showToast('Please enter volume');
-            return;
-        }
-
-        // Convert to m³ if needed
-        const volumeM3 = unit === 'ft³' ? volume * 0.0283168 : volume;
-
-        // Parse ratio
-        const [cement, sand, aggregate] = ratio.split(':').map(Number);
-        const totalParts = cement + sand + aggregate;
-
-        // Calculate materials
-        const cementM3 = (volumeM3 * cement / totalParts);
-        const sandM3 = (volumeM3 * sand / totalParts);
-        const aggregateM3 = (volumeM3 * aggregate / totalParts);
-
-        // Convert cement to bags (1 bag = 50kg, 1m³ cement ≈ 1440 kg)
-        const cementBags = Math.ceil((cementM3 * 1440) / 50);
-        const waterL = (volumeM3 * 200).toFixed(0); // Approx 200L per m³
-
-        let resultHTML = `
-            <div class="result-box">
-                <div class="result-item">
-                    <span class="result-label">Cement</span>
-                    <span class="result-value">${cementBags} bags (50kg)</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Sand</span>
-                    <span class="result-value">${sandM3.toFixed(2)} m³</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Aggregate (Stone)</span>
-                    <span class="result-value">${aggregateM3.toFixed(2)} m³</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Water (approx)</span>
-                    <span class="result-value">${waterL} liters</span>
-                </div>
-        `;
-
-        // Add cost if enabled
-        if (document.getElementById('concrete-cost').checked) {
-            const cementPrice = parseFloat(document.getElementById('concrete-cement-price').value) || 0;
-            const sandPrice = parseFloat(document.getElementById('concrete-sand-price').value) || 0;
-            const aggregatePrice = parseFloat(document.getElementById('concrete-aggregate-price').value) || 0;
-
-            const totalCost = (cementBags * cementPrice) + (sandM3 * sandPrice) + (aggregateM3 * aggregatePrice);
-
-            resultHTML += `
-                <div class="result-item">
-                    <span class="result-label">Total Material Cost</span>
-                    <span class="result-value">RM ${totalCost.toFixed(2)}</span>
-                </div>
-            `;
-        }
-
-        resultHTML += `</div>`;
-
-        document.getElementById('concrete-result').innerHTML = resultHTML;
-        document.getElementById('concrete-result').style.display = 'block';
-
-        showToast('✅ Calculation complete!');
-    }
-
-    // Paint Calculator
-    function calculatePaint() {
-        const area = parseFloat(document.getElementById('paint-area').value);
-        const coats = parseFloat(document.getElementById('paint-coats').value);
-        const coverage = parseFloat(document.getElementById('paint-coverage').value);
-        const unit = document.getElementById('paint-unit').value;
-
-        if (!area || !coats || !coverage) {
-            showToast('Please fill all fields');
-            return;
-        }
-
-        // Convert to m² if needed
-        const areaM2 = unit === 'ft²' ? area * 0.092903 : area;
-
-        // Calculate paint needed
-        const totalArea = areaM2 * coats;
-        const litersNeeded = (totalArea / coverage).toFixed(2);
-        const gallonsNeeded = (litersNeeded / 3.78541).toFixed(2);
-
-        let resultHTML = `
-            <div class="result-box">
-                <div class="result-item">
-                    <span class="result-label">Paint Needed</span>
-                    <span class="result-value">${litersNeeded} liters</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Or in Gallons</span>
-                    <span class="result-value">${gallonsNeeded} gallons</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Total Coverage</span>
-                    <span class="result-value">${totalArea.toFixed(2)} m²</span>
-                </div>
-        `;
-
-        // Add cost if enabled
-        if (document.getElementById('paint-cost').checked) {
-            const paintPrice = parseFloat(document.getElementById('paint-price').value) || 0;
-            const totalCost = litersNeeded * paintPrice;
-
-            resultHTML += `
-                <div class="result-item">
-                    <span class="result-label">Total Material Cost</span>
-                    <span class="result-value">RM ${totalCost.toFixed(2)}</span>
-                </div>
-            `;
-        }
-
-        resultHTML += `</div>`;
-
-        document.getElementById('paint-result').innerHTML = resultHTML;
-        document.getElementById('paint-result').style.display = 'block';
-
-        showToast('✅ Calculation complete!');
-    }
-
-    // Tiles Calculator
-    function calculateTiles() {
-        const area = parseFloat(document.getElementById('tile-area').value);
-        const wastage = parseFloat(document.getElementById('tile-wastage').value) || 10;
-        const unit = document.getElementById('tile-unit').value;
-
-        if (!area) {
-            showToast('Please enter area');
-            return;
-        }
-
-        // Convert to m² if needed
-        const areaM2 = unit === 'ft²' ? area * 0.092903 : area;
-
-        // Add wastage
-        const totalArea = areaM2 * (1 + wastage / 100);
-
-        // Calculate boxes (assuming 1 box = 1.44 m² for 300x300)
-        const boxes = Math.ceil(totalArea / 1.44);
-
-        // Adhesive: ~5kg per m²
-        const adhesiveKg = (totalArea * 5).toFixed(0);
-        const adhesiveBags = Math.ceil(adhesiveKg / 20); // 20kg per bag
-
-        // Grout: ~0.5kg per m²
-        const groutKg = (totalArea * 0.5).toFixed(1);
-        const groutBags = Math.ceil(groutKg / 5); // 5kg per bag
-
-        let resultHTML = `
-            <div class="result-box">
-                <div class="result-item">
-                    <span class="result-label">Tiles Needed</span>
-                    <span class="result-value">${totalArea.toFixed(2)} m²</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Boxes (approx)</span>
-                    <span class="result-value">${boxes} boxes</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Tile Adhesive</span>
-                    <span class="result-value">${adhesiveBags} bags (20kg)</span>
-                </div>
-                <div class="result-item">
-                    <span class="result-label">Grout</span>
-                    <span class="result-value">${groutBags} bags (5kg)</span>
-                </div>
-        `;
-
-        // Add cost if enabled
-        if (document.getElementById('tile-cost').checked) {
-            const tilePrice = parseFloat(document.getElementById('tile-price').value) || 0;
-            const adhesivePrice = parseFloat(document.getElementById('tile-adhesive-price').value) || 0;
-            const groutPrice = parseFloat(document.getElementById('tile-grout-price').value) || 0;
-
-            const totalCost = (totalArea * tilePrice) + (adhesiveBags * adhesivePrice) + (groutBags * groutPrice);
-
-            resultHTML += `
-                <div class="result-item">
-                    <span class="result-label">Total Material Cost</span>
-                    <span class="result-value">RM ${totalCost.toFixed(2)}</span>
-                </div>
-            `;
-        }
-
-        resultHTML += `</div>`;
-
-        document.getElementById('tile-result').innerHTML = resultHTML;
-        document.getElementById('tile-result').style.display = 'block';
-
-        showToast('✅ Calculation complete!');
-    }
-
-    // Projects
-    function showNewProjectModal() {
-        document.getElementById('newProjectModal').classList.add('active');
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.remove('active');
-    }
-
-    function createProject() {
-        const name = document.getElementById('new-project-name').value.trim();
-        const desc = document.getElementById('new-project-desc').value.trim();
-        const budget = parseFloat(document.getElementById('new-project-budget').value) || 0;
-
-        if (!name) {
-            showToast('Please enter project name');
-            return;
-        }
-
-        const project = {
-            id: Date.now(),
-            name: name,
-            description: desc,
-            budget: budget,
-            spent: 0,
-            createdAt: new Date().toISOString(),
-            calculations: []
-        };
-
-        projects.push(project);
-        localStorage.setItem('materialmate_projects', JSON.stringify(projects));
-
-        closeModal('newProjectModal');
-        loadProjects();
-        showToast('✅ Project created!');
-
-        // Clear form
-        document.getElementById('new-project-name').value = '';
-        document.getElementById('new-project-desc').value = '';
-        document.getElementById('new-project-budget').value = '';
-    }
-
-    function loadProjects() {
-        const container = document.getElementById('project-list');
-
-        if (projects.length === 0) {
-            container.innerHTML = `
+        <!-- Projects Tab -->
+        <div id="projects" class="tab-content">
+            <button class="btn-primary" onclick="showNewProjectModal()">➕ New Project</button>
+            <div id="project-list" class="project-list" style="margin-top: 20px;">
                 <div class="empty-state">
                     <div class="empty-icon">📁</div>
                     <div class="empty-text">No projects yet. Create your first project!</div>
                 </div>
-            `;
-            return;
-        }
+            </div>
+        </div>
 
-        container.innerHTML = projects.map(project => `
-            <div class="project-card" onclick="viewProject(${project.id})">
-                <div class="project-info">
-                    <h4>${project.name}</h4>
-                    <p>${project.description || 'No description'}</p>
-                    <p style="margin-top: 8px; font-size: 12px;">Created ${new Date(project.createdAt).toLocaleDateString()}</p>
+        <!-- Suppliers Tab -->
+        <div id="suppliers" class="tab-content">
+            <div class="calc-card">
+                <h3 style="margin-bottom: 16px;">🏪 Common Suppliers in Malaysia</h3>
+                
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: var(--primary); margin-bottom: 12px;">Hardware Stores</h4>
+                    <div style="color: var(--text-secondary); line-height: 1.8;">
+                        • Mr DIY - General hardware & tools<br>
+                        • HomePro - Home improvement & building materials<br>
+                        • DIY Hardware - Construction materials<br>
+                        • Bunnings - Wide range of materials
+                    </div>
                 </div>
-                <div class="project-cost">
-                    RM ${project.spent.toFixed(0)}
-                    ${project.budget ? `<div style="font-size: 12px; color: var(--text-secondary);">/ ${project.budget}</div>` : ''}
+
+                <div style="margin-bottom: 20px;">
+                    <h4 style="color: var(--primary); margin-bottom: 12px;">Specialist Suppliers</h4>
+                    <div style="color: var(--text-secondary); line-height: 1.8;">
+                        • YTL Cement - Cement & concrete products<br>
+                        • Nippon Paint - Paint & coatings<br>
+                        • Guocera - Tiles & ceramics<br>
+                        • CT Tiles - Premium tiles
+                    </div>
+                </div>
+
+                <div>
+                    <h4 style="color: var(--primary); margin-bottom: 12px;">Online Marketplaces</h4>
+                    <div style="color: var(--text-secondary); line-height: 1.8;">
+                        • Lazada - Wide selection, home delivery<br>
+                        • Shopee - Competitive prices<br>
+                        • Lelong - Local sellers<br>
+                        • Mudah - Classified ads
+                    </div>
                 </div>
             </div>
-        `).join('');
-    }
 
-    function viewProject(id) {
-        showToast('Project details - Coming in next version!');
-    }
+            <div class="calc-card">
+                <h3 style="margin-bottom: 16px;">💰 Typical Price Ranges (RM)</h3>
+                
+                <div style="margin-bottom: 16px;">
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--surface-light);">
+                        <span>Cement (50kg bag)</span>
+                        <span style="color: var(--success); font-weight: 600;">RM 20-30</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--surface-light);">
+                        <span>Epoxy Resin (per kg)</span>
+                        <span style="color: var(--success); font-weight: 600;">RM 40-60</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--surface-light);">
+                        <span>Paint (per liter)</span>
+                        <span style="color: var(--success); font-weight: 600;">RM 30-80</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--surface-light);">
+                        <span>Tiles (per m²)</span>
+                        <span style="color: var(--success); font-weight: 600;">RM 15-100</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 12px 0;">
+                        <span>Stone chips (per kg)</span>
+                        <span style="color: var(--success); font-weight: 600;">RM 5-15</span>
+                    </div>
+                </div>
 
-    function loadSavedCalculations() {
-        const container = document.getElementById('saved-list');
+                <div style="background: var(--surface-light); padding: 16px; border-radius: 12px; margin-top: 16px;">
+                    <div style="font-size: 13px; color: var(--text-secondary);">
+                        💡 <strong>Tip:</strong> Prices vary by location and brand. Always compare at least 3 suppliers before buying. Bulk purchases often get discounts!
+                    </div>
+                </div>
+            </div>
+        </div>
 
-        if (savedCalculations.length === 0) {
-            container.innerHTML = `
+        <!-- Saved Tab -->
+        <div id="saved" class="tab-content">
+            <div id="saved-list" class="project-list">
                 <div class="empty-state">
                     <div class="empty-icon">💾</div>
                     <div class="empty-text">No saved calculations yet. Save a calculation to access it later!</div>
                 </div>
-            `;
-            return;
-        }
-
-        container.innerHTML = savedCalculations.map((calc, index) => `
-            <div class="project-card">
-                <div class="project-info">
-                    <h4>${calc.type}</h4>
-                    <p>${calc.description}</p>
-                </div>
-                <div class="project-cost">RM ${calc.cost || 0}</div>
             </div>
-        `).join('');
-    }
+        </div>
+    </div>
 
-    // Settings
-    function showSettings() {
-        showToast('Settings - Coming soon!');
-    }
+    <!-- New Project Modal -->
+    <div id="newProjectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>New Project</h3>
+                <button class="close-btn" onclick="closeModal('newProjectModal')">×</button>
+            </div>
+            
+            <div class="input-group">
+                <label>Project Name</label>
+                <input type="text" id="new-project-name" placeholder="e.g., Master Bathroom Renovation" style="width: 100%; background: var(--surface-light); border: 2px solid transparent; padding: 14px 16px; border-radius: 12px; color: var(--text); font-size: 16px;">
+            </div>
 
-    // Export Data
-    function exportData() {
-        const data = {
-            projects: projects,
-            saved: savedCalculations,
-            exportDate: new Date().toISOString()
-        };
+            <div class="input-group">
+                <label>Description (Optional)</label>
+                <textarea id="new-project-desc" placeholder="Project details..." style="width: 100%; background: var(--surface-light); border: 2px solid transparent; padding: 14px 16px; border-radius: 12px; color: var(--text); font-size: 16px; min-height: 80px; resize: vertical;"></textarea>
+            </div>
 
-        const dataStr = JSON.stringify(data, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `materialmate-backup-${Date.now()}.json`;
-        link.click();
+            <div class="input-group">
+                <label>Budget (Optional)</label>
+                <div class="input-wrapper">
+                    <input type="number" id="new-project-budget" placeholder="5000" step="1">
+                    <div class="unit">RM</div>
+                </div>
+            </div>
 
-        showToast('✅ Data exported!');
-    }
+            <button class="btn-primary" onclick="createProject()">Create Project</button>
+        </div>
+    </div>
 
-    // Toast Notification
-    function showToast(message) {
-        const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.textContent = message;
-        document.body.appendChild(toast);
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>⚙️ Settings</h3>
+                <button class="close-btn" onclick="closeModal('settingsModal')">×</button>
+            </div>
 
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
-    }
+            <!-- Appearance Settings -->
+            <div class="settings-section">
+                <h4 class="settings-title">🎨 Appearance</h4>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Theme</div>
+                        <div class="setting-desc">Choose your preferred color scheme</div>
+                    </div>
+                    <div class="setting-control">
+                        <select id="setting-theme" onchange="applyThemeSetting()">
+                            <option value="dark">🌙 Dark Mode</option>
+                            <option value="light">☀️ Light Mode</option>
+                            <option value="auto">🌓 Auto (System)</option>
+                        </select>
+                    </div>
+                </div>
 
-    // PWA Install
-    let deferredPrompt;
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Font Size</div>
+                        <div class="setting-desc">Adjust text size for better readability</div>
+                    </div>
+                    <div class="setting-control" style="flex-direction: column; gap: 8px; align-items: stretch;">
+                        <input type="range" id="font-size-slider" min="12" max="20" value="16" step="1" oninput="adjustFontSize(this.value)" style="width: 100%;">
+                        <div style="display: flex; justify-content: space-between; font-size: 12px; color: var(--text-secondary);">
+                            <span>Small</span>
+                            <span id="font-size-display">16px</span>
+                            <span>Large</span>
+                        </div>
+                    </div>
+                </div>
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e;
-        showToast('💡 Add MaterialMate to your home screen!');
-    });
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Compact Mode</div>
+                        <div class="setting-desc">Reduce spacing for more content</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="setting-compact" onchange="toggleCompactMode()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
 
-    // Initialize
-    window.addEventListener('load', () => {
-        loadTheme();
-        
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js');
+            <!-- Unit Settings -->
+            <div class="settings-section">
+                <h4 class="settings-title">📏 Units & Currency</h4>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Currency</div>
+                        <div class="setting-desc">Default currency for calculations</div>
+                    </div>
+                    <div class="setting-control">
+                        <select id="setting-currency" onchange="saveCurrency()">
+                            <option value="RM">RM (Ringgit)</option>
+                            <option value="USD">USD ($)</option>
+                            <option value="EUR">EUR (€)</option>
+                            <option value="SGD">SGD (S$)</option>
+                            <option value="GBP">GBP (£)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Default Area Unit</div>
+                        <div class="setting-desc">Preferred measurement system</div>
+                    </div>
+                    <div class="setting-control">
+                        <select id="setting-area-unit" onchange="saveAreaUnit()">
+                            <option value="m²">Metric (m²)</option>
+                            <option value="ft²">Imperial (ft²)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Default Volume Unit</div>
+                        <div class="setting-desc">For concrete and material volumes</div>
+                    </div>
+                    <div class="setting-control">
+                        <select id="setting-volume-unit" onchange="saveVolumeUnit()">
+                            <option value="m³">Cubic Meters (m³)</option>
+                            <option value="ft³">Cubic Feet (ft³)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Calculation Settings -->
+            <div class="settings-section">
+                <h4 class="settings-title">🧮 Calculations</h4>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Default Wastage %</div>
+                        <div class="setting-desc">Safety margin for materials</div>
+                    </div>
+                    <div class="setting-control">
+                        <input type="number" id="setting-wastage" min="0" max="30" value="10" step="1" onchange="saveWastage()" style="width: 80px; background: var(--surface-light); border: 2px solid transparent; padding: 8px 12px; border-radius: 8px; color: var(--text);">
+                        <span style="margin-left: 8px;">%</span>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Decimal Places</div>
+                        <div class="setting-desc">Precision for results</div>
+                    </div>
+                    <div class="setting-control">
+                        <select id="setting-decimals" onchange="saveDecimals()">
+                            <option value="0">0 (Whole numbers)</option>
+                            <option value="1">1 decimal</option>
+                            <option value="2">2 decimals</option>
+                            <option value="3">3 decimals</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Auto-Calculate</div>
+                        <div class="setting-desc">Calculate as you type</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="setting-auto-calc" onchange="saveAutoCalc()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Management -->
+            <div class="settings-section">
+                <h4 class="settings-title">💾 Data Management</h4>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Auto-Save</div>
+                        <div class="setting-desc">Automatically save calculations</div>
+                    </div>
+                    <div class="setting-control">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="setting-auto-save" checked onchange="saveAutoSave()">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Backup Data</div>
+                        <div class="setting-desc">Export all projects and calculations</div>
+                    </div>
+                    <div class="setting-control">
+                        <button class="btn-secondary" onclick="exportData()">📤 Export</button>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Restore Data</div>
+                        <div class="setting-desc">Import from backup file</div>
+                    </div>
+                    <div class="setting-control">
+                        <button class="btn-secondary" onclick="document.getElementById('import-file').click()">📥 Import</button>
+                        <input type="file" id="import-file" accept=".json" style="display: none;" onchange="importData(event)">
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Clear All Data</div>
+                        <div class="setting-desc">Delete all projects and calculations</div>
+                    </div>
+                    <div class="setting-control">
+                        <button class="btn-secondary" onclick="confirmClearData()" style="background: var(--error); color: white;">🗑️ Clear</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- About -->
+            <div class="settings-section">
+                <h4 class="settings-title">ℹ️ About</h4>
+                
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">MaterialMate</div>
+                        <div class="setting-desc">Version 1.0.0</div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Storage Used</div>
+                        <div class="setting-desc" id="storage-info">Calculating...</div>
+                    </div>
+                </div>
+
+                <div class="setting-item">
+                    <div class="setting-info">
+                        <div class="setting-label">Built for</div>
+                        <div class="setting-desc">DIY Construction Enthusiasts 🏗️</div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="closeModal('settingsModal')">Done</button>
+        </div>
+    </div>
+
+    <!-- Bottom Navigation -->
+    <div class="bottom-nav">
+        <div class="nav-item active" onclick="switchTab('calculators')">
+            <div class="nav-icon">🧮</div>
+            <div>Calculators</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('projects')">
+            <div class="nav-icon">📁</div>
+            <div>Projects</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('suppliers')">
+            <div class="nav-icon">🏪</div>
+            <div>Suppliers</div>
+        </div>
+        <div class="nav-item" onclick="switchTab('saved')">
+            <div class="nav-icon">💾</div>
+            <div>Saved</div>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let projects = JSON.parse(localStorage.getItem('materialmate_projects')) || [];
+        let savedCalculations = JSON.parse(localStorage.getItem('materialmate_saved')) || [];
+
+        // Theme Management
+        function toggleTheme() {
+            const body = document.body;
+            const themeBtn = document.getElementById('theme-toggle');
+            
+            if (body.classList.contains('light-mode')) {
+                body.classList.remove('light-mode');
+                themeBtn.textContent = '🌙';
+                localStorage.setItem('materialmate_theme', 'dark');
+                showToast('🌙 Dark mode activated');
+            } else {
+                body.classList.add('light-mode');
+                themeBtn.textContent = '☀️';
+                localStorage.setItem('materialmate_theme', 'light');
+                showToast('☀️ Light mode activated');
+            }
         }
-    });
-</script>
-```
+
+        // Load saved theme on startup
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('materialmate_theme');
+            const themeBtn = document.getElementById('theme-toggle');
+            
+            if (savedTheme === 'light') {
+                document.body.classList.add('light-mode');
+                if (themeBtn) themeBtn.textContent = '☀️';
+            } else {
+                if (themeBtn) themeBtn.textContent = '🌙';
+            }
+        }
+
+        // Tab Switching
+        function switchTab(tabName) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelectorAll('.nav-item').forEach(nav => {
+                nav.classList.remove('active');
+            });
+
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
+            
+            // Update button states
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            tabButtons.forEach(btn => {
+                if (btn.textContent.toLowerCase().includes(tabName.slice(0, 4))) {
+                    btn.classList.add('active');
+                }
+            });
+
+            // Update nav states
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(nav => {
+                if (nav.textContent.toLowerCase().includes(tabName)) {
+                    nav.classList.add('active');
+                }
+            });
+
+            // Load data for specific tabs
+            if (tabName === 'projects') {
+                loadProjects();
+            } else if (tabName === 'saved') {
+                loadSavedCalculations();
+            }
+        }
+
+        // Toggle cost inputs
+        document.getElementById('terrazzo-cost').addEventListener('change', function() {
+            document.getElementById('terrazzo-cost-inputs').style.display = this.checked ? 'block' : 'none';
+        });
+
+        document.getElementById('concrete-cost').addEventListener('change', function() {
+            document.getElementById('concrete-cost-inputs').style.display = this.checked ? 'block' : 'none';
+        });
+
+        document.getElementById('paint-cost').addEventListener('change', function() {
+            document.getElementById('paint-cost-inputs').style.display = this.checked ? 'block' : 'none';
+        });
+
+        document.getElementById('tile-cost').addEventListener('change', function() {
+            document.getElementById('tile-cost-inputs').style.display = this.checked ? 'block' : 'none';
+        });
+
+        // Terrazzo Calculator
+        function calculateTerrazzo() {
+            const area = parseFloat(document.getElementById('terrazzo-area').value);
+            const thickness = parseFloat(document.getElementById('terrazzo-thickness').value);
+            const unit = document.getElementById('terrazzo-unit').value;
+            
+            if (!area || !thickness) {
+                showToast('Please enter area and thickness');
+                return;
+            }
+
+            // Convert to m² if needed
+            const areaM2 = unit === 'ft²' ? area * 0.092903 : area;
+            
+            // Calculate volume in liters (m² * mm thickness / 1000)
+            const volumeL = areaM2 * thickness / 1000 * 1000; // Convert to liters
+            
+            // Get mix ratio (default 40:45:10:5 = Resin:Chips:Powder:Pigment)
+            const resinPercent = 0.40;
+            const chipsPercent = 0.45;
+            const powderPercent = 0.10;
+            const pigmentPercent = 0.05;
+            
+            // Density: Epoxy ~1.1 kg/L, Stone ~1.5 kg/L, Powder ~1.2 kg/L
+            const totalWeight = volumeL * 1.3; // Average density
+            
+            const resinKg = (totalWeight * resinPercent).toFixed(2);
+            const chipsKg = (totalWeight * chipsPercent).toFixed(2);
+            const powderKg = (totalWeight * powderPercent).toFixed(2);
+            const pigmentKg = (totalWeight * pigmentPercent).toFixed(2);
+
+            let resultHTML = `
+                <div class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">Epoxy Resin + Hardener</span>
+                        <span class="result-value">${resinKg} kg</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Stone Chips (5-10mm)</span>
+                        <span class="result-value">${chipsKg} kg</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Powder Filler (CaCO₃)</span>
+                        <span class="result-value">${powderKg} kg</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Pigment</span>
+                        <span class="result-value">${pigmentKg} kg</span>
+                    </div>
+            `;
+
+            // Add cost if enabled
+            if (document.getElementById('terrazzo-cost').checked) {
+                const resinPrice = parseFloat(document.getElementById('terrazzo-resin-price').value) || 0;
+                const chipsPrice = parseFloat(document.getElementById('terrazzo-chips-price').value) || 0;
+                const powderPrice = parseFloat(document.getElementById('terrazzo-powder-price').value) || 0;
+
+                const totalCost = (resinKg * resinPrice) + (chipsKg * chipsPrice) + (powderKg * powderPrice);
+
+                resultHTML += `
+                    <div class="result-item">
+                        <span class="result-label">Total Material Cost</span>
+                        <span class="result-value">RM ${totalCost.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+
+            resultHTML += `</div>`;
+            
+            document.getElementById('terrazzo-result').innerHTML = resultHTML;
+            document.getElementById('terrazzo-result').style.display = 'block';
+
+            showToast('✅ Calculation complete!');
+        }
+
+        // Concrete Calculator
+        function calculateConcrete() {
+            const volume = parseFloat(document.getElementById('concrete-volume').value);
+            const unit = document.getElementById('concrete-unit').value;
+            const ratio = document.getElementById('concrete-ratio').value;
+
+            if (!volume) {
+                showToast('Please enter volume');
+                return;
+            }
+
+            // Convert to m³ if needed
+            const volumeM3 = unit === 'ft³' ? volume * 0.0283168 : volume;
+
+            // Parse ratio
+            const [cement, sand, aggregate] = ratio.split(':').map(Number);
+            const totalParts = cement + sand + aggregate;
+
+            // Calculate materials
+            const cementM3 = (volumeM3 * cement / totalParts);
+            const sandM3 = (volumeM3 * sand / totalParts);
+            const aggregateM3 = (volumeM3 * aggregate / totalParts);
+
+            // Convert cement to bags (1 bag = 50kg, 1m³ cement ≈ 1440 kg)
+            const cementBags = Math.ceil((cementM3 * 1440) / 50);
+            const waterL = (volumeM3 * 200).toFixed(0); // Approx 200L per m³
+
+            let resultHTML = `
+                <div class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">Cement</span>
+                        <span class="result-value">${cementBags} bags (50kg)</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Sand</span>
+                        <span class="result-value">${sandM3.toFixed(2)} m³</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Aggregate (Stone)</span>
+                        <span class="result-value">${aggregateM3.toFixed(2)} m³</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Water (approx)</span>
+                        <span class="result-value">${waterL} liters</span>
+                    </div>
+            `;
+
+            // Add cost if enabled
+            if (document.getElementById('concrete-cost').checked) {
+                const cementPrice = parseFloat(document.getElementById('concrete-cement-price').value) || 0;
+                const sandPrice = parseFloat(document.getElementById('concrete-sand-price').value) || 0;
+                const aggregatePrice = parseFloat(document.getElementById('concrete-aggregate-price').value) || 0;
+
+                const totalCost = (cementBags * cementPrice) + (sandM3 * sandPrice) + (aggregateM3 * aggregatePrice);
+
+                resultHTML += `
+                    <div class="result-item">
+                        <span class="result-label">Total Material Cost</span>
+                        <span class="result-value">RM ${totalCost.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+
+            resultHTML += `</div>`;
+
+            document.getElementById('concrete-result').innerHTML = resultHTML;
+            document.getElementById('concrete-result').style.display = 'block';
+
+            showToast('✅ Calculation complete!');
+        }
+
+        // Paint Calculator
+        function calculatePaint() {
+            const area = parseFloat(document.getElementById('paint-area').value);
+            const coats = parseFloat(document.getElementById('paint-coats').value);
+            const coverage = parseFloat(document.getElementById('paint-coverage').value);
+            const unit = document.getElementById('paint-unit').value;
+
+            if (!area || !coats || !coverage) {
+                showToast('Please fill all fields');
+                return;
+            }
+
+            // Convert to m² if needed
+            const areaM2 = unit === 'ft²' ? area * 0.092903 : area;
+
+            // Calculate paint needed
+            const totalArea = areaM2 * coats;
+            const litersNeeded = (totalArea / coverage).toFixed(2);
+            const gallonsNeeded = (litersNeeded / 3.78541).toFixed(2);
+
+            let resultHTML = `
+                <div class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">Paint Needed</span>
+                        <span class="result-value">${litersNeeded} liters</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Or in Gallons</span>
+                        <span class="result-value">${gallonsNeeded} gallons</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Total Coverage</span>
+                        <span class="result-value">${totalArea.toFixed(2)} m²</span>
+                    </div>
+            `;
+
+            // Add cost if enabled
+            if (document.getElementById('paint-cost').checked) {
+                const paintPrice = parseFloat(document.getElementById('paint-price').value) || 0;
+                const totalCost = litersNeeded * paintPrice;
+
+                resultHTML += `
+                    <div class="result-item">
+                        <span class="result-label">Total Material Cost</span>
+                        <span class="result-value">RM ${totalCost.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+
+            resultHTML += `</div>`;
+
+            document.getElementById('paint-result').innerHTML = resultHTML;
+            document.getElementById('paint-result').style.display = 'block';
+
+            showToast('✅ Calculation complete!');
+        }
+
+        // Tiles Calculator
+        function calculateTiles() {
+            const area = parseFloat(document.getElementById('tile-area').value);
+            const wastage = parseFloat(document.getElementById('tile-wastage').value) || 10;
+            const unit = document.getElementById('tile-unit').value;
+
+            if (!area) {
+                showToast('Please enter area');
+                return;
+            }
+
+            // Convert to m² if needed
+            const areaM2 = unit === 'ft²' ? area * 0.092903 : area;
+
+            // Add wastage
+            const totalArea = areaM2 * (1 + wastage / 100);
+
+            // Calculate boxes (assuming 1 box = 1.44 m² for 300x300)
+            const boxes = Math.ceil(totalArea / 1.44);
+
+            // Adhesive: ~5kg per m²
+            const adhesiveKg = (totalArea * 5).toFixed(0);
+            const adhesiveBags = Math.ceil(adhesiveKg / 20); // 20kg per bag
+
+            // Grout: ~0.5kg per m²
+            const groutKg = (totalArea * 0.5).toFixed(1);
+            const groutBags = Math.ceil(groutKg / 5); // 5kg per bag
+
+            let resultHTML = `
+                <div class="result-box">
+                    <div class="result-item">
+                        <span class="result-label">Tiles Needed</span>
+                        <span class="result-value">${totalArea.toFixed(2)} m²</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Boxes (approx)</span>
+                        <span class="result-value">${boxes} boxes</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Tile Adhesive</span>
+                        <span class="result-value">${adhesiveBags} bags (20kg)</span>
+                    </div>
+                    <div class="result-item">
+                        <span class="result-label">Grout</span>
+                        <span class="result-value">${groutBags} bags (5kg)</span>
+                    </div>
+            `;
+
+            // Add cost if enabled
+            if (document.getElementById('tile-cost').checked) {
+                const tilePrice = parseFloat(document.getElementById('tile-price').value) || 0;
+                const adhesivePrice = parseFloat(document.getElementById('tile-adhesive-price').value) || 0;
+                const groutPrice = parseFloat(document.getElementById('tile-grout-price').value) || 0;
+
+                const totalCost = (totalArea * tilePrice) + (adhesiveBags * adhesivePrice) + (groutBags * groutPrice);
+
+                resultHTML += `
+                    <div class="result-item">
+                        <span class="result-label">Total Material Cost</span>
+                        <span class="result-value">RM ${totalCost.toFixed(2)}</span>
+                    </div>
+                `;
+            }
+
+            resultHTML += `</div>`;
+
+            document.getElementById('tile-result').innerHTML = resultHTML;
+            document.getElementById('tile-result').style.display = 'block';
+
+            showToast('✅ Calculation complete!');
+        }
+
+        // Projects
+        function showNewProjectModal() {
+            document.getElementById('newProjectModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function createProject() {
+            const name = document.getElementById('new-project-name').value.trim();
+            const desc = document.getElementById('new-project-desc').value.trim();
+            const budget = parseFloat(document.getElementById('new-project-budget').value) || 0;
+
+            if (!name) {
+                showToast('Please enter project name');
+                return;
+            }
+
+            const project = {
+                id: Date.now(),
+                name: name,
+                description: desc,
+                budget: budget,
+                spent: 0,
+                createdAt: new Date().toISOString(),
+                calculations: []
+            };
+
+            projects.push(project);
+            localStorage.setItem('materialmate_projects', JSON.stringify(projects));
+
+            closeModal('newProjectModal');
+            loadProjects();
+            showToast('✅ Project created!');
+
+            // Clear form
+            document.getElementById('new-project-name').value = '';
+            document.getElementById('new-project-desc').value = '';
+            document.getElementById('new-project-budget').value = '';
+        }
+
+        function loadProjects() {
+            const container = document.getElementById('project-list');
+
+            if (projects.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📁</div>
+                        <div class="empty-text">No projects yet. Create your first project!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = projects.map(project => `
+                <div class="project-card" onclick="viewProject(${project.id})">
+                    <div class="project-info">
+                        <h4>${project.name}</h4>
+                        <p>${project.description || 'No description'}</p>
+                        <p style="margin-top: 8px; font-size: 12px;">Created ${new Date(project.createdAt).toLocaleDateString()}</p>
+                    </div>
+                    <div class="project-cost">
+                        RM ${project.spent.toFixed(0)}
+                        ${project.budget ? `<div style="font-size: 12px; color: var(--text-secondary);">/ ${project.budget}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewProject(id) {
+            showToast('Project details - Coming in next version!');
+        }
+
+        function loadSavedCalculations() {
+            const container = document.getElementById('saved-list');
+
+            if (savedCalculations.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">💾</div>
+                        <div class="empty-text">No saved calculations yet. Save a calculation to access it later!</div>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = savedCalculations.map((calc, index) => `
+                <div class="project-card">
+                    <div class="project-info">
+                        <h4>${calc.type}</h4>
+                        <p>${calc.description}</p>
+                    </div>
+                    <div class="project-cost">RM ${calc.cost || 0}</div>
+                </div>
+            `).join('');
+        }
+
+        // Settings
+        function showSettings() {
+            loadSettingsValues();
+            document.getElementById('settingsModal').classList.add('active');
+            calculateStorageUsed();
+        }
+
+        function loadSettingsValues() {
+            // Load all saved settings
+            document.getElementById('setting-theme').value = localStorage.getItem('materialmate_theme') || 'dark';
+            document.getElementById('setting-currency').value = localStorage.getItem('materialmate_currency') || 'RM';
+            document.getElementById('setting-area-unit').value = localStorage.getItem('materialmate_area_unit') || 'm²';
+            document.getElementById('setting-volume-unit').value = localStorage.getItem('materialmate_volume_unit') || 'm³';
+            document.getElementById('setting-wastage').value = localStorage.getItem('materialmate_wastage') || '10';
+            document.getElementById('setting-decimals').value = localStorage.getItem('materialmate_decimals') || '2';
+            document.getElementById('setting-auto-calc').checked = localStorage.getItem('materialmate_auto_calc') !== 'false';
+            document.getElementById('setting-auto-save').checked = localStorage.getItem('materialmate_auto_save') !== 'false';
+            document.getElementById('setting-compact').checked = localStorage.getItem('materialmate_compact') === 'true';
+            
+            // Load font size
+            const fontSize = localStorage.getItem('materialmate_font_size') || '16';
+            document.getElementById('font-size-slider').value = fontSize;
+            document.getElementById('font-size-display').textContent = fontSize + 'px';
+        }
+
+        // Font Size Control
+        function adjustFontSize(size) {
+            document.getElementById('font-size-display').textContent = size + 'px';
+            localStorage.setItem('materialmate_font_size', size);
+            
+            // Remove existing font classes
+            document.body.classList.remove('font-small', 'font-large', 'font-xlarge');
+            
+            // Apply appropriate class
+            if (size <= 14) {
+                document.body.classList.add('font-small');
+            } else if (size >= 18) {
+                document.body.classList.add('font-large');
+            } else if (size >= 20) {
+                document.body.classList.add('font-xlarge');
+            }
+            
+            // Update base font size
+            document.documentElement.style.fontSize = size + 'px';
+        }
+
+        // Theme Settings
+        function applyThemeSetting() {
+            const theme = document.getElementById('setting-theme').value;
+            localStorage.setItem('materialmate_theme', theme);
+            
+            if (theme === 'auto') {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                if (prefersDark) {
+                    document.body.classList.remove('light-mode');
+                    document.getElementById('theme-toggle').textContent = '🌙';
+                } else {
+                    document.body.classList.add('light-mode');
+                    document.getElementById('theme-toggle').textContent = '☀️';
+                }
+            } else if (theme === 'light') {
+                document.body.classList.add('light-mode');
+                document.getElementById('theme-toggle').textContent = '☀️';
+            } else {
+                document.body.classList.remove('light-mode');
+                document.getElementById('theme-toggle').textContent = '🌙';
+            }
+            
+            showToast('✅ Theme updated!');
+        }
+
+        // Compact Mode
+        function toggleCompactMode() {
+            const isCompact = document.getElementById('setting-compact').checked;
+            localStorage.setItem('materialmate_compact', isCompact);
+            
+            if (isCompact) {
+                document.body.classList.add('compact-mode');
+                showToast('✅ Compact mode enabled');
+            } else {
+                document.body.classList.remove('compact-mode');
+                showToast('✅ Compact mode disabled');
+            }
+        }
+
+        // Currency Settings
+        function saveCurrency() {
+            const currency = document.getElementById('setting-currency').value;
+            localStorage.setItem('materialmate_currency', currency);
+            showToast('✅ Currency set to ' + currency);
+        }
+
+        // Unit Settings
+        function saveAreaUnit() {
+            const unit = document.getElementById('setting-area-unit').value;
+            localStorage.setItem('materialmate_area_unit', unit);
+            showToast('✅ Area unit set to ' + unit);
+        }
+
+        function saveVolumeUnit() {
+            const unit = document.getElementById('setting-volume-unit').value;
+            localStorage.setItem('materialmate_volume_unit', unit);
+            showToast('✅ Volume unit set to ' + unit);
+        }
+
+        // Calculation Settings
+        function saveWastage() {
+            const wastage = document.getElementById('setting-wastage').value;
+            localStorage.setItem('materialmate_wastage', wastage);
+            showToast('✅ Default wastage set to ' + wastage + '%');
+        }
+
+        function saveDecimals() {
+            const decimals = document.getElementById('setting-decimals').value;
+            localStorage.setItem('materialmate_decimals', decimals);
+            showToast('✅ Decimal precision set to ' + decimals);
+        }
+
+        function saveAutoCalc() {
+            const autoCalc = document.getElementById('setting-auto-calc').checked;
+            localStorage.setItem('materialmate_auto_calc', autoCalc);
+            showToast(autoCalc ? '✅ Auto-calculate enabled' : '✅ Auto-calculate disabled');
+        }
+
+        function saveAutoSave() {
+            const autoSave = document.getElementById('setting-auto-save').checked;
+            localStorage.setItem('materialmate_auto_save', autoSave);
+            showToast(autoSave ? '✅ Auto-save enabled' : '✅ Auto-save disabled');
+        }
+
+        // Import Data
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    
+                    if (data.projects) {
+                        localStorage.setItem('materialmate_projects', JSON.stringify(data.projects));
+                        projects = data.projects;
+                    }
+                    
+                    if (data.saved) {
+                        localStorage.setItem('materialmate_saved', JSON.stringify(data.saved));
+                        savedCalculations = data.saved;
+                    }
+                    
+                    showToast('✅ Data imported successfully!');
+                    loadProjects();
+                    loadSavedCalculations();
+                } catch (error) {
+                    showToast('❌ Invalid backup file');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Clear All Data
+        function confirmClearData() {
+            if (confirm('⚠️ WARNING: This will delete ALL your projects, calculations, and settings. This cannot be undone!\n\nAre you absolutely sure?')) {
+                localStorage.clear();
+                showToast('✅ All data cleared');
+                setTimeout(() => {
+                    location.reload();
+                }, 1500);
+            }
+        }
+
+        // Calculate Storage Used
+        function calculateStorageUsed() {
+            let totalSize = 0;
+            for (let key in localStorage) {
+                if (localStorage.hasOwnProperty(key)) {
+                    totalSize += localStorage[key].length + key.length;
+                }
+            }
+            
+            const sizeKB = (totalSize / 1024).toFixed(2);
+            const sizeMB = (totalSize / (1024 * 1024)).toFixed(2);
+            
+            const storageInfo = document.getElementById('storage-info');
+            if (storageInfo) {
+                if (sizeMB >= 1) {
+                    storageInfo.textContent = sizeMB + ' MB';
+                } else {
+                    storageInfo.textContent = sizeKB + ' KB';
+                }
+            }
+        }
+
+        // Apply saved settings on load
+        function applyStoredSettings() {
+            // Font size
+            const fontSize = localStorage.getItem('materialmate_font_size') || '16';
+            adjustFontSize(fontSize);
+            
+            // Compact mode
+            if (localStorage.getItem('materialmate_compact') === 'true') {
+                document.body.classList.add('compact-mode');
+            }
+        }
+
+        // Export Data
+        function exportData() {
+            const data = {
+                projects: projects,
+                saved: savedCalculations,
+                exportDate: new Date().toISOString()
+            };
+
+            const dataStr = JSON.stringify(data, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `materialmate-backup-${Date.now()}.json`;
+            link.click();
+
+            showToast('✅ Data exported!');
+        }
+
+        // Toast Notification
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // PWA Install
+        let deferredPrompt;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showToast('💡 Add MaterialMate to your home screen!');
+        });
+
+        // Initialize
+        window.addEventListener('load', () => {
+            loadTheme();
+            applyStoredSettings();
+            
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('sw.js');
+            }
+        });
+    </script>
 
 </body>
 </html>
